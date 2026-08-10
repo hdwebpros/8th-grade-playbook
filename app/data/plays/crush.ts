@@ -155,7 +155,7 @@ const L_PIN_52: Action = {
   ],
 }
 
-/** 4-4: the read is the walked-up safety, so the wing runs wider before he pins. */
+/** 4-4: the read is the walked-up outside backer, so the wing runs wider before he pins. */
 const L_PIN_44: Action = {
   kind: 'run',
   path: [
@@ -204,7 +204,7 @@ const SKILL = {
  * out to the walked-up backer. The wing arcs all the way to the corner.
  */
 const vs44: FrontPlan = {
-  readKey: 'S-L',
+  readKey: 'O-L',
   actions: {
     ...SKILL,
     Y: block('E-L'),
@@ -224,7 +224,7 @@ const vs44: FrontPlan = {
     L: {
       rule: 'Tight off the read — pin the backer.',
       detail:
-        'Release outside and run straight past the read key (never touch him — he is the walked-up safety in this front), then whip back inside and pin the backer. You and the tackle are both on him: whoever gets there first takes him, the other one hits the next jersey that shows.',
+        'Release outside and run straight past the read key (never touch him — he is the walked-up outside backer in this front), then whip back inside and pin the backer. You and the tackle are both on him: whoever gets there first takes him, the other one hits the next jersey that shows.',
     },
     LT: {
       rule: 'Uncovered — step playside, climb to the backer.',
@@ -416,7 +416,7 @@ const assignments: Record<OffPosId, Assignment> = {
 
 const reviewNotes = [
   "CRUSH RUNS TO THE TIGHT END. Page 7 draws Crush out of Red going LEFT — to Y and the L wing — which is the opposite way from Veer out of the same formation. We ship it that way: Crush Red is left, Crush Black is right. Confirm you want it that way and not called to the split-end side.",
-  "THE READ. Crush is captioned OUTSIDE VEER, and the circled defender on page 7 is the end aligned OUTSIDE the tight end — one man wider than the circled end on the Veer page. So the rule we teach is: Crush reads the first man outside our tight end's block. Against our 5-2 that is the end (E), which is the literal scan picture. Against the 4-4 the end is head up on Y, so Y blocks him and the read becomes the walked-up backer (S). Against the 4-3 there is nobody walked up, so the read is the outside backer (B) at four and a half yards. Confirm the 4-4 and 4-3 keys — they are our football call, not something the scan draws.",
+  "THE READ. Crush is captioned OUTSIDE VEER, and the circled defender on page 7 is the end aligned OUTSIDE the tight end — one man wider than the circled end on the Veer page. So the rule we teach is: Crush reads the first man outside our tight end's block. Against our 5-2 that is the end (E), which is the literal scan picture. Against the 4-4 the end is head up on Y, so Y blocks him and the read becomes the walked-up outside backer (the Sam, or the Will when our strength is the other way). Against the 4-3 there is nobody walked up, so the read is the outside backer (B) at four and a half yards. Confirm the 4-4 and 4-3 keys — they are our football call, not something the scan draws.",
   "THE PLAYSIDE WING'S BLOCK — CHANGED. We used to arc him all the way to the corner. That was wrong. Page 5 writes the rule out: PSW — '1st: Tight off the Read Key to Pin LB. 2nd: If missed, hit near color.' And every drawing agrees: on the Crush panel his arrow runs up OUTSIDE the circled end, turns back INSIDE and caps a block bar in front of the playside backer — the same shape as the Speedo panel and both Veer panels on page 6. He now pins the backer vs the 5-2 and the 4-4. Vs the 4-3 the playside backer IS the read key, so he falls through to 'near color' and takes the corner.",
   "WHAT THAT COSTS. Pinning the backer means nobody blocks the playside corner or safety on the 5-2 and the 4-4 — the pitch has to beat them with speed. That is exactly what the varsity panel draws (its $ and its C are both unblocked). If you would rather the wing keep running to the corner and give up the pin, it is a one-line change per front.",
   "TWO MEN ON THE PLAYSIDE BACKER (5-2). The panel really does draw both the tight end climbing to him from the inside and the wing pinning him from the outside, the same way it draws the center and playside guard both on the nose. We coded it that way. Teach it as 'first one there takes him, the other takes the next color' — that is the second half of the wing's own rule.",

@@ -17,6 +17,7 @@ import type {
   Front,
   Pt,
 } from '~/types/football'
+import { labelledDefenders } from '~/utils/defense'
 import { fitViewBox, U } from './geometry'
 import { C, DIM, M } from './style'
 import DiagramField from './DiagramField.vue'
@@ -42,7 +43,11 @@ const emit = defineEmits<{ select: [pos: OffPosId | null] }>()
 
 const plan = computed(() => props.play.vs[props.front])
 
-const defenders = computed<Defender[]>(() => props.fronts[props.front]?.defenders ?? [])
+/* Letters like W/S and F/$ are named off the offense's strength, so they're
+   resolved against this formation rather than read straight off the front. */
+const defenders = computed<Defender[]>(() =>
+  labelledDefenders(props.fronts[props.front], props.formation),
+)
 
 const defenderById = computed(() => {
   const m = new Map<string, Defender>()

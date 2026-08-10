@@ -31,20 +31,30 @@
  * digit is always X's and the second digit is always R's. In Black it is the
  * mirror: X is still the outside man, and the left wing (L) is inside him.
  *
- * Two digits, two receivers. That is the whole trick — once a kid knows the
- * tree he can run a call he has never heard before.
- *
- * WHY ONLY TWO DIGITS
+ * WHO CARRIES A DIGIT TODAY
  * ---------------------------------------------------------------------------
- * Varsity p16/p18 label their panels "(x2) - 12, (x3) - 112" — two digits for
- * a two-receiver surface, three for a three-receiver surface. Out of Red and
- * Black we only ever have a two-receiver surface, so our calls are always two
- * digits. The other side of the ball is not called; it is a standing rule:
- *   - Y (tight end) protects. That is a zero, and it is why 0 is on the tree.
- *   - The backside wing has one job that depends on the protection —
- *     on DROPBACK he arcs out to the backside flat as the checkdown
- *     (drawn in black on p16), on SPRINT he runs the 7 to carry the safety
- *     away from the throw (drawn in orange on p18).
+ * As the system stands, the digits go to three men: the split end and the two
+ * wings. Y, the tight end, is a zero on the calls we have — which is part of
+ * why 0 is on the tree at all.
+ *
+ * OPEN: we are exploring how to call the Y to a route in this audible system.
+ * It may be a fourth number. Awaiting confirmation, so nothing here sends him
+ * out yet.
+ *
+ * TWO DIGITS, OR THREE
+ * ---------------------------------------------------------------------------
+ * Varsity p16/p18 label their panels "(x2) - 12, (x3) - 112" — a digit per
+ * receiver on the surface. Our normal call is TWO digits, and then the
+ * backside wing has a standing rule: he runs a 2, a speed out, the OPPOSITE
+ * way. Call a THIRD digit and that rule is off — the third digit is his, and
+ * he runs it off his own side.
+ *
+ * THE DASH TAG
+ * ---------------------------------------------------------------------------
+ * "Dash" rides after the protection word — Red Ram Dash 33. It means Super
+ * does not block: he releases out of the backfield to the flat on the
+ * SPLIT-END side, the same side the digits are on. It works on either
+ * protection, and it trades a blocker for a fourth target.
  *
  * THE PROTECTIONS
  * ---------------------------------------------------------------------------
@@ -69,7 +79,7 @@
  *                     is. (varsity p16, panel "(x2) - 33")
  *   Red Ram 12      — dropback, two digits that work together: the slant runs
  *                     in behind the out. (varsity p16, panel "(x2) - 12")
- *   Red Sprint Rt 54 — the book's own printed example: "Red - Sprint Rt 54 —
+ *   Red Sprint Right 54 — the book's own printed example: "Red - Sprint Rt 54 —
  *                     Reach To The Right — 54 = WR Curl, Wing Wheel."
  *                     (varsity p17 text, drawn on p18 panel "(x2) - 54")
  *
@@ -234,6 +244,30 @@ const S_RAM_52: Action[] = [
   { kind: 'block', targetId: 'E-R' },
 ]
 
+/**
+ * DASH — the tag that takes Super out of the protection.
+ *
+ * Coach Ryan's term: on Dash, Super does not block anybody. He releases out of
+ * the backfield toward the SPLIT-END side (the side the digits are on, right
+ * out of Red) and shows up in the flat. It is a route, not a block, so the
+ * diagram draws him as a receiver.
+ *
+ * This works on either protection. It costs us the blocker Super would have
+ * been — off the away tackle's hip on a dropback, or the playside edge on a
+ * sprint — which is the trade the quarterback has to know he is making.
+ */
+const S_DASH: Action[] = [
+  {
+    kind: 'route',
+    path: [
+      { x: 2.6, y: -4.2 },
+      { x: 5.6, y: -3.1 },
+      { x: 8.6, y: -1 },
+      { x: 10.2, y: 2 },
+    ],
+  },
+]
+
 /** Sprint Super, p17: out of the backfield, flat to the call side, block the playside edge. */
 const sprintSuper = (edgeId: string): Action[] => [
   { kind: 'run', path: [{ x: 2.5, y: -4.2 }, { x: 4.6, y: -3.3 }] },
@@ -265,23 +299,18 @@ const Q_SPRINT: Action[] = [
 ]
 
 // ---------------------------------------------------------------------------
-// The backside wing — not called by the digits, a standing rule.
+// The backside wing — a standing rule when the call is only two digits.
 // ---------------------------------------------------------------------------
 
-/** Dropback (p16): arc out of the backfield to the backside flat, checkdown. */
-const L_CHECK_FLAT: Action[] = [
-  {
-    kind: 'route',
-    path: [
-      { x: -7.6, y: -0.6 },
-      { x: -9.8, y: 1.2 },
-      { x: -11, y: 3 },
-    ],
-  },
-]
-
-/** Sprint (p18): run the 7 and carry the safety away from the throw. */
-const L_BACKSIDE_POST: Action[] = routeOn(7, AT_L, -1)
+/**
+ * Coach Ryan's rule: the wing away from the action runs a 2 — a speed out, the
+ * OPPOSITE way — whenever the call is two digits. He is the outside man on his
+ * own side (only Y is inside him), so unlike the called wing he has no ground
+ * to make up sideways; the route runs at its tree width.
+ *
+ * If a THIRD digit is called it is his, and it replaces this.
+ */
+const L_BACKSIDE_OUT: Action[] = routeOn(2, AT_L, -1)
 
 // ---------------------------------------------------------------------------
 // Assignment text — the front-independent teaching table.
@@ -293,7 +322,7 @@ const a = (rule: string, detail: string): Assignment => ({ rule, detail })
 const DROPBACK_JOBS = {
   Y: a(
     'Zero — block. You have the end on your side.',
-    "The call only has two digits and neither one is yours, so yours is a zero: don't release. Inside foot back, take the end outside our tackle and ride him past the quarterback. If he tries to cross your face, you have him — never let him inside.",
+    "On the calls we have, the digits go to the split end and the two wings, so yours is a zero: stay in and block. Inside foot back, take the end outside our tackle and ride him past the quarterback. If he tries to cross your face, you have him — never let him inside. (We are working on a way to call you to a route in this system, maybe as a fourth number — until that is confirmed, block.)",
   ),
   LT: a(
     'Ram — slide toward the split end. Block the man in your gap on the slide side.',
@@ -324,8 +353,8 @@ const DROPBACK_JOBS = {
     'Straight back off the midline, five steps, ball at your chest. The call tells you where to look: the first digit is X and the second is the wing, and you work outside-to-in exactly the way the call is said. Feet set on the last step, then throw.',
   ),
   L: a(
-    'Backside wing — arc out to the flat. You are the checkdown.',
-    'Nobody called a digit for you. Release out of the backfield, arc to about three yards deep in the backside flat, and turn your numbers to the quarterback. If everything downfield is covered, you are the ball.',
+    'Backside wing — two digits called, so you run the 2. Speed out, AWAY.',
+    'Nobody said a third number, so you have the standing rule: a speed out the OPPOSITE way from the call. Five yards, roll your shoulders, break flat for YOUR sideline. You are the outlet if the quarterback comes off the digits, and you pull a defender away from them either way.',
   ),
 } satisfies Partial<Record<OffPosId, Assignment>>
 
@@ -333,7 +362,7 @@ const DROPBACK_JOBS = {
 const SPRINT_JOBS = {
   Y: a(
     'Zero — block. You have the end on your side.',
-    'No digit for you, so it is a zero. You are the back side of a sprint: the quarterback is running away from you, so all you have to do is keep the end from chasing him down. Get your hat across him and stay on your feet.',
+    'No digit for you on this call, so it is a zero — a route for the Y is still being worked out. You are the back side of a sprint: the quarterback is running away from you, so all you have to do is keep the end from chasing him down. Get your hat across him and stay on your feet.',
   ),
   LT: a(
     'Sprint — REACH to the call side. Block the man in your gap that way.',
@@ -364,8 +393,8 @@ const SPRINT_JOBS = {
     "Open to the call side, get depth on your first three steps so you clear the tackle, then flatten out and run downhill at the sideline. Shoulders square to where you are throwing. Work outside-to-in through the digits, and if it is not there, run — a sprint-out quarterback who tucks it is not a mistake.",
   ),
   L: a(
-    'Backside wing — run the 7 (post).',
-    'No digit for you, but you are not decoration: run a post from the back side and take the free safety with you. If he stays in the middle you have made room for the whole call. If he chases you, the quarterback throws it under him.',
+    'Backside wing — two digits called, so you run the 2. Speed out, AWAY.',
+    'Same standing rule as any two-digit call: speed out the OPPOSITE way from the sprint. Five yards, break flat for YOUR sideline. The quarterback is running away from you, so you are the throwback — get your eyes back to him the second you break and stay alive.',
   ),
 } satisfies Partial<Record<OffPosId, Assignment>>
 
@@ -416,54 +445,44 @@ const S_52_DROPBACK_ASSIGNMENT: Assignment = a(
 // Front plan builders
 // ---------------------------------------------------------------------------
 
-/** Skill actions = the two called digits + the backside wing. */
+/** Skill actions = the called digits + the backside wing. */
 type Skill = Partial<Record<OffPosId, Action[]>>
 
-function dropbackPlans(skill: Skill): Record<FrontId, FrontPlan> {
+/**
+ * On Dash, Super is a receiver on every front, so the per-front Super rules
+ * (the hip, the 5-2 end, the playside edge) do not apply and neither does the
+ * 5-2 Super assignment override.
+ */
+function dropbackPlans(skill: Skill, dash: boolean): Record<FrontId, FrontPlan> {
   return {
     '44': {
-      actions: { ...LINE['44'], ...skill, L: L_CHECK_FLAT, S: S_RAM_HIP, Q: Q_DROP },
+      actions: { ...LINE['44'], ...skill, S: dash ? S_DASH : S_RAM_HIP, Q: Q_DROP },
     },
     '43': {
-      actions: { ...LINE['43'], ...skill, L: L_CHECK_FLAT, S: S_RAM_HIP, Q: Q_DROP },
+      actions: { ...LINE['43'], ...skill, S: dash ? S_DASH : S_RAM_HIP, Q: Q_DROP },
       assignments: { ...OVERRIDES_43 },
     },
     '52': {
-      actions: { ...LINE['52'], ...skill, L: L_CHECK_FLAT, S: S_RAM_52, Q: Q_DROP },
-      assignments: { ...OVERRIDES_52, S: S_52_DROPBACK_ASSIGNMENT },
+      actions: { ...LINE['52'], ...skill, S: dash ? S_DASH : S_RAM_52, Q: Q_DROP },
+      assignments: dash
+        ? { ...OVERRIDES_52 }
+        : { ...OVERRIDES_52, S: S_52_DROPBACK_ASSIGNMENT },
     },
   }
 }
 
-function sprintPlans(skill: Skill): Record<FrontId, FrontPlan> {
+function sprintPlans(skill: Skill, dash: boolean): Record<FrontId, FrontPlan> {
+  const superOn = (edgeId: string) => (dash ? S_DASH : sprintSuper(edgeId))
   return {
     '44': {
-      actions: {
-        ...LINE['44'],
-        ...skill,
-        L: L_BACKSIDE_POST,
-        S: sprintSuper('S-R'),
-        Q: Q_SPRINT,
-      },
+      actions: { ...LINE['44'], ...skill, S: superOn('O-R'), Q: Q_SPRINT },
     },
     '43': {
-      actions: {
-        ...LINE['43'],
-        ...skill,
-        L: L_BACKSIDE_POST,
-        S: sprintSuper('B-R'),
-        Q: Q_SPRINT,
-      },
+      actions: { ...LINE['43'], ...skill, S: superOn('B-R'), Q: Q_SPRINT },
       assignments: { ...OVERRIDES_43 },
     },
     '52': {
-      actions: {
-        ...LINE['52'],
-        ...skill,
-        L: L_BACKSIDE_POST,
-        S: sprintSuper('E-R'),
-        Q: Q_SPRINT,
-      },
+      actions: { ...LINE['52'], ...skill, S: superOn('E-R'), Q: Q_SPRINT },
       assignments: { ...OVERRIDES_52 },
     },
   }
@@ -475,17 +494,18 @@ function sprintPlans(skill: Skill): Record<FrontId, FrontPlan> {
 
 const sharedReviewNotes = [
   'DIGIT ORDER — confirmed off the scans, not assumed. p18 panel "(x3) - 542" draws the split end on a curl, the next man in on a wheel, and the innermost on a speed out, in that order right-to-left from the sideline. p16 panel "(x2) - 92" draws the split end on a fade and the man inside him on a speed out. Outside-to-in on the split-end side is what the book actually draws.',
-  'TWO DIGITS ONLY — varsity calls two digits for a two-receiver surface and three for a three-receiver surface. Red and Black only ever give us a two-receiver surface, so our calls are always exactly two digits: X first, wing second. Confirm you want it stated that flatly to the kids.',
-  'THE UNCALLED SIDE — the scans never write a rule for Y or the backside wing, they just draw them. Y is drawn with no route in every dropback and sprint panel, so he is written here as a zero (block). The backside wing IS drawn: on p16 (dropback) he has a black arc out to the backside flat, on p18 (sprint) he has an orange vertical that breaks inside. Those are transcribed literally as "checkdown to the flat" and "run the 7". Please confirm those are standing rules and not just what happened to be drawn on those pages.',
+  'TWO DIGITS OR THREE — the normal call is two digits, X first and the wing inside him second. A third digit belongs to the BACKSIDE wing and cancels his standing out. That is Coach Ryan\'s rule, given directly, and it is what the caller on /audible now offers.',
+  'THE Y IS AN OPEN QUESTION — on every dropback and sprint panel in the scans the tight end is drawn with no route, so as it stands the digits belong to the split end and the two wings and Y is a zero. We are exploring how to call the Y to a route in this audible system; it may be the fourth number. Awaiting confirmation, so nothing in here releases him yet — say the word and we will wire it up.',
+  "THE BACKSIDE WING'S STANDING RULE IS A 2 — Coach Ryan's rule: on a two-digit call the wing away from the action runs a speed out the OPPOSITE way, on both protections. That REPLACES what the scans happened to draw (p16 had him arcing to the backside flat on dropback, p18 had him on a post under sprint) — the coach's standing rule wins over one drawn panel. His out runs at tree width, not the stretched width the called wing uses, because he is already the outside man on his side.",
+  'DASH — Coach Ryan\'s term, not in the scans. "Dash" after the protection word means Super releases instead of blocking and goes to the flat on the SPLIT-END side — the side the digits are on. It is offered on both dropback and sprint. On dropback that gives up the away-tackle hip; on sprint it gives up the playside edge, so the quarterback has no edge blocker and has to know it. The flat landmark drawn here (about 10 yards out, 2 yards past the line) is authored — say the word if you want him flatter, deeper, or checking release first.',
   'RAM vs BULL DIRECTION — p15 is one picture titled "RAM / BULL". The drawn arrows all cap about half a man to the LEFT of each lineman and Super\'s arrow runs up-and-RIGHT to a bar on the inside hip of the right tackle, so the picture as drawn is BULL (slide left, Super off the hip of the tackle away). We slide TOWARD the split-end side so the free edge is always on the tight end\'s side where Y is standing — that makes Red = Ram and Black = Bull, and it makes p15\'s drawn picture literally our Black dropback. If you would rather always slide away from the throw, say so and both dropback plays flip.',
   "SUPER'S DROPBACK BAR — on p15 Super's block bar sits BETWEEN the away guard and the away tackle and behind the line, not outside the tackle. That is transcribed as drawn: he sets at the away tackle's inside hip at depth. It is written as a set-step block rather than a block on a named defender, because in an even front nobody is standing there pre-snap.",
-  'SLIDE vs REACH TARGETS — Ram (slide right) and Sprint Rt (reach right) give the linemen the SAME gaps; the difference on p15 vs p17 is technique and Super\'s job. So one line map serves both protections in this file. Flag it if you teach different gap ownership for the two.',
+  'SLIDE vs REACH TARGETS — Ram (slide right) and Sprint Right (reach right) give the linemen the SAME gaps; the difference on p15 vs p17 is technique and Super\'s job. So one line map serves both protections in this file. Flag it if you teach different gap ownership for the two.',
   'VS THE 5-2 THE PROTECTION IS A DIFFERENT PICTURE — five down men means there is no empty gap to slide into, so the protection becomes man-on: Y has the end, both tackles have the man on their nose, the center has the nose guard, and the two uncovered guards climb to the two backers. On DROPBACK that leaves Super with the end on the split-end side instead of a hip (the p15 rule cannot be run against this front). On SPRINT he still has the playside edge, which against a 5-2 is that same end. This is the biggest front-driven change in the file — please eyeball the 5-2 diagrams first.',
   'THE PLAYSIDE EDGE, BY FRONT — p17 says "SUPER: PLAYSIDE EDGE" without naming anybody. Resolved here as the outermost rusher on the call side: the walked-up backer in the 4-4, the Sam in the 4-3, the end in the 5-2. Confirm.',
   "THE QUARTERBACK'S PATH IS NOT DRAWN ON p15 OR p16 — the dropback panels show him as a circle with no line. The five-step drop here is authored, not transcribed. The SPRINT path IS drawn (p18, the long black arrow that dips behind Super and then runs flat toward the sideline) and follows p17's words, \"Gain Depth — Sprint Downhill Toward Sideline.\"",
   "WING ROUTE WIDTH — the wing lines up eight yards inside the split end, so his out and his wheel have to cover more ground sideways to finish at the same spot on the field. The route paths here stretch that lateral distance (and only the lateral distance — every depth and every break point comes straight out of app/data/routes.ts). That is what the scans draw: on p16 \"12\" the wing's out finishes outside the split end's alignment, and on p18 \"54\" the wheel turns up outside the curl.",
   'WING WIDTH FOR THE ROUTES THE SCANS NEVER DREW — /audible lets a kid call any two digits, which means the wing can be sent on routes varsity never drew for him. Only the 2 (off p16) and the 4 (off p18) are measured; the 6, 8 and 9 are stretched by an estimated amount so a called audible draws something honest, and the inside-breaking routes (1, 3, 5, 7) are not stretched at all. Those three estimates are the numbers to eyeball.',
-  'BACKSIDE POST DEPTH — p18 draws the backside wing\'s post breaking at about five yards and finishing about thirteen. Our route tree (p14, app/data/routes.ts) puts the post\'s break at fifteen. The tree wins here so the kid learns one 7, but the scan\'s version is shallower. Say the word and we can add a shallow tag.',
   'THE VARSITY DROPBACK AND SPRINT PAGES ARE DRAWN IN SPREAD SETS — p16 and p18 use 2x2 and 3x1 out of Twins/Spread/Over/Trips, all of which are cut from our book. Only the ROUTE CONCEPTS and the numbering are transcribed from them; the alignments are our Red and Black from p1, and the protections come from p15 and p17.',
 ]
 
@@ -499,13 +519,22 @@ export type Protection = 'dropback' | 'sprint'
 export type Digit = number
 
 /**
- * A call: which protection, and the two digits read outside-to-in on the
- * split-end side. `outside` is always X's; `inside` is always the wing's.
+ * A call: which protection, and the digits read outside-to-in on the
+ * split-end side. `outside` is always X's; `inside` is always the called
+ * wing's; the optional third digit is the BACKSIDE wing's.
+ *
+ * Two digits is the normal call — the backside wing then has his standing
+ * rule, a speed out away. Say a third digit and you have bought him a route.
+ * Y never has one either way.
  */
 export interface AudibleCall {
   protection: Protection
   outside: Digit
   inside: Digit
+  /** Optional third digit — the backside wing's route. */
+  backside?: Digit
+  /** "Dash": Super releases to the split-end-side flat instead of blocking. */
+  dash?: boolean
 }
 
 /** Hand-written prose the generic builder cannot know. Optional. */
@@ -519,16 +548,18 @@ export interface AudibleAuthoring {
 
 export const PROTECTION_LABELS: Record<Protection, Record<'red' | 'black', string>> = {
   dropback: { red: 'Ram', black: 'Bull' },
-  sprint: { red: 'Sprint Rt', black: 'Sprint Lt' },
+  sprint: { red: 'Sprint Right', black: 'Sprint Left' },
 }
 
-/** "33", "54" — the digits as they are said in the huddle. */
-export const digitsOf = (call: AudibleCall): string => `${call.outside}${call.inside}`
+/** "33", "54", "542" — the digits as they are said in the huddle. */
+export const digitsOf = (call: AudibleCall): string =>
+  `${call.outside}${call.inside}${call.backside ?? ''}`
 
-/** "Red Ram 33", "Black Sprint Lt 54". */
+/** "Red Ram 33", "Black Sprint Left Dash 54". Dash rides after the protection. */
 export function callNameOf(call: AudibleCall, formation: 'red' | 'black'): string {
   const form = formation === 'red' ? 'Red' : 'Black'
-  return `${form} ${PROTECTION_LABELS[call.protection][formation]} ${digitsOf(call)}`
+  const tag = call.dash ? ' Dash' : ''
+  return `${form} ${PROTECTION_LABELS[call.protection][formation]}${tag} ${digitsOf(call)}`
 }
 
 const routeNameOf = (num: Digit): string => ROUTE_BY_NUM.get(num)?.name ?? `Route ${num}`
@@ -540,7 +571,7 @@ const routeDetailOf = (num: Digit): string => ROUTE_BY_NUM.get(num)?.description
  * the top.
  */
 function digitAssignments(call: AudibleCall): Partial<Record<OffPosId, Assignment>> {
-  return {
+  const jobs: Partial<Record<OffPosId, Assignment>> = {
     X: a(
       `First digit: ${call.outside} — ${routeNameOf(call.outside).toLowerCase()}.`,
       `You are the outside man on the split-end side, so the FIRST digit is always yours. ${routeDetailOf(call.outside)}`,
@@ -550,21 +581,48 @@ function digitAssignments(call: AudibleCall): Partial<Record<OffPosId, Assignmen
       `You are the inside man, so you get the SECOND digit. ${routeDetailOf(call.inside)}`,
     ),
   }
+
+  // A third digit buys the backside wing a route and cancels his standing out.
+  if (call.backside !== undefined) {
+    jobs.L = a(
+      `Third digit: ${call.backside} — ${routeNameOf(call.backside).toLowerCase()}.`,
+      `Three numbers were called, so the last one is yours and you do NOT run your standing out. Run it off your own side. ${routeDetailOf(call.backside)}`,
+    )
+  }
+
+  if (call.dash) {
+    jobs.S = a(
+      'DASH — you are not blocking. Release to the flat on the split-end side.',
+      'Dash means you leave the backfield. Get out toward the same side the digits are on and get to about three yards deep in the flat, numbers back to the quarterback. Nobody is blocking your gap now, so RUN — the sooner you are a target, the sooner the ball can come out.',
+    )
+  }
+
+  return jobs
 }
 
 /** The generic, no-prose description of a call — used when nothing is authored. */
 function describeCall(call: AudibleCall, formation: 'red' | 'black'): string {
   const wing = formation === 'red' ? 'the right wing' : 'the left wing'
+  const backWing = formation === 'red' ? 'the left wing' : 'the right wing'
   const side = formation === 'red' ? 'RIGHT' : 'LEFT'
+  const superJob = call.dash
+    ? `sends Super out of the backfield to the ${side} flat — "Dash" means he releases instead of blocking`
+    : call.protection === 'dropback'
+      ? 'sets Super off the inside hip of the tackle away from the slide'
+      : 'sends Super to block the playside edge'
   const prot =
     call.protection === 'dropback'
-      ? `"${PROTECTION_LABELS.dropback[formation]}" slides the line ${side} and sets Super off the inside hip of the tackle away from the slide, and the quarterback takes a five-step drop`
-      : `"${PROTECTION_LABELS.sprint[formation]}" reaches the line ${side}, sends Super to block the playside edge, and sprints the quarterback downhill toward that sideline`
+      ? `"${PROTECTION_LABELS.dropback[formation]}" slides the line ${side}, ${superJob}, and the quarterback takes a five-step drop`
+      : `"${PROTECTION_LABELS.sprint[formation]}" reaches the line ${side}, ${superJob}, and sprints the quarterback downhill toward that sideline`
+  const backside =
+    call.backside === undefined
+      ? `${backWing} runs his standing rule — a 2, speed out, the opposite way`
+      : `the third digit, the ${call.backside}, belongs to ${backWing}, so he runs a ${routeNameOf(call.backside).toLowerCase()} off his own side instead of his standing out`
   return (
     `${callNameOf(call, formation)}. ${prot}. ` +
     `Then the digits, read outside-to-in on the split-end side: the ${call.outside} belongs to X, the outside man, ` +
     `so he runs a ${routeNameOf(call.outside).toLowerCase()}; the ${call.inside} belongs to ${wing}, the man inside him, ` +
-    `so he runs a ${routeNameOf(call.inside).toLowerCase()}. Y blocks, and the backside wing runs his standing rule.`
+    `so he runs a ${routeNameOf(call.inside).toLowerCase()}. Y blocks on this call — a way to send him on a route is still being worked out — and ${backside}.`
   )
 }
 
@@ -576,6 +634,9 @@ function buildAudibleRed(call: AudibleCall, authoring: AudibleAuthoring = {}): P
   const skill: Skill = {
     X: routeOn(call.outside, AT_X, 1),
     R: routeOn(call.inside, AT_R, 1, WING_WIDEN[call.inside] ?? 1),
+    // The backside wing is the outside man on his own side, so his routes run
+    // at tree width — no stretch, unlike the called wing inside the split end.
+    L: call.backside === undefined ? L_BACKSIDE_OUT : routeOn(call.backside, AT_L, -1),
   }
 
   const base = call.protection === 'dropback' ? DROPBACK_JOBS : SPRINT_JOBS
@@ -587,8 +648,8 @@ function buildAudibleRed(call: AudibleCall, authoring: AudibleAuthoring = {}): P
   } as Record<OffPosId, Assignment>
 
   return {
-    id: authoring.id ?? `audible-${call.protection}-${digitsOf(call)}-red`,
-    name: `Audible ${digitsOf(call)}`,
+    id: authoring.id ?? `audible-${call.protection}${call.dash ? '-dash' : ''}-${digitsOf(call)}-red`,
+    name: `Audible ${call.dash ? 'Dash ' : ''}${digitsOf(call)}`,
     callName: callNameOf(call, 'red'),
     family: 'pass',
     formation: 'red',
@@ -596,7 +657,10 @@ function buildAudibleRed(call: AudibleCall, authoring: AudibleAuthoring = {}): P
     ballCarrier: 'Q',
     description: authoring.description ?? describeCall(call, 'red'),
     assignments,
-    vs: call.protection === 'dropback' ? dropbackPlans(skill) : sprintPlans(skill),
+    vs:
+      call.protection === 'dropback'
+        ? dropbackPlans(skill, call.dash === true)
+        : sprintPlans(skill, call.dash === true),
     reviewNotes: authoring.reviewNotes ?? sharedReviewNotes,
   }
 }
@@ -608,7 +672,7 @@ function buildAudibleRed(call: AudibleCall, authoring: AudibleAuthoring = {}): P
  * Black is generated by mirroring Red — our three fronts are left/right
  * symmetric and varsity p1 draws Black as an exact mirror — so the only
  * things that change by hand are the id, the protection WORD (Ram/Bull,
- * Sprint Rt/Sprint Lt name directions, not sides of a play) and the prose.
+ * Sprint Right/Sprint Left name directions, not sides of a play) and the prose.
  */
 export function buildAudible(
   call: AudibleCall,
@@ -624,7 +688,7 @@ export function buildAudible(
       blackAuthoring.id ??
       (authoring.id
         ? authoring.id.replace(/-red$/, '-black')
-        : `audible-${call.protection}-${digitsOf(call)}-black`),
+        : `audible-${call.protection}${call.dash ? '-dash' : ''}-${digitsOf(call)}-black`),
     callName: callNameOf(call, 'black'),
     formation: 'black' as FormationId,
     description: blackAuthoring.description ?? describeCall(call, 'black'),
@@ -669,7 +733,7 @@ const audible33 = example(
   {
     id: 'audible-33-red',
     description:
-      'The easiest call in the system, and the one to learn it on. "Red" is the formation. "Ram" is the protection — the line slides RIGHT and Super sets off the inside hip of the LEFT tackle, the tackle away from the slide. Then the digits, read outside-to-in on the split-end side: the FIRST 3 belongs to X, the outside man, and the SECOND 3 belongs to R, the wing inside him. Three on the tree is a hitch, so both of them run one — six yards, stop, come back. Y blocks and the backside wing arcs to the flat as the checkdown. Two receivers, two digits, ball out in three steps.',
+      'The easiest call in the system, and the one to learn it on. "Red" is the formation. "Ram" is the protection — the line slides RIGHT and Super sets off the inside hip of the LEFT tackle, the tackle away from the slide. Then the digits, read outside-to-in on the split-end side: the FIRST 3 belongs to X, the outside man, and the SECOND 3 belongs to R, the wing inside him. Three on the tree is a hitch, so both of them run one — six yards, stop, come back. Y blocks, like he does on every pass call, and the backside wing runs his standing rule — a 2, speed out the other way. Two digits, ball out in three steps.',
     assignments: {
       X: a(
         'First digit: 3 — hitch.',
@@ -738,14 +802,14 @@ const audible12 = example(
   },
 )
 
-/** 3 — RED SPRINT RT 54 · the book's own printed example. */
+/** 3 — RED SPRINT RIGHT 54 · the book's own printed example. */
 const audible54 = example(
   { protection: 'sprint', outside: 5, inside: 4 },
   "The book's own printed example: curl and wheel off a sprint.",
   {
     id: 'audible-54-red',
     description:
-      'This is the call varsity prints in their own book as the example, word for word: "Red — Sprint Rt 54 — Reach To The Right — 54 = WR Curl, Wing Wheel." Take it apart. "Red" is the formation. "Sprint Rt" is the protection and the quarterback\'s path — every lineman REACHES to the right and Super comes out of the backfield to block the playside edge, while the quarterback gains depth and then sprints downhill toward the sideline. Then the digits, outside-to-in on the split-end side: 5 is X\'s, so the outside man runs a CURL; 4 is R\'s, so the wing runs a WHEEL up the sideline behind him. Same two digits, same reading order as a dropback call — only the protection word changed.',
+      'This is the call varsity prints in their own book as the example, word for word: "Red — Sprint Rt 54 — Reach To The Right — 54 = WR Curl, Wing Wheel." Take it apart — and note that we say it spelled out, "Sprint Right", not "Sprint Rt". "Red" is the formation. "Sprint Right" is the protection and the quarterback\'s path — every lineman REACHES to the right and Super comes out of the backfield to block the playside edge, while the quarterback gains depth and then sprints downhill toward the sideline. Then the digits, outside-to-in on the split-end side: 5 is X\'s, so the outside man runs a CURL; 4 is R\'s, so the wing runs a WHEEL up the sideline behind him. Same two digits, same reading order as a dropback call — only the protection word changed.',
     assignments: {
       X: a(
         'First digit: 5 — curl.',
@@ -772,9 +836,9 @@ const audible54 = example(
   {
     id: 'audible-54-black',
     description:
-      'Fifty-four to the left. Black puts the split end on the left, so "Sprint Lt" — reach to the LEFT, Super to the left edge, quarterback sprints left. The digits are untouched: 5 is still X\'s curl because he is still the outside man, 4 is still the wing\'s wheel because he is still the man inside. That is the point of the system — the numbers never change sides, only the direction word does.',
+      'Fifty-four to the left. Black puts the split end on the left, so "Sprint Left" — reach to the LEFT, Super to the left edge, quarterback sprints left. The digits are untouched: 5 is still X\'s curl because he is still the outside man, 4 is still the wing\'s wheel because he is still the man inside. That is the point of the system — the numbers never change sides, only the direction word does.',
     reviewNotes: [
-      'Generated by mirroring Red Sprint Rt 54 with no hand corrections. "Sprint Rt" becomes "Sprint Lt"; the digits are unchanged, which is the teaching point.',
+      'Generated by mirroring Red Sprint Right 54 with no hand corrections. "Sprint Right" becomes "Sprint Left"; the digits are unchanged, which is the teaching point. We say the direction spelled out — Sprint Right out of Red, Sprint Left out of Black — rather than the book\'s abbreviated "Sprint Rt".',
       'A left-handed quarterback sprinting left is a different athletic problem than sprinting right. Nothing in the varsity book addresses it. Flag if you want a note on the play page about who we can and cannot run this with.',
       ...sharedReviewNotes,
     ],

@@ -54,8 +54,12 @@ export interface Formation {
 
 /**
  * A defender in a front. `id` is stable and side-suffixed where mirrored
- * (e.g. 'E-L', 'T-R', 'N', 'B-L', 'C-R', 'F'); `label` is what's drawn
- * ('E', 'T', 'N', 'B', 'W', 'S', 'C', 'F', '$').
+ * (e.g. 'E-L', 'T-R', 'N', 'B-L', 'C-R', 'F'); `label` is what's drawn:
+ *   E end · T tackle · N nose · B linebacker (inside) · M Mike ·
+ *   W Will (weak side) · S Sam (strong side) · C corner ·
+ *   F free safety · $ strong safety
+ * W/S and F/$ are strength names, so fronts author them strength-RIGHT and
+ * app/utils/defense.ts resolves the drawn letter against the formation.
  */
 export interface Defender {
   id: string

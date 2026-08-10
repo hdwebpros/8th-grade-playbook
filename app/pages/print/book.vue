@@ -20,6 +20,7 @@ import {
   mergedAssignments,
   playSideOf,
 } from '~/utils/playbook'
+import { labelForId } from '~/utils/defense'
 import '~/assets/css/print-book.css'
 
 definePageMeta({ layout: false, pageTransition: false })
@@ -117,9 +118,7 @@ function rowsFor(play: Play, front: FrontId): Row[] {
 }
 
 function readKeyFor(play: Play, front: FrontId): string | null {
-  const keyId = play.vs[front]?.readKey
-  if (!keyId) return null
-  return fronts[front]?.defenders.find((d) => d.id === keyId)?.label ?? null
+  return labelForId(fronts[front], formations[play.formation], play.vs[front]?.readKey)
 }
 
 const formationName = (play: Play) => formations[play.formation]?.name ?? play.formation

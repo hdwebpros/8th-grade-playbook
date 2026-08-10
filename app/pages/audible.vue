@@ -80,6 +80,20 @@ const protectionOptions = computed<{ value: Protection; label: string }[]>(() =>
 /** In Red the man inside X is the right wing; in Black it is the left wing. */
 const wingLabel = computed(() => (formation.value === 'red' ? 'R — right wing' : 'L — left wing'))
 
+/** The wing away from the digits — the one the optional third digit buys. */
+const backWingLabel = computed(() =>
+  formation.value === 'red' ? 'L — left wing' : 'R — right wing',
+)
+
+/**
+ * The third digit is optional: with two digits the backside wing has his
+ * standing rule (a 2, speed out away), so "—" is a real choice and not an
+ * empty state.
+ */
+function toggleBackside(d: number) {
+  ownCall.value.backside = ownCall.value.backside === d ? undefined : d
+}
+
 function chooseExample(d: string) {
   source.value = { kind: 'example', digits: d }
 }
@@ -198,6 +212,13 @@ function onDiagramSelect(pos: OffPosId | null) {
           </button>
 
           <div v-if="activeDigits === null" class="pad">
+            <!-- The whole point of the pad: the words come first, and they
+                 change under your thumb as you press the buttons below. -->
+            <div class="say">
+              <span class="say-label">Say it</span>
+              <p class="say-phrase">{{ spokenCall }}</p>
+            </div>
+
             <div class="pad-row">
               <span class="pad-label">Protection</span>
               <SegmentedControl
@@ -247,12 +268,111 @@ function onDiagramSelect(pos: OffPosId | null) {
               </div>
             </div>
 
+            <div class="pad-row">
+              <span class="pad-label">
+                Third digit &middot; {{ backWingLabel }}
+                <em class="pad-route">
+                  {{
+                    ownCall.backside === undefined
+                      ? 'Not called — speed out away'
+                      : routeName(ownCall.backside)
+                  }}
+                </em>
+              </span>
+              <div class="digit-row" role="group" aria-label="Third digit — backside wing">
+                <button
+                  type="button"
+                  class="digit digit-none"
+                  :class="{ active: ownCall.backside === undefined }"
+                  :aria-pressed="ownCall.backside === undefined"
+                  @click="ownCall.backside = undefined"
+                >
+                  &mdash;
+                </button>
+                <button
+                  v-for="d in digits"
+                  :key="`b${d}`"
+                  type="button"
+                  class="digit"
+                  :class="{ active: ownCall.backside === d }"
+                  :aria-pressed="ownCall.backside === d"
+                  @click="toggleBackside(d)"
+                >
+                  {{ d }}
+                </button>
+              </div>
+            </div>
+
+            <div class="pad-row">
+              <span class="pad-label">
+                Tag
+                <em class="pad-route">
+                  {{ ownCall.dash ? 'Super to the flat' : 'Super blocks' }}
+                </em>
+              </span>
+              <button
+                type="button"
+                class="tag-btn"
+                :class="{ active: ownCall.dash === true }"
+                :aria-pressed="ownCall.dash === true"
+                @click="ownCall.dash = !ownCall.dash"
+              >
+                Dash
+              </button>
+            </div>
+
             <p class="pad-hint muted">
               <Icon name="lucide:route" aria-hidden="true" />
               Say the whole call out loud, then check the picture.
               <NuxtLink to="/routes" class="pad-link">See the route tree</NuxtLink>
             </p>
           </div>
+
+          <!-- The words that are not digits. Learn these and the rest is math. -->
+          <fieldset class="terms">
+            <legend>Terms to know</legend>
+            <dl class="term-list">
+              <div class="term">
+                <dt>Dash</dt>
+                <dd>
+                  Super does not block — he releases to the flat on the split-end side, the
+                  same side the digits are on. Say it after the protection:
+                  <em>Red Ram Dash 33</em>. Costs you a blocker, buys you a target.
+                </dd>
+              </div>
+              <div class="term">
+                <dt>Ram &amp; Bull</dt>
+                <dd>
+                  The two dropback protections. <strong>Ram</strong> slides the line to the
+                  RIGHT; <strong>Bull</strong> is the reverse — the same thing to the LEFT.
+                  We slide toward the split end, so Red is Ram and Black is Bull.
+                </dd>
+              </div>
+              <div class="term">
+                <dt>The Y</dt>
+                <dd>
+                  Right now the digits belong to the split end and the two wings, and the
+                  tight end blocks. We are exploring how to call the Y to a route in this
+                  audible system — it may be the fourth number, awaiting confirmation.
+                </dd>
+              </div>
+              <div class="term">
+                <dt>Two digits</dt>
+                <dd>
+                  X gets the first, the wing inside him gets the second. The wing on the
+                  other side has his standing rule: a <strong>2</strong>, speed out, the
+                  opposite way.
+                </dd>
+              </div>
+              <div class="term">
+                <dt>Three digits</dt>
+                <dd>
+                  The third one belongs to that backside wing. He runs it instead of his
+                  standing out.
+                </dd>
+              </div>
+            </dl>
+          </fieldset>
         </div>
       </section>
 
@@ -505,6 +625,31 @@ function onDiagramSelect(pos: OffPosId | null) {
   display: grid;
   gap: 6px;
 }
+
+/* The live call phrase, sitting above the protection field. */
+.say {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: var(--r-ctl);
+  border: 1px solid color-mix(in srgb, var(--red) 45%, var(--line));
+  background: color-mix(in srgb, var(--red) 10%, var(--panel-raised));
+}
+.say-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--steel);
+}
+.say-phrase {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.5rem;
+  line-height: 1.15;
+  color: var(--red);
+}
 .pad-label {
   display: flex;
   align-items: baseline;
@@ -551,6 +696,74 @@ function onDiagramSelect(pos: OffPosId | null) {
   border-color: var(--red);
   color: #fff;
 }
+.digit-none {
+  width: auto;
+  min-width: 44px;
+  padding: 0 12px;
+}
+.tag-btn {
+  min-height: 44px;
+  padding: 0 20px;
+  width: fit-content;
+  border-radius: var(--r-ctl);
+  border: 1px solid var(--line);
+  background: var(--panel-raised);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--chalk);
+  transition:
+    border-color var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease);
+}
+.tag-btn:hover {
+  border-color: var(--steel);
+}
+.tag-btn.active {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+}
+
+/* --- Terms --- */
+.terms {
+  border: 0;
+  border-top: 1px solid var(--line);
+  padding: 12px 0 0;
+  margin: 2px 0 0;
+  display: grid;
+  gap: 8px;
+}
+.term-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+.term {
+  display: grid;
+  gap: 2px;
+}
+.term dt {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--red);
+}
+.term dd {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--chalk-dim);
+}
+.term dd em {
+  font-style: normal;
+  color: var(--chalk);
+  white-space: nowrap;
+}
+
 .pad-hint {
   display: flex;
   align-items: center;

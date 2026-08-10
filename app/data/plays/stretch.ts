@@ -193,7 +193,7 @@ const vs44: FrontPlan = {
   actions: {
     ...BACKS,
     Y: block('E-L'),
-    L: block('S-L'),
+    L: block('O-L'),
     LT: block('B-L'),
     LG: block('T-L'),
     C: block('T-L'),

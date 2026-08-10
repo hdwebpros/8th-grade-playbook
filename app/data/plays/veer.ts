@@ -175,7 +175,7 @@ const vs44: FrontPlan = {
     // climb carries on to the free safety.
     C: [{ kind: 'run', path: [{ x: 0, y: 4.2 }] }, ...block('F')],
     RT: block('B-R'),
-    R: [WING_TIGHT, ...block('S-R')],
+    R: [WING_TIGHT, ...block('O-R')],
   },
   assignments: {
     C: {

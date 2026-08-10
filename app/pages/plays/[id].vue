@@ -2,6 +2,7 @@
 import type { FrontId, OffPosId, Play } from '~/types/football'
 import { plays, formations, fronts } from '~/data'
 import { FRONT_LABELS, FRONT_ORDER } from '~/utils/playbook'
+import { labelForId } from '~/utils/defense'
 
 const route = useRoute()
 const router = useRouter()
@@ -45,11 +46,9 @@ watch(
 const frontOptions = FRONT_ORDER.map((f) => ({ value: f, label: FRONT_LABELS[f] }))
 const frontInfo = computed(() => fronts[front.value]!)
 
-const readKeyLabel = computed(() => {
-  const keyId = play.value.vs[front.value]?.readKey
-  if (!keyId) return null
-  return frontInfo.value.defenders.find((d) => d.id === keyId)?.label ?? null
-})
+const readKeyLabel = computed(() =>
+  labelForId(frontInfo.value, formation.value, play.value.vs[front.value]?.readKey),
+)
 
 /* --- Selection: diagram tap ⇄ assignment row --- */
 const selected = ref<OffPosId | null>(null)
