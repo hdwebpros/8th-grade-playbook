@@ -347,3 +347,59 @@ Indy/Hoosier callName; Split Wide DRAFT gate; no git commits unless asked.
 - vue-tsc clean (only the two pre-existing nuxt.config.ts errors), build clean,
   /plays /audible /plays/audible-33-red /plays/audible-54-black /quiz/know-your-job
   /print/book all 200.
+
+## 2026-08-10 (later) — Self-study flashcards designed; Name That Play tracer live
+- Mode designed as FOUR decks behind a picker at /quiz/flashcards (HANDOFF §5:
+  guess-the-play + guess-the-formation live here): Name That Play (BUILT),
+  Name That Formation, Route Numbers, What's My Job (flashcard cousin of KYJ —
+  no options, say it out loud, flip). Engine contract: a deck is a shuffled
+  card list that reshuffles + re-rolls fronts every lap and loops forever;
+  tap-to-flip (3D flip, reduced-motion safe); rep counter only — nothing
+  scored, nothing stored. Deck builders live in composables/useFlashcards.ts;
+  the three unbuilt decks are visible picker tiles marked "Up next".
+- Tracer (Name That Play): one card per play in playList (20, incl. DRAFT
+  split-wide + audible examples — decodable calls are good drilling), random
+  front per lap, front face = unlabeled PlayDiagram + "What's the call?",
+  back = name/callName/family/formation/direction/description + "Study it"
+  deep link to /plays/<id>?front=<front>. Quiz index tile flipped live.
+- Verified: vue-tsc clean, generate clean (.nuxt-flash), headless drive
+  (scratchpad flash-check.mjs, fresh puppeteer-core install): tile links,
+  4 decks/1 live, no name leak on the front face, flip/next/skip, lap-2
+  reshuffle, zero pageerrors. No screenshots per Ryan's directive.
+
+## 2026-08-10 (later still) — All four flashcard decks live
+- Ryan: "use 3 subagents one for each of the rest of the categories, and
+  complete the rest of the flashcards." Three parallel subagents, one deck
+  each, strict file ownership (own composable + own faces component, page and
+  frozen files off-limits) so nothing collided; orchestrator refactored
+  flashcards.vue into a deck-agnostic engine (DeckDef: build/relap/faces/
+  studyLink; faces are two-root-fragment components rendering .face.front +
+  .face.back inside the page's flip button) and extracted the tracer's faces
+  to components/flashcards/PlayFaces.vue. NOTE nuxt.config has pathPrefix:
+  false — components are PlayFaces/FormationFaces/RouteFaces/JobFaces, no dir
+  prefix.
+- Name That Formation (useFormationDeck.ts + FormationFaces.vue): 3 cards,
+  one per formation — mirroring rejected as dishonest (Black IS mirrored Red);
+  front is a dots-only SVG reusing diagram geometry/tokens (PlayDiagram would
+  leak via position letters + front); back = name + hand-written recognition
+  cue (data descriptions verified against formations.ts). No study link (no
+  formation page exists).
+- Route Numbers (useRouteDeck.ts + RouteFaces.vue): route tree already in
+  app/data/routes.ts (varsity p14; 0 Block … 9 Fade) — nothing invented.
+  20 cards = 10 routes × both directions (number→route and shape→number),
+  relap guard keyed on route number so a flipped-direction repeat can't lead
+  a new lap. Shapes drawn with shared SEAM parts, no number badge on fronts.
+- What's My Job (useJobDeck.ts + JobFaces.vue): one card per play per lap
+  (~20), random eligible position + front re-rolled every relap so the ~660
+  combos accumulate across laps; answers via mergedAssignments (same source
+  as KYJ); play name IS shown on the front (the mystery is the job); study
+  link to /plays/<id>?front=<front>.
+- Verified: nuxi typecheck clean in app code (only the two pre-existing
+  nuxt.config.ts errors), generate clean (.nuxt-flash), flash-check.mjs
+  extended to 27 assertions across all four decks — leak checks per deck
+  (no play name / formation name / route name on fronts), lap wrap on 20- and
+  3-card decks, study links present exactly where designed, both route
+  directions appear, zero pageerrors. ALL PASS. Three checker-script bugs
+  fixed along the way (ghost button absent while flipped; typographic
+  apostrophes in titles; tap-hint Icon svg tripping the shape detector) —
+  all script-side, not app bugs.

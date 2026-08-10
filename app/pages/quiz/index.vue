@@ -12,10 +12,11 @@ const modes = [
     available: true,
   },
   {
+    to: '/quiz/flashcards',
     icon: 'lucide:layers',
     title: 'Self-Study Flashcards',
     sub: 'Unlimited reps, instant reveal, nothing scored. Bus mode.',
-    available: false,
+    available: true,
   },
   {
     icon: 'lucide:monitor-play',
