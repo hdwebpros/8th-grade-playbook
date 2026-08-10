@@ -269,3 +269,81 @@ are listed in HANDOFF §10 + any reviewNotes in data.
   questions (Waggle fake, Ram/Bull).
 - After agents land: re-run vue-tsc + generate, re-capture changed plays,
   full offline sweep (offline.mjs) against the rebuilt output, then report.
+
+## 2026-08-10 — Fidelity pass LANDED + PWA offline root-cause + icon fix
+ARROW FIXES (all 7 compare agents done; typecheck clean; regenerated):
+- veer.ts: Y rip-inside before wall-off; S dive angled at PSG hip (was vertical
+  over C); Q keep breaks flat/wide at LOS; pitch arc re-hung 5x1; R vertical
+  stem; C "get vertical" leg. LT down-step confirmed vs scan, untouched.
+- crush.ts: L pin-pulls INSIDE onto B-L per p5 PSW rule (was arcing to corner
+  — biggest error); Q flat at backfield depth; R pitch 5x1 behind LOS; mesh
+  point aligned. 43: L falls through to C-L (read key IS the backer).
+- buck-sweep.ts: R carrier tucks INSIDE the kick (was bouncing outside own
+  block); RG wrap flat through QB heels then up; LG kick stays flat, never
+  turns up; S midline +3.4.
+- stretch.ts: S aims x=-3.8 then dead-vertical (was pressing to -5.5 = sweep);
+  Q mesh at (-2.5,-2.9); LG adds climb to B-L in 52. p13 "Stretch Right" is
+  NOT the mirror — weak-side stretch out of Red; doc comment corrected.
+- waggle.ts: Y drag→OVER; L over→POST deep-middle; X corner deepened (flood
+  was inverted); R motion behind Super, fake stops behind LOS; Q boot launch
+  deeper (old note had it backwards); RG pull past the wing.
+- free-call.ts: 12 wing speed-out now finishes OUTSIDE X (widen 2). 33/54
+  match. routes.ts verified correct, untouched.
+- split-wide formation: MATCH, untouched.
+- Each play file gained reviewNotes (grep reviewNotes for Ryan's review list;
+  new highlights: waggle 18-19yd depths vs 8th grade?; buck wing-vs-kick same
+  edge man ambiguity; crush nobody-on-corner trade; stretch backside wing).
+PWA (nuxt.config.ts):
+- ICONS: @nuxt/icon was fetching from iconify API at build (flaky → missing
+  glyphs offline). Pinned: icon.serverBundle.collections ['lucide'] +
+  clientBundle scan. Verified bundled.
+- OFFLINE ROOT CAUSE (supersedes yesterday's two partial fixes): the module's
+  clean-URL manifest rewrite made extensionless precache keys that NO
+  navigation URL form can match. Fix = identity manifestTransforms (its mere
+  presence disables the rewrite) → raw ".../index.html" keys match "/x/"
+  navigations via directoryIndex. Also navigateFallback must be '/index.html'
+  (exact key; '/' hard-failed EVERY fallback = ERR_INTERNET_DISCONNECTED).
+- VERIFIED offline: '/', '/plays/', '/plays/veer-red/' (+?front=52) serve
+  correct pages w/ diagrams. KNOWN GAP: slash-less '/plays/x' offline serves
+  home shell and Nuxt hydration REWRITES URL to '/' (does not recover route).
+  App's internal links are slash-less, so an offline REFRESH on a play page
+  lands home. Candidate fixes post-compact: (a) Nuxt trailingSlash so links/
+  URLs carry '/', (b) also precache extensionless twins (breaks install on
+  hosts that 404 extensionless), (c) teach the fallback shell to re-route.
+  Pick (a) first — investigate route rendering impact.
+- offline.mjs asset "FAIL" lines were cascade noise from a dead error page.
+- capture.mjs recaptured 60/60 post-fix; agents' fixes not yet visually
+  re-eyeballed by Ryan (he views the app himself).
+STILL OPEN: slash-less offline gap above; print PDF re-verify at full-book
+size (measure.mjs + --print-to-pdf); Ryan's coaching rulings (reviewNotes);
+Indy/Hoosier callName; Split Wide DRAFT gate; no git commits unless asked.
+
+## 2026-08-10 (later) — Slash-less offline gap CLOSED + Ryan's free-call→audible rename absorbed
+- Offline fix: chose ledger option (b) dual-key precache, NOT trailingSlash (Nuxt 3 has no first-class option). manifestTransforms in nuxt.config.ts now emits an extensionless twin for every `*/index.html` entry (same revision, ~KBs). 147→177 entries. Verified offline: /plays, /plays/, /plays/audible-33-red, /plays/audible-33-red/ all 200 with correct h1 under SW with network dead. Offline REFRESH on play pages now works.
+- Debugging note: first build this morning silently failed (Ryan's mid-flight rename), so an earlier sw.js inspection read STALE output — always check generate exit before reading .output.
+- Ryan renamed free-call.ts→audible.ts and REWROTE it (buildAudible generator, AudibleCall/AudibleExample types, audiblePlays export, play ids now audible-33-red etc.), updated index.ts himself. I only bridged one transient import-path break mid-refactor; his version won. No freeCall refs remain in app/. vue-tsc clean, 62 routes prerendered clean.
+- STILL OPEN: print PDF re-verify at full-book size; Ryan's coaching rulings (grep reviewNotes); scratchpad capture.mjs play list still uses free-call-* ids (stale, harmless).
+
+## 2026-08-10 (later still) — /audible page + one Audible card on /plays
+- /plays: the three Free Call concept cards collapsed into ONE card, "Audible",
+  whose single door opens /audible. Cards can now be either a concept (Red +
+  Black doors) or a single door (`Concept.to`). The example plays stay in
+  `playList`, so the print book and Know Your Job are unchanged.
+- New page app/pages/audible.vue: formation toggle (Red/Black), front control,
+  diagram, then UNDER the diagram a fieldset "Examples" with the three scanned
+  calls (33 / 12 / 54) plus a "Call your own" button. Call-your-own opens a pad
+  — protection segment + two 0-9 digit rows — and the diagram redraws live off
+  `buildAudible()`. That is the practice loop Ryan asked for; nothing is
+  stubbed.
+- Extracted app/components/AssignmentPanel.vue out of pages/plays/[id].vue so
+  the play page and /audible share the same eleven rows (and the diagram-tap →
+  scroll-to-row behaviour) instead of duplicating ~120 lines.
+- data/plays/audible.ts: `routeOn` now emits kind 'block' for a called 0 (a
+  zero is not a two-yard route), and the wing's lateral stretch moved into a
+  documented WING_WIDEN table — only the 2 (p16) and 4 (p18) are measured, the
+  6/8/9 are estimates so an ad-hoc call still draws honestly. New review note
+  flags those three estimates for Ryan.
+- Coach's film notes render for the three examples only, not for made-up calls.
+- vue-tsc clean (only the two pre-existing nuxt.config.ts errors), build clean,
+  /plays /audible /plays/audible-33-red /plays/audible-54-black /quiz/know-your-job
+  /print/book all 200.

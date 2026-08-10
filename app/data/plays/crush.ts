@@ -29,7 +29,12 @@
  * Arrow-by-arrow transcription of the page-7 panel (its front is the varsity
  * "50" look — E outside the tight end, T head up on the playside tackle, N on
  * the center — which is exactly our 5-2, so `vs['52']` is the literal copy):
- *   L  — runs up past the circled E and caps a block beyond him (arc).
+ *   L  — runs up OUTSIDE the circled E, then turns back INSIDE and caps a
+ *        block bar in front of the playside backer. This is the varsity PSW
+ *        rule written out on page 5: "1st: Tight off the Read Key to Pin LB.
+ *        2nd: If missed, hit near color." The same shape is drawn on the
+ *        Speedo panel and on both Veer panels of page 6 — the wing pins the
+ *        backer, he does NOT arc to the corner.
  *   Y  — red arc up and INSIDE over the top of LT, ending in an arrowhead
  *        (a climb, not a block bar) → climbs to the playside backer.
  *   LT — short vertical stem capped on the T head up on him → base block.
@@ -38,9 +43,12 @@
  *        both on the nose.
  *   RG — long curve up and playside ending in an ARROWHEAD → climb to a backer.
  *   RT — stem up and inside onto the down lineman in his inside gap.
- *   Q  — flat arrow to the playside, outside the tight end.
- *   S  — arrow up and playside into the line.
- *   R  — orbit squiggle through the heels of Super, then flat and wide away.
+ *   Q  — FLAT arrow to the playside ending just outside the tight end, at
+ *        backfield depth. The panel never turns him upfield.
+ *   S  — arrow up and playside into the line. It stops at the mesh, behind
+ *        the line — it is the ride, not the whole run.
+ *   R  — orbit squiggle through the heels of Super, then flat and wide away,
+ *        staying at backfield depth (no upfield turn).
  *   X  — blue block marks on the corner over him.
  */
 
@@ -70,35 +78,41 @@ const S_DIVE: Action[] = [
   {
     kind: 'carry',
     path: [
-      { x: -0.6, y: -3.4 },
-      { x: -1.6, y: -2.2 },
-      { x: -2.6, y: -1.1 },
-      { x: -3.5, y: 0.3 },
-      { x: -4, y: 2.6 },
+      { x: -0.4, y: -3.6 },
+      { x: -1.2, y: -2.4 },
+      { x: -2, y: -1.2 },
+      { x: -3, y: 0.2 },
+      { x: -3.8, y: 2.5 },
       { x: -4.3, y: 5.5 },
     ],
   },
 ]
 
-/** Q: open playside, ride the mesh, then get FLAT and press the edge. */
+/**
+ * Q: open playside, ride the mesh, then run FLAT down the line to the read.
+ * The page-7 panel draws this arrow dead flat, ending just outside the tight
+ * end at backfield depth — it never turns upfield, because the keep only
+ * happens if the read tells him to. Keeping it flat also keeps the mesh
+ * legible: Q crosses Super's path at about (−2, −1.2).
+ */
 const Q_READ: Action[] = [
   {
     kind: 'run',
     path: [
-      { x: -1.1, y: -1.7 },
-      { x: -2.5, y: -1.9 },
-      { x: -4, y: -1.7 },
-      { x: -5.4, y: -0.8 },
-      { x: -6.4, y: 1.2 },
-      { x: -6.8, y: 3.6 },
+      { x: -0.9, y: -1.35 },
+      { x: -2.2, y: -1.3 },
+      { x: -3.6, y: -1.25 },
+      { x: -5, y: -1.2 },
     ],
   },
 ]
 
 /**
- * R: the pitch man. Orbit motion through the heels of Super, then arc and hold
- * a 5-by-1 pitch relationship. Wider than Veer's — outside veer starts wider,
- * so the pitch phase starts wider too.
+ * R: the pitch man. Orbit motion through the heels of Super, then run flat and
+ * hold the varsity 5-by-1 relationship (page 5, BSW: "Motion through heels of
+ * Super to keep 5x1 Pitch relationship with QB"). The panel draws this second
+ * half flat and deep — the pitch man never crosses the line ahead of the ball,
+ * he stays five outside and one behind where the quarterback ends up (−5, −1.2).
  */
 const R_PITCH: Action[] = [
   {
@@ -114,9 +128,9 @@ const R_PITCH: Action[] = [
   {
     kind: 'pitch',
     path: [
-      { x: -6.2, y: -2.9 },
-      { x: -8.4, y: -1.4 },
-      { x: -9.8, y: 0.8 },
+      { x: -6.3, y: -3.3 },
+      { x: -8.3, y: -2.7 },
+      { x: -10, y: -2.2 },
     ],
   },
 ]
@@ -124,13 +138,44 @@ const R_PITCH: Action[] = [
 /** X: backside — go get the corner on your side. */
 const X_CORNER: Action[] = block('C-R')
 
-/** L: the arc. Release around the read key and go get the last man out. */
-const L_ARC: Action = {
+/**
+ * L: the wing's release. Varsity PSW rule, page 5: "1st: Tight off the Read
+ * Key to Pin LB. 2nd: If missed, hit near color." So the path runs up just
+ * OUTSIDE the read key and then turns back INSIDE onto the backer — which is
+ * exactly the arrow drawn on the Crush panel, on Speedo, and on both Veer
+ * panels of page 6. The turn-in point moves with the read key, so each front
+ * gets its own path.
+ */
+const L_PIN_52: Action = {
   kind: 'run',
   path: [
-    { x: -7.2, y: -0.5 },
-    { x: -8.6, y: 1.6 },
-    { x: -9.4, y: 3.8 },
+    { x: -6.3, y: 0.2 },
+    { x: -6.4, y: 2.1 },
+    { x: -5.5, y: 3.3 },
+  ],
+}
+
+/** 4-4: the read is the walked-up safety, so the wing runs wider before he pins. */
+const L_PIN_44: Action = {
+  kind: 'run',
+  path: [
+    { x: -7, y: 0.3 },
+    { x: -7.5, y: 2.6 },
+    { x: -6.4, y: 4 },
+  ],
+}
+
+/**
+ * 4-3: the playside backer IS the read key, so there is no backer left to pin
+ * — the wing falls through to the second half of his rule and hits the near
+ * color, the corner.
+ */
+const L_NEAR_COLOR_43: Action = {
+  kind: 'run',
+  path: [
+    { x: -6.4, y: 0.4 },
+    { x: -6.8, y: 2.8 },
+    { x: -7.4, y: 5 },
   ],
 }
 
@@ -163,7 +208,7 @@ const vs44: FrontPlan = {
   actions: {
     ...SKILL,
     Y: block('E-L'),
-    L: [L_ARC, ...block('C-L')],
+    L: [L_PIN_44, ...block('B-L')],
     LT: block('B-L'),
     LG: block('T-L'),
     C: block('F'),
@@ -177,9 +222,9 @@ const vs44: FrontPlan = {
         'The end is head up on you in a 4-4. Take him — that is what moves the read out to the backer behind him. Get your hat on his playside number and do not let him cross your face.',
     },
     L: {
-      rule: 'Arc around the read — go get the corner.',
+      rule: 'Tight off the read — pin the backer.',
       detail:
-        'Release outside, run right past the read key (never touch him) and climb to the corner. You are the last block before the pitch turns into a long one.',
+        'Release outside and run straight past the read key (never touch him — he is the walked-up safety in this front), then whip back inside and pin the backer. You and the tackle are both on him: whoever gets there first takes him, the other one hits the next jersey that shows.',
     },
     LT: {
       rule: 'Uncovered — step playside, climb to the backer.',
@@ -188,7 +233,7 @@ const vs44: FrontPlan = {
     },
     LG: {
       rule: 'Covered — base him.',
-      detail: 'The tackle is right on you. Take his playside number and wall him inside.',
+      detail: 'The tackle is head up on you. Take his playside number and wall him inside.',
     },
     C: {
       rule: 'Step playside. Uncovered — get vertical.',
@@ -215,7 +260,7 @@ const vs43: FrontPlan = {
   actions: {
     ...SKILL,
     Y: block('E-L'),
-    L: [L_ARC, ...block('C-L')],
+    L: [L_NEAR_COLOR_43, ...block('C-L')],
     LT: block('M'),
     LG: block('T-L'),
     C: block('T-R'),
@@ -229,9 +274,9 @@ const vs43: FrontPlan = {
         'The end is head up on you. Block him. The read is the backer behind him — leave that man alone, he is the quarterback\'s.',
     },
     L: {
-      rule: 'Arc around the read — go get the corner.',
+      rule: 'No backer to pin — hit the near color.',
       detail:
-        'Release outside and run past the backer we are reading. Climb to the corner and stay on him.',
+        'Your rule is tight off the read key and pin a backer, but in this front the backer we are reading IS that man, and the Mike is already blocked. So run past the read (never touch him) and take the near color — the corner.',
     },
     LT: {
       rule: 'Uncovered — step playside, climb to the Mike.',
@@ -266,7 +311,7 @@ const vs52: FrontPlan = {
   actions: {
     ...SKILL,
     Y: [Y_INSIDE, ...block('B-L')],
-    L: [L_ARC, ...block('C-L')],
+    L: [L_PIN_52, ...block('B-L')],
     LT: block('T-L'),
     LG: block('N'),
     C: block('N'),
@@ -277,12 +322,12 @@ const vs52: FrontPlan = {
     Y: {
       rule: 'Inside release — climb to the playside backer.',
       detail:
-        'The end outside you is the read key: do not touch him. Step inside, run right over the top of the tackle\'s block and put your hat on the backer. That block is what springs the keep.',
+        'The end outside you is the read key: do not touch him. Step inside, run over the top of the tackle\'s block and put your hat on the backer. That block is what springs the keep.',
     },
     L: {
-      rule: 'Arc around the read — go get the corner.',
+      rule: 'Tight off the read — pin the backer.',
       detail:
-        'Release outside, run past the end we are reading and climb to the corner. If a safety beats you to the alley, take him instead — block the first jersey that shows outside.',
+        'Release outside and run straight past the end we are reading — never touch him. As soon as you clear him, turn back inside and pin the playside backer. The tight end is climbing to that same man from the inside: whoever gets him, the other one takes the next jersey that shows.',
     },
     LT: {
       rule: 'Base the man on you.',
@@ -296,7 +341,7 @@ const vs52: FrontPlan = {
     },
     C: {
       rule: 'Covered — block the nose.',
-      detail: 'He is right on you. Take him, and let the guard take his playside half.',
+      detail: 'He is head up on you. Take him, and let the guard take his playside half.',
     },
     RG: {
       rule: 'Uncovered — climb to the backside backer.',
@@ -317,7 +362,7 @@ const assignments: Record<OffPosId, Assignment> = {
   LT: {
     rule: 'Covered: base. Uncovered: step playside and climb.',
     detail:
-      'You are the playside tackle. If a man is on you, take him — the dive is coming right off your outside hip and he cannot be there. If nobody is on you, step playside and go get a linebacker.',
+      'You are the playside tackle. If a man is on you, take him — the dive is coming off your outside hip and he cannot be there. If nobody is on you, step playside and go get a linebacker.',
   },
   LG: {
     rule: 'Covered: base. Uncovered: down, then help on the nose.',
@@ -343,14 +388,14 @@ const assignments: Record<OffPosId, Assignment> = {
       'Playside tight end. If a defender is head up on you, base him and the read moves out to the next man. If he is aligned outside you, he IS the read — release inside him and climb to the backer.',
   },
   L: {
-    rule: 'Arc around the read key — block the last man out.',
+    rule: 'Tight off the read key — pin the backer. Missed him? Near color.',
     detail:
-      'You are the playside wing. Release outside, run right past the read key without touching him, and go get the deepest support man on your side — corner or safety, whoever shows. This block turns a five-yard pitch into a long one.',
+      'You are the playside wing, and this is the varsity rule word for word. Release outside and run TIGHT past the read key without touching him, then turn back inside and pin the playside linebacker. If that backer is already blocked — or he is the man we are reading — hit the near color instead: the first jersey that shows outside.',
   },
   R: {
     rule: 'Pitch man. Orbit motion through the heels of Super.',
     detail:
-      'Pre-snap motion through the heels of Super, then arc and hold five yards outside the quarterback and one yard behind him. Eyes on the ball the whole way, hands up and soft.',
+      'Pre-snap motion through the heels of Super, then run flat and hold five yards outside the quarterback and one yard behind him — 5 by 1, the whole way. Stay behind him: never get ahead of the ball. Eyes on it the whole way, hands up and soft.',
   },
   S: {
     rule: 'Dive OUTSIDE the playside tackle.',
@@ -360,7 +405,7 @@ const assignments: Record<OffPosId, Assignment> = {
   Q: {
     rule: 'Open playside. Read the key: dive, keep, or pitch.',
     detail:
-      'Step playside and pivot on your back foot. Extend the ball behind your back hip. Your key is one man WIDER than on Veer — the first man outside our tight end\'s block, the one who has to support the pitch. If he takes the dive: give it. If he sits: pull it and get flat around the edge. If he takes you: pitch it.',
+      'Step playside and pivot on your back foot. Extend the ball behind your back hip. Run FLAT down the line — the panel never turns you upfield until the read tells you to. Your key is one man WIDER than on Veer: the first man outside our tight end\'s block, the one who has to support the pitch. If he takes the dive: give it. If he sits: pull it and get up in the C gap. If he takes you: pitch it.',
   },
   X: {
     rule: 'Backside: block the corner.',
@@ -372,10 +417,15 @@ const assignments: Record<OffPosId, Assignment> = {
 const reviewNotes = [
   "CRUSH RUNS TO THE TIGHT END. Page 7 draws Crush out of Red going LEFT — to Y and the L wing — which is the opposite way from Veer out of the same formation. We ship it that way: Crush Red is left, Crush Black is right. Confirm you want it that way and not called to the split-end side.",
   "THE READ. Crush is captioned OUTSIDE VEER, and the circled defender on page 7 is the end aligned OUTSIDE the tight end — one man wider than the circled end on the Veer page. So the rule we teach is: Crush reads the first man outside our tight end's block. Against our 5-2 that is the end (E), which is the literal scan picture. Against the 4-4 the end is head up on Y, so Y blocks him and the read becomes the walked-up backer (S). Against the 4-3 there is nobody walked up, so the read is the outside backer (B) at four and a half yards. Confirm the 4-4 and 4-3 keys — they are our football call, not something the scan draws.",
-  "THE PLAYSIDE WING'S BLOCK. On the scan the wing's arrow runs up past the circled end and caps a block just beyond him, in the space where the varsity front draws its $. Our three fronts have no $ on that edge, so we send him to the corner on his side — the last man who can make the tackle on a pitch. If you would rather he take the first safety in the alley, say so and it is a one-line change in all three fronts.",
+  "THE PLAYSIDE WING'S BLOCK — CHANGED. We used to arc him all the way to the corner. That was wrong. Page 5 writes the rule out: PSW — '1st: Tight off the Read Key to Pin LB. 2nd: If missed, hit near color.' And every drawing agrees: on the Crush panel his arrow runs up OUTSIDE the circled end, turns back INSIDE and caps a block bar in front of the playside backer — the same shape as the Speedo panel and both Veer panels on page 6. He now pins the backer vs the 5-2 and the 4-4. Vs the 4-3 the playside backer IS the read key, so he falls through to 'near color' and takes the corner.",
+  "WHAT THAT COSTS. Pinning the backer means nobody blocks the playside corner or safety on the 5-2 and the 4-4 — the pitch has to beat them with speed. That is exactly what the varsity panel draws (its $ and its C are both unblocked). If you would rather the wing keep running to the corner and give up the pin, it is a one-line change per front.",
+  "TWO MEN ON THE PLAYSIDE BACKER (5-2). The panel really does draw both the tight end climbing to him from the inside and the wing pinning him from the outside, the same way it draws the center and playside guard both on the nose. We coded it that way. Teach it as 'first one there takes him, the other takes the next color' — that is the second half of the wing's own rule.",
   "BACKSIDE GUARD vs the 5-2. The scan's arrow from the backside guard is a climb (arrowhead, no block bar) that ends between the two backers. We put him on the BACKSIDE backer because the tight end is already climbing to the playside one. If you want him playside instead, the tight end goes to the safety.",
   "CENTER AND PLAYSIDE GUARD vs the 5-2 are both drawn on the nose on the scan, so both are coded on the nose. Kids should be taught it as one block with two men on it — guard takes the playside half, center takes the man, and whoever comes free climbs.",
   "The page-7 front is the varsity 50 look (end outside the tight end, tackle head up on the playside tackle, nose on the center), which our 5-2 matches almost exactly — that plan is a literal transcription. The 4-4 and 4-3 plans are the same rules resolved against our own fronts and are the parts most worth your eyes.",
+  "THE QUARTERBACK'S ARROW IS FLAT. The panel draws Q dead flat from the mesh to a point just outside the tight end, at backfield depth — no upfield turn at all. We used to curl him up past the wing to five yards downfield, which drew the keep as if it had already happened. He now runs flat and stops where the panel stops him; the keep and the pitch live in the assignment text (page 5's Q rule: 'If Keep: Vertical In C-Gap. Pitch: Press The Pitch').",
+  "THE PITCH PHASE IS FLAT AND DEEP. Same fix for the pitch man: the panel runs him flat behind Super's heels and off the edge without ever crossing the line, and page 5 says the relationship is 5x1 with the quarterback. His path now ends at (−10, −2.2), which is five outside and one behind where the quarterback's arrow ends — the numbers finally match the words on his card.",
+  "SUPER'S ARROW. The panel stops Super's arrow at the mesh, behind the line, pointed at the playside guard's outside shoulder — it is drawing the ride, not the run. We keep drawing the whole run and still aim him OUTSIDE the playside tackle, which is what makes this outside veer instead of Veer. The mesh now happens at about (−2, −1.2), where the quarterback's flat path crosses him. Confirm the aiming point: if you want Super at the guard's crack like Veer, that is a data change, not a drawing change.",
   "Page 7 also carries INDY/HOOSIER - DIVE ('automatic give') and INDY/HOOSIER - SPEEDO ('keep or pitch') on the same page. Those are separate calls off the same look and are NOT in this slice. Flagging them so they don't get lost.",
 ]
 

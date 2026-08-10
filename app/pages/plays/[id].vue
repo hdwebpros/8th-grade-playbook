@@ -1,14 +1,7 @@
 <script setup lang="ts">
-import type { Assignment, FrontId, OffPosId, Play } from '~/types/football'
+import type { FrontId, OffPosId, Play } from '~/types/football'
 import { plays, formations, fronts } from '~/data'
-import {
-  FRONT_LABELS,
-  FRONT_ORDER,
-  POSITION_GROUPS,
-  POSITION_NAMES,
-  mergedAssignments,
-  playSideOf,
-} from '~/utils/playbook'
+import { FRONT_LABELS, FRONT_ORDER } from '~/utils/playbook'
 
 const route = useRoute()
 const router = useRouter()
@@ -62,39 +55,12 @@ const readKeyLabel = computed(() => {
 const selected = ref<OffPosId | null>(null)
 watch(() => play.value.id, () => (selected.value = null))
 
-const rowEls = ref<Partial<Record<OffPosId, HTMLElement>>>({})
-function setRowEl(pos: OffPosId, el: unknown) {
-  if (el instanceof HTMLElement) rowEls.value[pos] = el
-}
+const panel = ref<{ revealRow: (pos: OffPosId) => void } | null>(null)
 
 function onDiagramSelect(pos: OffPosId | null) {
   selected.value = pos
-  if (pos) {
-    nextTick(() => rowEls.value[pos]?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }))
-  }
+  if (pos) panel.value?.revealRow(pos)
 }
-
-function onRowClick(pos: OffPosId) {
-  selected.value = selected.value === pos ? null : pos
-}
-
-/* --- Assignment panel data --- */
-const assignments = computed(() => mergedAssignments(play.value, front.value))
-
-const groups = computed(() =>
-  POSITION_GROUPS.map((g) => ({
-    label: g.label,
-    rows: g.positions
-      .filter((pos) => assignments.value[pos])
-      .map((pos) => ({
-        pos,
-        name: POSITION_NAMES[pos],
-        side: playSideOf(pos, play.value, formation.value, front.value),
-        assignment: assignments.value[pos] as Assignment,
-        overridden: Boolean(play.value.vs[front.value]?.assignments?.[pos]),
-      })),
-  })).filter((g) => g.rows.length),
-)
 
 useHead(() => ({
   title: `${play.value.name} ${formation.value.name} — Wolves Playbook`,
@@ -163,44 +129,14 @@ useHead(() => ({
       <section class="panel" aria-label="Assignments">
         <p class="desc">{{ play.description }}</p>
 
-        <div v-for="group in groups" :key="group.label" class="group">
-          <h2 class="group-title">{{ group.label }}</h2>
-          <ul class="rows">
-            <li
-              v-for="row in group.rows"
-              :key="row.pos"
-              :ref="(el) => setRowEl(row.pos, el)"
-            >
-              <button
-                type="button"
-                class="row"
-                :class="{ selected: selected === row.pos }"
-                :aria-expanded="selected === row.pos"
-                @click="onRowClick(row.pos)"
-              >
-                <span class="pos-chip" :class="{ hot: row.pos === play.ballCarrier }">
-                  {{ row.pos }}
-                </span>
-                <span class="row-main">
-                  <span class="row-top">
-                    <span class="row-name">{{ row.name }}</span>
-                    <PlaySideBadge :side="row.side" />
-                    <span v-if="row.overridden" class="vs-chip">
-                      vs {{ FRONT_LABELS[front] }}
-                    </span>
-                  </span>
-                  <span class="row-rule">{{ row.assignment.rule }}</span>
-                  <span
-                    v-if="row.assignment.detail && selected === row.pos"
-                    class="row-detail muted"
-                  >
-                    {{ row.assignment.detail }}
-                  </span>
-                </span>
-              </button>
-            </li>
-          </ul>
-        </div>
+        <AssignmentPanel
+          ref="panel"
+          :play="play"
+          :front="front"
+          :formation="formation"
+          :selected="selected"
+          @select="selected = $event"
+        />
 
         <CoachNote
           v-if="play.reviewNotes?.length"
@@ -340,100 +276,6 @@ useHead(() => ({
 .desc {
   font-size: 1rem;
   color: var(--chalk-dim);
-}
-
-.group {
-  display: grid;
-  gap: 8px;
-}
-.group-title {
-  font-size: 0.95rem;
-  color: var(--steel);
-  letter-spacing: 0.14em;
-}
-.rows {
-  display: grid;
-  gap: 6px;
-}
-.row {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  width: 100%;
-  text-align: left;
-  padding: 10px 12px;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--line);
-  border-radius: var(--r-card);
-  transition:
-    border-color var(--t-fast) var(--ease),
-    background var(--t-fast) var(--ease);
-}
-.row:hover {
-  background: var(--panel-raised);
-}
-.row.selected {
-  border-color: var(--red);
-  background: var(--panel-raised);
-}
-.pos-chip {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  flex: none;
-  border-radius: 999px;
-  border: 2px solid var(--chalk);
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.05rem;
-  color: var(--chalk);
-}
-.pos-chip.hot {
-  background: var(--red);
-  border-color: var(--red);
-  color: #fff;
-}
-.row-main {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
-.row-top {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.row-name {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--steel);
-}
-.vs-chip {
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--panel-raised);
-  border: 1px solid var(--steel);
-  color: var(--chalk);
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-.row-rule {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--chalk);
-}
-.row-detail {
-  font-size: 0.92rem;
-  padding-top: 2px;
 }
 
 /* --- Desktop: diagram pinned left, jobs scroll right --- */

@@ -47,6 +47,28 @@
  *   X    long line back across the field, bar ON the deep safety (MDM)
  *   S    bucket step, mesh, then TWO arrows off the aiming point — one bending
  *        up at the C gap and one bouncing outside. Same read, two answers.
+ *
+ * MEASURED GEOMETRY off page-12 (offensive line spacing = 1.5 yd = 23.3 px in
+ * the 1275-wide scan; the C square is x=0, the OL row is y=0):
+ *   Q at (0, −1.2) · mesh circle at (−2.5, −2.9) — i.e. behind the INSIDE leg
+ *   of the playside tackle, exactly as the table says.
+ *   S at (0, −4.0); his line dips back/away, runs through the mesh, and reaches
+ *   the aiming point at (−3.8, −1.9). The bend-up arrow is then DEAD VERTICAL
+ *   at x = −3.8 up to y = +3.2 — that is between Y (−4.5) and LT (−3.0), i.e.
+ *   literally OUTSIDE THE PLAYSIDE TACKLE, not out at the wing.
+ *   The second (bounce) arrow leaves the same aiming point and finishes at
+ *   about (−7.0, +0.8), outside the wing.
+ *   L's block bar is drawn at (−7.9, +2.0), heading up and OUT — short of the
+ *   corner letter at (−9.4, +3.9) but pointed at nobody else (the $ safety is
+ *   at (−6.1, +7.6), straight up from L, and the arc bows away from him).
+ *
+ * ALSO DRAWN, and easy to miss: two black DOTTED arrows capped with block bars,
+ * climbing off the double-teams to the second level — one from the E over the
+ * playside tackle up to W (the playside inside backer), one from the nose
+ * climbing straight up. These are the "climb" half of "gap to CLIMB": the
+ * LT/LG combo comes off onto W. Coded as a chained second block on LG in the
+ * 5-2 plan. The nose climb is drawn short and lands on no letter, so it is
+ * left alone and flagged.
  */
 
 import type {
@@ -67,23 +89,22 @@ const block = (targetId: string): Action[] => [{ kind: 'block', targetId }]
 // ---------------------------------------------------------------------------
 
 /**
- * S: slow bucket step away, then flat playside, aiming point OUTSIDE the
- * playside tackle. Keys the end man on the line: this path shows the bend-up,
- * which is the answer the scan draws with the vertical arrow. The scan draws a
- * second arrow bouncing outside — that lives in the assignment text.
+ * S: slow bucket step back and away, through the mesh, to an aiming point
+ * OUTSIDE the playside tackle — x = −3.8, between LT (−3.0) and Y (−4.5),
+ * which is where page-12 puts it. Then he keys the end man on the line and
+ * this path shows the BEND-UP: the scan's dead-vertical arrow off that aiming
+ * point. The scan's second arrow (bounce outside) lives in the assignment text.
  */
 const S_STRETCH: Action[] = [
   {
     kind: 'carry',
     path: [
-      { x: 0.7, y: -4.9 },
-      { x: -0.9, y: -4.1 },
-      { x: -2.6, y: -3.5 },
-      { x: -4.3, y: -2.6 },
-      { x: -5.3, y: -1.2 },
-      { x: -5.5, y: 0.5 },
-      { x: -5.1, y: 3.2 },
-      { x: -4.7, y: 6.5 },
+      { x: 0.3, y: -4.9 },
+      { x: -1.2, y: -3.9 },
+      { x: -2.5, y: -2.9 },
+      { x: -3.8, y: -1.9 },
+      { x: -3.8, y: 0.6 },
+      { x: -3.8, y: 3.2 },
     ],
   },
 ]
@@ -93,9 +114,8 @@ const Q_MESH: Action[] = [
   {
     kind: 'run',
     path: [
-      { x: -0.8, y: -2.0 },
-      { x: -1.7, y: -2.9 },
-      { x: -2.6, y: -3.5 },
+      { x: -1.3, y: -2.1 },
+      { x: -2.5, y: -2.9 },
     ],
   },
 ]
@@ -119,7 +139,10 @@ const vs52: FrontPlan = {
     Y: block('E-L'),
     L: block('C-L'),
     LT: block('T-L'),
-    LG: block('T-L'),
+    // Combo, then climb: page-12 draws a dotted arrow with a block bar coming
+    // off this double-team up to W (our B-L). Chained blocks render exactly
+    // that — LG to the down man, then off him to the backer.
+    LG: [...block('T-L'), ...block('B-L')],
     C: block('N'),
     RG: block('N'),
     RT: block('T-R'),
@@ -133,14 +156,14 @@ const vs52: FrontPlan = {
         'The tackle is head up on you in a 5-2. Playside foot first at 45 degrees, get your hat across his playside number and run your feet. The guard is coming to help.',
     },
     LG: {
-      rule: '45 outside step — help the tackle, then climb.',
+      rule: '45 outside step — combo the down man, then climb to the backer.',
       detail:
-        'Nobody on you. Step playside at 45 and put your inside hand on the down man the tackle is reaching. Stay on him until the tackle owns him, then come off for the backer.',
+        'Nobody on you. Step playside at 45 and put your inside hand on the down man the tackle is reaching. Stay on him until the tackle owns him, then come off flat for the inside backer — he is the one who fills this play.',
     },
     C: {
       rule: '45 outside step — reach the nose.',
       detail:
-        'Odd front: the nose is right on you. Playside step, get your helmet to his playside number and do not let him cross your face. The backside guard is scooping behind you.',
+        'Odd front: the nose is head up on you. Playside step, get your helmet to his playside number and do not let him cross your face. The backside guard is scooping behind you.',
     },
     RG: {
       rule: '45 inside step — scoop the nose with C.',
@@ -183,7 +206,7 @@ const vs44: FrontPlan = {
     Y: {
       rule: '45 outside step — reach the end on you.',
       detail:
-        'In a 4-4 the end is right on your outside shoulder. Playside step at 45, hat across his outside number, and turn him in. If he beats you outside, run him past the play and the back bends up.',
+        'In a 4-4 the end is on your outside shoulder. Playside step at 45, hat across his outside number, and turn him in. If he beats you outside, run him past the play and the back bends up.',
     },
     LT: {
       rule: '45 outside step — climb to the playside backer.',
@@ -335,9 +358,13 @@ const assignments: Record<OffPosId, Assignment> = {
 const reviewNotes = [
   "Page numbers: HANDOFF.md's map says Stretch is pages 11–12, but the actual JPEGs are off by one here — page-11.jpg is JET, page-12.jpg is the STRETCH main page, page-13.jpg is the STRETCH variants page. This file is transcribed from 12 and 13.",
   "Direction: the scan draws Stretch out of our RED alignment running to the LEFT — to the tight end and wing. So Stretch Red is a LEFT play and Stretch Black is the mirror (right). That is the opposite of Veer, where Red runs right. Confirm you want the names to follow the formation rather than the direction.",
-  "Page-13 is NOT a vs-front page. It is six FORMATION variants (Stretch Left/Right, I Stretch Left/Right, Gun Stretch Left/Right) against the same defense. Our package has no I or Gun, so the only thing page 13 added was the Stretch Right picture, which we used to check the mirror. That means the varsity book gives us the arrows against exactly ONE front.",
+  "Page-13 is NOT a vs-front page. It is six FORMATION variants (Stretch Left/Right, I Stretch Left/Right, Gun Stretch Left/Right) against the same defense. Our package has no I or Gun, so the varsity book gives us the arrows against exactly ONE front.",
+  "Correction to an earlier read of page 13: its 'Stretch Right' panel is NOT the mirrored formation. Re-measured, that panel keeps the SAME alignment as 'Stretch Left' (Y and the L wing to the left, R wing right, X split right) and simply runs the ball to the RIGHT — a weak-side stretch out of Red, which is not a play we have. So page 13 never draws our Black. Stretch Black here is still a pure mirror of Red, which is football-correct because all three of our fronts are left/right symmetric, but it is a mirror we derived, not one the book confirms.",
+  "Fixed after a literal re-measure of page-12: Super's bend-up arrow is DEAD VERTICAL at about 3.8 yards outside the ball — between the tight end (−4.5) and the playside tackle (−3.0), i.e. right off the tackle's outside shoulder. Our old path pressed all the way out to −5.5 (the wing) and then drifted, which drew a sweep, not a stretch. Path retuned to bucket → mesh at (−2.5, −2.9) → aiming point (−3.8, −1.9) → straight up. Q's mesh was also 0.6 yd too deep and now lands where the scan draws the mesh circle, behind the tackle's inside leg.",
+  "Added after the re-measure: page-12 draws two black DOTTED arrows capped with block bars, climbing off the double-teams to the second level. The clear one comes off the playside double-team up to W (our B-L), so LG in the 5-2 plan is now a chained block — down man first, then off to B-L. The second dotted arrow climbs off the nose but is drawn short and lands on no letter (M is already the backside wing's man), so nothing was coded for it. If you want C or RG to come off the nose onto a backer too, say which one and where he ends up.",
   "The one front the scan draws is an ODD look — three down linemen with a nose head-up on the center, two edge backers, two inside backers. We mapped it onto our 5-2 (drawn E→T-L/T-R, N→N, B→E-L, S→E-R, W→B-L, M→B-R) and the 5-2 plan in this file is a one-for-one copy of the drawn arrows. The 4-4 and 4-3 plans apply the same written rules to those fronts — they are football, not transcription. Please eyeball those two.",
-  "Backside wing (R) 'Cutoff': the scan draws his arrow climbing straight up to the backside INSIDE backer, and that is what we coded for all three fronts. But the drawn defense had no tight end-man on the back side, and all three of OUR fronts do (E-R at +4.8 / +5.2). Varsity's own 'Stretch Right' panel on page 13 puts the backside wing on that tight edge defender instead. So: do you want R on the backside backer (as coded, matching the main scan) or on the backside end (matching the Stretch Right panel and our tighter fronts)? One-line change.",
+  "Backside wing (R) 'Cutoff': the scan draws his arrow climbing up and over to the backside INSIDE backer (M), and that is what we coded for all three fronts. But the drawn defense's backside edge man (S) is walked out to about +6.3 and 2 yards deep — nobody is tight on R — whereas all three of OUR fronts put a defender right on that edge (E-R at +4.8 / +5.2, only a yard outside the wing). Page 13's weak-side 'Stretch Right' panel is the case that matches ours: there the backside wing has a tight edge defender (B) next to him and he blocks HIM rather than climbing. So: R on the backside backer (as coded, literal to the main drawing) or on E-R (matching the tighter fronts we actually see)? One-line change per front.",
+  "Playside wing (L), measured: his block bar is drawn at about (−7.9, +2.0) — up and OUT, past everybody, but stopping well short of the corner letter at (−9.4, +3.9) and bowing away from the $ safety at (−6.1, +7.6). No defender sits under that bar, so we read it as 'the corner / the man in the alley' and target C-L. Our 5-2 puts C-L a good bit deeper than the drawn bar, so our line to him is longer than the scan's. Flagging rather than guessing at a different target.",
   "Playside wing (L): the scan sends him past everybody to the CORNER, because the drawn front had only one edge defender and the tight end took him. Against our 4-4 he instead takes the walked-up S backer and against our 4-3 the outside backer — the first man in the alley — and the corner goes unblocked. Same rule, different answer per front. Confirm.",
   "S's path: the scan draws TWO arrows off the aiming point — one bending up inside the end man and one bouncing outside him. The data can only carry one carry path, so the diagram shows the BEND-UP and the 'or bounce it' lives in his assignment text. Say the word if you'd rather see the bounce drawn.",
   "Q: the scan's quarterback line stops at the mesh — no boot fake is drawn on the Stretch page (Jet and Rocket both say 'carry out boot fake', Stretch's table does not). We drew it literally, stopping at the mesh, and put 'carry out your fake' in the coaching detail. Waggle is the play that punishes a defense for chasing that fake, so you may want it drawn.",
@@ -359,20 +386,17 @@ export const stretchRed: Play = {
 }
 
 /**
- * Stretch Black — generated by mirroring Stretch Red, then checked against
- * varsity page-13's "Stretch Right" panel.
+ * Stretch Black — generated by mirroring Stretch Red. No hand corrections.
  *
- * Hand corrections after that check: NONE. Page-13's Stretch Right is the same
- * play run the other way, and all three of our fronts are left/right symmetric,
- * so every rule resolves to the mirrored player with the same job: LT becomes
- * the backside tackle taking the inside step, R becomes the playside wing on
- * the force man, L becomes the backside wing cutting off, and X — now split
- * left — still blocks the deep safety on his side.
- *
- * The one thing page-13's Stretch Right panel does differently is put the
- * BACKSIDE wing on the tight backside edge defender rather than on the backside
- * inside backer. That is a defensive-alignment difference, not a direction
- * difference, and it is flagged in reviewNotes for both directions.
+ * Note that the varsity book never draws this picture. Page-13's "Stretch
+ * Right" panel keeps the RED alignment and runs weak; it is not the mirrored
+ * formation (see reviewNotes). Black is therefore a derived mirror, which is
+ * safe here only because all three of our fronts are left/right symmetric, so
+ * every rule resolves to the mirrored player with the same job: LT becomes the
+ * backside tackle taking the inside step, RG becomes the playside guard
+ * reaching, R becomes the playside wing on the force man, L becomes the
+ * backside wing cutting off, and X — now split left — still blocks the deep
+ * safety on his side.
  */
 export const stretchBlack: Play = mirrorPlay(stretchRed, {
   id: 'stretch-black',
@@ -381,7 +405,7 @@ export const stretchBlack: Play = mirrorPlay(stretchRed, {
     'Stretch to the right out of Black. Same 45-degree steps, same bucket step, same read on the end man — other side of the ball. R is the playside wing now and L is the one cutting off the back side.',
   reviewNotes: [
     ...reviewNotes,
-    'Stretch Black is generated by mirroring Stretch Red (app/utils/mirror.ts) with no hand corrections, checked against the "Stretch Right" panel on page-13. If any of the Red answers above change, Black changes with it automatically.',
+    'Stretch Black is generated by mirroring Stretch Red (app/utils/mirror.ts) with no hand corrections. The varsity book has no drawing of this picture — page-13\'s "Stretch Right" is the Red alignment run weak, not the Black formation — so Black rests on the fronts being symmetric. If any of the Red answers above change, Black changes with it automatically.',
   ],
 })
 

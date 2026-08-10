@@ -15,23 +15,29 @@
  * quarterback boots RIGHT. So `direction` is 'right' — the pass side, which is
  * where playside/backside badges should read from.
  *
- * ARROWS AS DRAWN on the Waggle Rt panel:
+ * ARROWS AS DRAWN on the Waggle Rt panel (re-measured off the scan; the panel
+ * is drawn about twice as wide as it is tall, so depths were taken off the
+ * vertical scale and widths off the receivers' own alignments):
  *   LT LG C RG RT   short stems with block bars, every one of them leaning UP
  *                   and to the LEFT — the Stretch-left run action
  *   R               a wavy line (the book's motion mark) from the right wing
- *                   back across the formation, then flat behind the backs, then
- *                   up and out to a point just outside the LEFT tackle: motion
- *                   across and take the fake
- *   S               up over the right guard and out flat to about 7 yards
- *                   outside at the line: the flat route
- *   a black line from the right-guard area sweeping out past the wing to a
- *                   block bar ~6 yards outside, 1 yard behind the line: the
- *                   kick-out on the boot-side edge
- *   Q               down to the fake, then back around and out to an open
- *                   circle ~5 yards outside and ~3.5 deep: the launch point
- *   Y               up ~3 and then all the way across at ~4 yards: the drag
- *   L               up ~5, then break inside on an angle to ~9-10: the over
- *   X               stem, plant inside, then break back out and up: the corner
+ *                   back across the formation BEHIND Super — the flat part of
+ *                   the line runs ~2 yards deeper than S — then up and out
+ *                   toward the LEFT tackle: motion across and take the fake
+ *   S               up over the right guard and out flat to about 7-8 yards
+ *                   outside, finishing right at the line: the flat route
+ *   RG              a black line off the right guard sweeping out BEHIND the
+ *                   wing to a block bar ~6 yards outside, ~1.5 yards behind
+ *                   the line: the kick-out on the boot-side edge
+ *   Q               straight back to about Super's depth, then back around and
+ *                   out to an open circle ~5.5 yards outside and ~7 DEEP: the
+ *                   launch point (we carry it at 5.5 deep — see reviewNotes)
+ *   Y               inside release, climb to ~6, then across the field at
+ *                   ~9 yards: the OVER route, not a shallow drag
+ *   L               straight up ~10, then break inside on an angle to the deep
+ *                   middle (~19 on the scan): the POST
+ *   X               ~9-10 stem, plant inside, then break back out and up to
+ *                   ~18: the (post-)corner
  */
 
 import type {
@@ -56,12 +62,12 @@ const Q_BOOT: Action[] = [
   {
     kind: 'run',
     path: [
-      { x: -0.7, y: -2.0 },
-      { x: -1.4, y: -2.8 },
-      { x: -0.2, y: -3.7 },
-      { x: 1.8, y: -4.2 },
-      { x: 3.7, y: -4.0 },
-      { x: 5.4, y: -3.5 },
+      { x: -0.6, y: -2.2 },
+      { x: -1.3, y: -3.3 },
+      { x: -0.3, y: -4.4 },
+      { x: 1.8, y: -5.3 },
+      { x: 3.7, y: -5.6 },
+      { x: 5.6, y: -5.5 },
     ],
   },
 ]
@@ -71,18 +77,18 @@ const R_FAKE: Action[] = [
   {
     kind: 'motion',
     path: [
-      { x: 3.4, y: -1.9 },
-      { x: 2.0, y: -2.6 },
-      { x: 0.2, y: -2.8 },
-      { x: -1.6, y: -2.8 },
+      { x: 3.4, y: -2.4 },
+      { x: 2.3, y: -4.6 },
+      { x: 0.8, y: -6.2 },
+      { x: -1.3, y: -6.4 },
     ],
   },
   {
     kind: 'fake',
     path: [
-      { x: -3.0, y: -2.2 },
-      { x: -4.3, y: -1.2 },
-      { x: -5.1, y: 0.3 },
+      { x: -2.6, y: -5.4 },
+      { x: -3.6, y: -3.6 },
+      { x: -4.5, y: -1.9 },
     ],
   },
 ]
@@ -101,30 +107,30 @@ const S_FLAT: Action[] = [
   },
 ]
 
-/** Y: the drag — up three, then across the field at four. */
-const Y_DRAG: Action[] = [
+/** Y: the over — inside release, climb, then across the field at nine. */
+const Y_OVER: Action[] = [
   {
     kind: 'route',
     path: [
-      { x: -4.1, y: 1.6 },
-      { x: -2.8, y: 3.4 },
-      { x: 0.6, y: 4.2 },
-      { x: 4.0, y: 4.4 },
-      { x: 6.4, y: 4.4 },
+      { x: -4.0, y: 1.8 },
+      { x: -3.0, y: 5.8 },
+      { x: -0.6, y: 8.4 },
+      { x: 2.8, y: 9.0 },
+      { x: 6.4, y: 9.0 },
     ],
   },
 ]
 
-/** L: the over route — five up, then break inside and run across deep. */
-const L_OVER: Action[] = [
+/** L: the post — ten straight up, then break inside to the deep middle. */
+const L_POST: Action[] = [
   {
     kind: 'route',
     path: [
-      { x: -5.5, y: 1.6 },
-      { x: -5.3, y: 5.0 },
-      { x: -3.0, y: 6.6 },
-      { x: 0.0, y: 8.2 },
-      { x: 1.8, y: 9.4 },
+      { x: -5.7, y: 1.6 },
+      { x: -5.6, y: 6.0 },
+      { x: -5.5, y: 10.3 },
+      { x: -2.5, y: 14.6 },
+      { x: 1.0, y: 18.4 },
     ],
   },
 ]
@@ -134,11 +140,11 @@ const X_CORNER: Action[] = [
   {
     kind: 'route',
     path: [
-      { x: 12.3, y: 2.4 },
-      { x: 12.2, y: 4.6 },
-      { x: 10.3, y: 6.2 },
-      { x: 12.6, y: 7.8 },
-      { x: 14.4, y: 9.6 },
+      { x: 12.1, y: 2.4 },
+      { x: 12.0, y: 9.4 },
+      { x: 10.4, y: 12.4 },
+      { x: 12.2, y: 15.2 },
+      { x: 13.6, y: 18.2 },
     ],
   },
 ]
@@ -147,8 +153,8 @@ const SKILL = {
   Q: Q_BOOT,
   R: R_FAKE,
   S: S_FLAT,
-  Y: Y_DRAG,
-  L: L_OVER,
+  Y: Y_OVER,
+  L: L_POST,
   X: X_CORNER,
 } satisfies Partial<Record<OffPosId, Action[]>>
 
@@ -162,7 +168,8 @@ const rgPull = (targetId: string): Action[] => [
     kind: 'run',
     path: [
       { x: 2.4, y: -0.9 },
-      { x: 3.8, y: -1.1 },
+      { x: 3.6, y: -1.3 },
+      { x: 4.8, y: -1.5 },
     ],
   },
   { kind: 'block', targetId },
@@ -207,14 +214,14 @@ const vs52: FrontPlan = {
   },
   assignments: {
     C: {
-      rule: 'Block Stretch left — the nose is yours.',
+      rule: 'Block Stretch to the fake side — the nose is yours.',
       detail:
-        'Odd front, so there is a man right on you. Playside step, get your hat across him and hold him. The right guard is gone on the pull, so nobody is coming to help — hold your ground and do not chase.',
+        'Odd front, so there is a man head up on you. Step toward the fake, get your hat across him and hold him. The pulling guard is gone, so nobody is coming to help — hold your ground and do not chase.',
     },
     LT: {
-      rule: 'Block Stretch left — reach the man on you.',
+      rule: 'Block Stretch to the fake side — reach the man on you.',
       detail:
-        'The tackle is head up on you in a 5-2. Step left, hat across his playside number, sell the run. The end outside you releases with the tight end and chases nothing.',
+        'The tackle is head up on you in a 5-2. Step toward the fake, hat across his near number, sell the run. The end outside you releases with the tight end and chases nothing.',
     },
   },
 }
@@ -226,14 +233,14 @@ const vs52: FrontPlan = {
 
 const assignments: Record<OffPosId, Assignment> = {
   Q: {
-    rule: 'Open left, ride the fake, then boot right. Read flat to drag to corner.',
+    rule: 'Open to the fake side, ride the fake, then boot back the other way. Read flat to over to corner.',
     detail:
-      'Open to the left exactly like Stretch — same footwork, same depth, ball out in front of your belly. Ride the fake all the way through, THEN pull it and get around the right edge, about five yards outside the tackle and three deep. Get your shoulders around. Read it low to high: flat first, drag second, corner third. Nothing there? Tuck it and run — this play is a run for you as often as it is a pass.',
+      'Open to the fake side exactly like Stretch — same footwork, same depth, ball out in front of your belly. Ride the fake all the way through, THEN pull it and get around the boot-side edge, about five yards outside the tackle and five deep. Get your shoulders around. Read it low to high: flat first, the over at nine second, the corner third. Nothing there? Tuck it and run — this play is a run for you as often as it is a pass.',
   },
   R: {
     rule: 'Motion across and carry out the Stretch fake.',
     detail:
-      'Motion back across the formation on the cadence, take the fake from the quarterback and run the Stretch track like the ball is in your gut, all the way outside the left tackle. If you jog this, the play does not work. You are the reason the linebackers step the wrong way.',
+      'Motion back across the formation on the cadence — run it deep, behind Super, the way it is drawn — take the fake from the quarterback and run the Stretch track like the ball is in your gut, out toward the tackle on the fake side. If you jog this, the play does not work. You are the reason the linebackers step the wrong way.',
   },
   S: {
     rule: 'Sell the run, then get to the flat on the boot side.',
@@ -241,53 +248,56 @@ const assignments: Record<OffPosId, Assignment> = {
       'Two hard steps toward the run action, then get over the top of the guard and out to the flat about seven yards outside. Turn your numbers to the quarterback and be ready early — you are his first look and his outlet if the edge gets messy.',
   },
   Y: {
-    rule: 'Drag — three up, then across at four yards.',
+    rule: 'Over route — climb inside, then run across at nine yards.',
     detail:
-      'Get off the ball like you are blocking, then release inside and run flat across the field at about four yards, all the way to the boot side. Do not drift deep. Keep running until the quarterback throws it or crosses your face.',
+      'Get off the ball like you are blocking, then release INSIDE, climb to about six, and run across the field at nine yards all the way to the boot side. Do not drift deeper and do not settle short — nine is where the linebackers are not, once they chase the run. Keep running until the quarterback throws it or crosses your face.',
   },
   L: {
-    rule: 'Over route — five up, then break inside and run across deep.',
+    rule: 'Post — ten straight up, then break inside for the deep middle.',
     detail:
-      'Five yards straight upfield to hold the safety, then break inside on an angle and cross the middle at nine or ten. You are the answer if they jump the drag.',
+      'Ten yards straight up the field at the safety, then stick your outside foot in the ground and take it to the post. You clear the middle for the over route, and if the safety jumps the crosser you are gone.',
   },
   X: {
-    rule: 'Corner — stem it, plant inside, then break back out.',
+    rule: 'Corner — stem to ten, plant inside, then break back out.',
     detail:
-      'Stem up the field, give one hard step inside to move the corner, then break back out and go get it over your outside shoulder. You are the shot on this play.',
+      'Stem up the field about ten, give one hard step inside to move the corner, then break back out and go get it over your outside shoulder at eighteen. You are the shot on this play.',
   },
   LT: {
-    rule: 'Block Stretch left — take the first man to your left.',
+    rule: 'Block Stretch to the fake side — take the first man that way.',
     detail:
-      'This is the Stretch block, not a pass set. Fire out at 45 to the left and put your hat on the first defender to your play side. Stay low, stay on the line — the second you stand up and pass-set, the linebackers know.',
+      'This is the Stretch block, not a pass set. Fire out at 45 toward the fake and put your hat on the first defender that way. Stay low, stay on the line — the second you stand up and pass-set, the linebackers know.',
   },
   LG: {
-    rule: 'Block Stretch left — take the first man to your left.',
+    rule: 'Block Stretch to the fake side — take the first man that way.',
     detail:
       'Same 45-degree step you take on Stretch. Sell the run with your pads, then keep your feet moving and never let anybody cross your face back toward the quarterback.',
   },
   C: {
-    rule: 'Block Stretch left — take the first man to your left.',
+    rule: 'Block Stretch to the fake side — take the first man that way.',
     detail:
-      'Playside step, take whoever shows. Remember the right guard is pulling, so the gap behind you is open — get your head around fast and do not chase anybody downfield.',
+      'Step toward the fake and take whoever shows. Remember the guard on the boot side is pulling, so the gap behind you is open — get your head around fast and do not chase anybody downfield.',
   },
   RG: {
     rule: 'Pull flat to the boot side and kick out the edge.',
     detail:
-      'Open to the right and run flat behind the tackle — do not go deep. Find the first man outside our right tackle and kick him OUT, away from the quarterback. Your block is the door the quarterback runs through.',
+      'Open to the boot side and run flat behind the line — do not go deep. Find the first man outside our boot-side tackle and kick him OUT, away from the quarterback. Your block is the door the quarterback runs through.',
   },
   RT: {
-    rule: 'Block Stretch left — take the first man to your left.',
+    rule: 'Block Stretch to the fake side — take the first man that way.',
     detail:
-      'Step down to your left with everybody else. You are selling the run; the man behind you is the right guard\'s problem now.',
+      'Step down toward the fake with everybody else. You are selling the run; the man behind you belongs to the pulling guard now.',
   },
 }
 
 const reviewNotes = [
   "Page 19 has NO assignment table — it is three hand-drawn panels and nothing else. Everything in the assignment column of this play is football written from the drawn arrows plus standard boot rules. It needs your eyes more than any other play we have transcribed.",
-  "BIGGEST OPEN QUESTION — who carries out the fake and who blocks the edge. On the Waggle Rt panel there is a wavy line (the book's motion mark, same one used on Jet and Rocket) running from the right wing back across the formation and out toward the left tackle, and a separate black line running out to a block bar on the boot-side edge. We read that as: R motions across and takes the fake, and the RIGHT GUARD pulls to kick out the edge. The other honest reading of the same ink is: R never motions, R blocks the edge, and Super carries out the fake. Those are very different plays for R and for Super. Please settle it — it is a small change either way.",
-  "Route depths are estimates. The Waggle panel is about two inches wide on the scan and there is no depth text anywhere on the page. We used honest 8th-grade numbers: Y drag at 4, L over breaking at 5 and crossing at 9-10, X corner planting around 6, Super's flat at the line about 7 wide. Change any number and we'll re-cut it.",
-  "The quarterback's boot landmark on the scan is very shallow — the drawn line finishes almost at the line of scrimmage. We set the launch point at about 5 yards outside and 3.5 deep, which is a depth a 13-year-old can actually throw from. Flagging the deviation.",
-  "Protection rule as coded: every lineman blocks the first defender to his LEFT (the Stretch run action), which is exactly what all five block bars on the scan show. Against our 5-2 that leaves the LEFT end (E-L) unblocked, because the tight end has released on the drag. On a boot away from him that is normal, but say the word if you'd rather the left tackle fan out to him and the guard/center slide.",
+  "BIGGEST OPEN QUESTION — who carries out the fake and who blocks the edge. On the Waggle Rt panel there is a wavy line (the book's motion mark, same one used on Jet and Rocket) running from the right wing back across the formation and out toward the left tackle, and a separate black line running out to a block bar on the boot-side edge. We read that as: R motions across and takes the fake, and the RIGHT GUARD pulls to kick out the edge. The other honest reading of the same ink is: R never motions, R blocks the edge, and Super carries out the fake. Those are very different plays for R and for Super. Please settle it — it is a small change either way. (One piece of evidence, offered not to close the question but because you should have it: on a zoom of the scan the wavy line and the line running left out of the backfield are BOTH drawn in R's red, while the line to the block bar is black like the linemen, and it can be traced back to a start point directly under the right guard. Super's black line traces up over the guard and out to the flat arrow, which is a separate line.)",
+  "ROUTE DEPTHS RE-CUT after a superimpose pass on a zoom of the panel — this is the big change in this pass, so look at the picture. Our first transcription had Y on a 4-yard DRAG and L on an over crossing at 9-10. Measured against the panel's own vertical scale, the ink says the opposite: Y runs the OVER (inside release, climb to about 6, across at 9) and L runs a deep POST (about 10 straight up, then break inside to the deep middle — the drawn arrow finishes near 19). X's corner is also drawn much deeper than we had it: about a 10-yard stem, plant inside, break back out to about 18. There is NO shallow drag on this panel; the underneath level is Super's flat. Depths are still estimates — the panel has no depth text — but the ORDER and SHAPE now match the drawing. If 18-19 yards is too deep for our kids, say so and we'll compress the whole flood while keeping the shape.",
+  "The quarterback's boot landmark on the scan is DEEP, not shallow — an earlier note here said the opposite and it was wrong. The open circle is drawn about 7 yards behind the line and 5-6 yards outside, below Super. We carry it at 5.5 outside and 5.5 deep, shallower than drawn, because that is a depth a 13-year-old can actually throw from and still get around the edge. Flagging the deviation; say the word and we'll take it to the drawn 7.",
+  "R's motion track on the scan runs DEEP — the flat part of it is about two yards BEHIND Super, not between Super and the quarterback where we first had it. It is now drawn that way. The consequence is that the motion line and the quarterback's ride no longer visibly meet on our diagram, which is exactly what the scan looks like too, but it does make the mesh point a coaching-point rather than a drawing-point. And the drawn fake track stops behind the left tackle rather than running past the line of scrimmage — ours now stops there too.",
+  "Protection rule as coded: every lineman blocks the first defender to his LEFT (the Stretch run action), which is exactly what all five block bars on the scan show. Against our 5-2 that leaves the LEFT end (E-L) unblocked, because the tight end has released on the over. On a boot away from him that is normal, but say the word if you'd rather the left tackle fan out to him and the guard/center slide.",
+  "Side effect of the deeper routes: the Waggle diagram now frames about 20 yards downfield instead of 10, so it draws at a smaller scale than the run plays. That is the diagram fitting the play, not a bug — but if you want every card to share one scale, tell us and we'll cap the frame.",
+  "The right guard's pull is drawn passing BEHIND the wing and putting the block bar about 6 yards outside and 1.5 yards behind the line, so his pull path now runs past R instead of stopping inside him. The block target is unchanged (first man outside the right tackle).",
   "The right guard pulling means the backside A gap is open. That is the price of the play and it is why the fake has to be good. If you'd rather keep the guard in and have the wing kick the edge, that is the alternate reading in the note above and it fixes this at the same time.",
   "Direction: `waggleRed.direction` is 'right' — the BOOT side, not the fake side — so the playside/backside badges read from where the ball is going. The run fake goes left. Confirm that is how you want it labeled for the kids.",
   "The panel above Waggle on the same page, 'Stretch Left Boot Rt', is the same protection and the same boot with the routes handed out differently (there the left wing runs the shallow flat all the way across and the tight end runs the deep over). If you want that one in the book too it is a small file — same bones, different routes.",
@@ -303,7 +313,7 @@ export const waggleRed: Play = {
   direction: 'right',
   ballCarrier: 'Q',
   description:
-    'Our play-action bread and butter. Everything up front looks exactly like Stretch going left — same steps, same fake, the wing coming across to take the ball — and then the quarterback keeps it and boots the other way with three receivers flooding the right side: the flat underneath, the drag at four, and the corner over the top. If they chase the run, somebody is wide open. If they do not, the run was going to work.',
+    'Our play-action bread and butter. Everything up front looks exactly like Stretch going left — same steps, same fake, the wing coming across to take the ball — and then the quarterback keeps it and boots the other way into a three-level flood: Super in the flat underneath, the tight end running the over at nine, and X on the corner over the top, with L clearing the middle on the post. If they chase the run, somebody is wide open. If they do not, the run was going to work.',
   assignments,
   vs: { '44': vs44, '43': vs43, '52': vs52 } satisfies Record<FrontId, FrontPlan>,
   reviewNotes,
@@ -316,14 +326,14 @@ export const waggleRed: Play = {
  * (Waggle Rt out of Red), so there is no second scan to diff against; all three
  * of our fronts are left/right symmetric and every job flips cleanly — L is the
  * motion man and fake carrier now, LG pulls to kick the boot-side edge, R runs
- * the over route, Y still runs the drag, and X — split left — still runs the
- * corner on the boot side.
+ * the post, Y still runs the over, and X — split left — still runs the corner
+ * on the boot side.
  */
 export const waggleBlack: Play = mirrorPlay(waggleRed, {
   id: 'waggle-black',
   formation: 'black',
   description:
-    'Waggle the other way out of Black. Fake the Stretch to the right, boot left, and flood it: flat, drag, corner. L is the motion man taking the fake now and the left guard pulls to open the edge.',
+    'Waggle the other way out of Black. Fake the Stretch to the right, boot left, and flood it: flat, over, corner, with the post clearing the middle. L is the motion man taking the fake now and the left guard pulls to open the edge.',
   reviewNotes: [
     ...reviewNotes,
     'Waggle Black is generated by mirroring Waggle Red (app/utils/mirror.ts) with no hand corrections. Page 19 only draws this play in one direction, so unlike Stretch there is no second scan to check the mirror against — it is symmetric football, but nobody has seen varsity draw it.',

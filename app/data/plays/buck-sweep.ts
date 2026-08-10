@@ -42,15 +42,21 @@
  *   LT — line up and away from the ball ending on a backer → he is uncovered
  *        in the odd panel, so he climbs.
  *   C  — short hook capped on the nose.
- *   LG — flat path behind the line all the way outside the tight end, then a
- *        hard turn UP → the kick.
- *   RG — flat path behind the line, turning up INSIDE the kick puller → the
- *        wrap.
+ *   LG — flat path behind the line at about a yard of depth, stopping just
+ *        outside the tight end (x ≈ −5) and capped there with a block bar
+ *        drawn PERPENDICULAR to the flat path → the kick. He never turns up:
+ *        the kick happens behind the line of scrimmage.
+ *   RG — flat path behind the line (it runs right through the quarterback's
+ *        heels), staying flat to about x ≈ −2.5, then a diagonal turn UP into
+ *        the alley, capped around x ≈ −4 two to three yards downfield → the
+ *        wrap. He turns up INSIDE the kick puller.
  *   RT — line ripping playside and climbing.
- *   S  — one long straight line from his alignment through the center to the
- *        line of scrimmage → the midline.
- *   R  — orbit squiggle right-to-left underneath Super, then a hard turn up
- *        into the alley with an arrowhead → he has the ball.
+ *   S  — one long straight line from his alignment through the center to about
+ *        three yards past the line of scrimmage → the midline.
+ *   R  — orbit squiggle right-to-left underneath Super, flat at five yards to
+ *        about x ≈ −2.5, then a hard turn up with an arrowhead → he has the
+ *        ball. Measured off the scan he turns up INSIDE the tight end, tight
+ *        behind the wrapping guard — not around the kick block.
  */
 
 import type {
@@ -87,11 +93,11 @@ const R_SWEEP: Action[] = [
     kind: 'carry',
     path: [
       { x: -1.8, y: -5.1 },
-      { x: -3.6, y: -4.6 },
-      { x: -5, y: -3.5 },
-      { x: -5.8, y: -1.6 },
-      { x: -5.9, y: 1 },
-      { x: -5.6, y: 4.8 },
+      { x: -3.2, y: -4.9 },
+      { x: -4.1, y: -3.8 },
+      { x: -4.5, y: -2 },
+      { x: -4.4, y: 1 },
+      { x: -4.2, y: 4.8 },
     ],
   },
 ]
@@ -104,7 +110,7 @@ const S_MIDLINE: Action[] = [
       { x: 0, y: -3.2 },
       { x: 0, y: -1.6 },
       { x: 0, y: 0.4 },
-      { x: 0, y: 2.6 },
+      { x: 0, y: 3.4 },
     ],
   },
 ]
@@ -147,9 +153,9 @@ const LG_KICK: Action = {
   kind: 'run',
   path: [
     { x: -2.2, y: -1.1 },
-    { x: -3.8, y: -1.4 },
-    { x: -5.2, y: -1.2 },
-    { x: -6.2, y: -0.3 },
+    { x: -3.6, y: -1.3 },
+    { x: -4.6, y: -1.2 },
+    { x: -5.4, y: -0.9 },
   ],
 }
 
@@ -158,10 +164,10 @@ const RG_WRAP: Action = {
   kind: 'run',
   path: [
     { x: 1, y: -1.3 },
-    { x: -0.8, y: -1.8 },
-    { x: -2.8, y: -1.9 },
-    { x: -4.4, y: -1.2 },
-    { x: -5, y: 0.6 },
+    { x: -0.6, y: -1.8 },
+    { x: -2.4, y: -1.7 },
+    { x: -3.6, y: -0.5 },
+    { x: -4.1, y: 1.6 },
   ],
 }
 
@@ -253,7 +259,7 @@ const vs43: FrontPlan = {
     Y: {
       rule: 'Down first — nobody there, climb to the outside backer.',
       detail:
-        'The outside backer is sitting right over you at four and a half yards. Get off the ball clean and go get him.',
+        'The outside backer is sitting head up on you at four and a half yards. Get off the ball clean and go get him.',
     },
     LT: {
       rule: 'Down — take the tackle over the guard.',
@@ -261,7 +267,7 @@ const vs43: FrontPlan = {
     },
     C: {
       rule: 'Uncovered playside — block back.',
-      detail: 'Step playside, then take the down man on the back side that the pulling guard left.',
+      detail: 'Step playside, then take the down man on the back side that the pulling guard left behind.',
     },
     LG: {
       rule: 'Pull — nobody to kick, turn up on the first color.',
@@ -314,7 +320,7 @@ const vs52: FrontPlan = {
     C: {
       rule: 'Covered — block the nose.',
       detail:
-        'The nose is right on you and both guards are pulling. You are alone on him — playside foot first, hat on his playside number, and do not lose him.',
+        'The nose is head up on you and both guards are pulling. You are alone on him — playside foot first, hat on his playside number, and do not lose him.',
     },
     LG: {
       rule: 'Pull — turn up and kick the corner.',
@@ -397,12 +403,15 @@ const assignments: Record<OffPosId, Assignment> = {
 const reviewNotes = [
   "DIRECTION. Page 8's main diagram is Buck Sweep to the LEFT out of Red — to the tight end — so Red is left here and Black is its mirror (right). Note that page 9 also draws Buck RIGHT out of Red, away from the tight end. If you want the away-from-the-tight-end version in the book as a separate call, it is a small addition; right now both of our diagrams are the tight-end-side sweep.",
   "THE PLAYSIDE WING BLOCKS DOWN, NOT OUT. Page 9's odd panel clearly caps his block on the defender INSIDE him, and the kick-out belongs to the playside guard. That is the single most common thing a 13-year-old gets backwards on this play, so it is spelled out in his detail text. Confirm that is how you teach it.",
+  "SCAN AMBIGUITY ON THE EDGE. Measured off page 8, the wing's block bar and the kick puller's block bar land on nearly the same spot — both within half a yard of the walked-up edge backer (the green B, which is our E-L in the 5-2). One of them has to be on somebody else. We resolved it the way the table reads: the wing takes him (Gap - Down - Climb finds him in the wing's inside gap) and the guard kicks the next color outside. If you teach it the other way — guard kicks the edge man, wing climbs past him to the alley/strong safety — say so and we will swap those two targets in all three fronts.",
+  "BALL-CARRIER DEPTH AND TIGHTNESS (changed). We had the wing bellying out to about six yards wide and turning up OUTSIDE the kick block. Measured against page 8 that was wrong: on the scan he runs flat at five yards to about two and a half yards outside the ball, then turns up INSIDE the tight end, tight behind the wrapping guard. Both pull paths were tightened to match (the kick now stays flat and stops just outside the tight end instead of turning up at six yards wide; the wrap now turns up at about four yards wide instead of five). This is the change a coach should eyeball first.",
   "THE KICK PULLER'S TARGET CHANGES BY FRONT and this is our football call, not something the scan draws against our fronts. 4-4: he kicks the walked-up backer (S) — a real kick-out. 4-3 and 5-2: nobody is standing on that edge, so he turns straight up and takes the first color in the alley — we sent him to the playside safety in the 4-3 and to the corner in the 5-2. Please confirm those two, especially the 5-2 (asking a guard to kick a corner is a long run).",
   "THE WRAP PULLER'S TARGET likewise: 4-4 free safety, 4-3 Mike, 5-2 playside safety. The rule in his assignment ('first color in the alley') is the thing to teach; the specific man is our reading of each front.",
   "THE CENTER. Page 9 caps his block on the nose in the odd panel. Against our even fronts nobody is on his nose and the backside guard has pulled, so we have him block BACK on the down man over the vacated guard. That is standard buck-sweep center play but it is not literally drawn anywhere — confirm.",
   "Q'S FOOTWORK. The table says 'Open up away from call working to mesh at 5 yards behind you.' We drew that as a reverse pivot away from the call, back to a five-yard mesh, then the boot away. If your quarterbacks open TO the call instead, tell us and the path changes.",
   "S RUNS THE MIDLINE and is drawn as a fake, not a carry — one straight line up the middle. He is the 'buck' in Buck Sweep. The scan draws it as one long straight line through the center, which is what we copied.",
-  "X on the back side is drawn as a free route, per the WR row in the table ('Backside: Free route'). We made it a vertical that runs the corner off. If you want him blocking the corner instead — like he does on Veer — say so.",
+  "LONG BLOCK BARS IN THE 4-3 AND 5-2. Because those two fronts leave nobody standing on the playside edge, the kick puller's target is a long way from where he pulls to (the playside safety in the 4-3, the corner in the 5-2), and the same is true of the wrap puller's free safety in the 4-4. The diagram therefore draws those three blocks as long lines running well downfield, which is honest about the assignment but does not look like the scan, where every block bar sits within about three yards of the ball. If you would rather the kick and wrap simply turn up and take the first color in the alley without naming a man that far away, tell us and we will retarget them.",
+  "X on the back side is drawn as a free route, per the WR row in the table ('Backside: Free route'). We made it a vertical that runs the corner off. Note that page 8 actually draws him with a short stem and then a FORK — one arrow breaking in and up, one arrow flat to the outside — which is the scan's way of saying 'free route, take what he gives you'. We could not draw a fork with one path, so we shipped the vertical. If you want the fork in the book, say so.",
 ]
 
 export const buckSweepRed: Play = {

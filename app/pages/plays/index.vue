@@ -1,24 +1,46 @@
 <script setup lang="ts">
 import type { Play } from '~/types/football'
-import { plays, formations } from '~/data'
+import { audiblePlays, plays, formations } from '~/data'
 
 useHead({ title: 'Plays — Wolves Playbook' })
 
 /**
  * Pair mirrored plays (veer-red / veer-black) into one card per concept,
  * grouped by family. Designed to scale to ~12 concepts.
+ *
+ * A card is either a CONCEPT — one play with a Red and a Black door — or a
+ * single door onto something bigger. The audible is the second kind: its
+ * three worked examples are not three concepts, they are three examples of
+ * one system, so they collapse into one card that opens /audible.
  */
 interface Concept {
   name: string
   callName?: string
   family: Play['family']
   description: string
-  directions: { id: string; formationName: string }[]
+  directions?: { id: string; formationName: string }[]
+  /** Set instead of `directions` when the card is a single door. */
+  to?: string
+  toLabel?: string
+}
+
+/** The audible examples live on /audible, not on a card of their own. */
+const audibleIds = new Set(audiblePlays.map((p) => p.id))
+
+const audibleCard: Concept = {
+  name: 'Audible',
+  callName: 'Formation · protection · two digits',
+  family: 'pass',
+  description:
+    'The numbered passing system. Every route on the tree has a digit, and a call is just the formation, the protection, and two digits read outside-to-in. Three worked examples inside — or call your own and see it drawn.',
+  to: '/audible',
+  toLabel: 'Open',
 }
 
 const concepts = computed<Concept[]>(() => {
   const byName = new Map<string, Play[]>()
   for (const play of Object.values(plays) as Play[]) {
+    if (audibleIds.has(play.id)) continue
     const list = byName.get(play.name) ?? []
     list.push(play)
     byName.set(play.name, list)
@@ -39,7 +61,10 @@ const concepts = computed<Concept[]>(() => {
 })
 
 const runs = computed(() => concepts.value.filter((c) => c.family === 'run'))
-const passes = computed(() => concepts.value.filter((c) => c.family === 'pass'))
+const passes = computed(() => [
+  ...concepts.value.filter((c) => c.family === 'pass'),
+  audibleCard,
+])
 </script>
 
 <template>
@@ -84,6 +109,10 @@ const passes = computed(() => concepts.value.filter((c) => c.family === 'pass'))
           </div>
           <p class="play-desc muted">{{ c.description }}</p>
           <div class="dir-row">
+            <NuxtLink v-if="c.to" :to="c.to" class="dir-link">
+              {{ c.toLabel ?? 'Open' }}
+              <Icon name="lucide:arrow-right" class="dir-arrow" aria-hidden="true" />
+            </NuxtLink>
             <NuxtLink
               v-for="d in c.directions"
               :key="d.id"

@@ -11,6 +11,14 @@ export default defineNuxtConfig({
   // <PlayDiagram> not <DiagramPlayDiagram> — SEAM §3 component contracts
   components: [{ path: '~/components', pathPrefix: false }],
 
+  // Offline PWA: icons must never come from the iconify network API. Serve
+  // SSR icons from the locally installed @iconify-json/lucide and compile every
+  // statically-used icon into the client bundle.
+  icon: {
+    serverBundle: { collections: ['lucide'] },
+    clientBundle: { scan: true, sizeLimitKb: 512 },
+  },
+
   fonts: {
     families: [
       { name: 'Barlow Condensed', weights: [600, 700] },
@@ -84,18 +92,27 @@ export default defineNuxtConfig({
       // the whole precache install. navigateFallback covers offline navigation,
       // so these two error pages don't need to be cached at all.
       globIgnores: ['404.html', '200.html'],
-      // The module also rewrites directory pages to extensionless clean URLs
-      // ("plays/veer-black"), but browsers navigate to "/plays/veer-black/" —
-      // neither that nor its directoryIndex variant matches the stored key, so
-      // every SW-controlled play navigation fell through to navigateFallback
-      // and got the HOME page. Restore ".../index.html" keys so directoryIndex
-      // matching works.
+      // The module rewrites directory pages to extensionless clean URLs
+      // ("plays/veer-black"), but precache lookups only try the EXACT request
+      // URL plus its directoryIndex/param-stripped variations — so whichever
+      // single form we precache, the other 404s to the fallback. Browsers hit
+      // both: the app's links are slash-less, deep links and redirects add the
+      // slash. Precache every page under BOTH keys (same revision, ~KBs of
+      // duplicate HTML) so "/plays/x" and "/plays/x/" each match directly.
+      // LOAD-BEARING. Declaring manifestTransforms disables the module's
+      // built-in clean-URL rewrite, which used to strip ".../index.html" down
+      // to extensionless-ONLY keys — a form no browser navigation could ever
+      // match, so every SW-controlled navigation fell through to the fallback
+      // and showed the HOME page. Here each directory page keeps its raw
+      // ".../index.html" key ("/plays/x/" matches via directoryIndex) AND
+      // gains an extensionless twin (the app's slash-less links match it
+      // directly). Same revision, a few KB of duplicate HTML.
       manifestTransforms: [
         async (entries: { url: string; revision: string | null }[]) => ({
-          manifest: entries.map((e) =>
-            /\.[a-z0-9]+$/i.test(e.url)
-              ? e
-              : { ...e, url: `${e.url.replace(/\/$/, '')}/index.html` },
+          manifest: entries.flatMap((e) =>
+            e.url !== 'index.html' && e.url.endsWith('/index.html')
+              ? [e, { ...e, url: e.url.slice(0, -'/index.html'.length) }]
+              : [e],
           ),
           warnings: [],
         }),
@@ -108,7 +125,9 @@ export default defineNuxtConfig({
       // SW misses and navigateFallback serves the HOME page for play URLs.
       ignoreURLParametersMatching: [/^front$/, /^utm_/, /^fbclid$/],
       cleanupOutdatedCaches: true,
-      navigateFallback: '/',
+      // Must be an EXACT precache key — createHandlerBoundToURL does no
+      // directoryIndex resolution, so '/' would hard-fail every fallback.
+      navigateFallback: '/index.html',
       navigateFallbackDenylist: [/^\/_nuxt\//, /\.[a-z0-9]+$/i],
     },
     client: { installPrompt: true },
