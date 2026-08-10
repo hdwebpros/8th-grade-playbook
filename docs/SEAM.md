@@ -49,8 +49,10 @@ Shape summary — read the types file for exact fields:
     varsity terms like *Rip*, *Scoop*, *Base*) and `detail` (coaching points).
   - `vs` — per-front plan (`FrontPlan`): a **complete** per-player action map
     for that front, plus assignment-text overrides where the front changes the
-    job, plus the `readKey` (defender id) for option plays. Reuse across
-    fronts happens with TS spreads in the data files, not in the schema.
+    job, plus the `readKey` (defender id) for option plays, plus optional
+    `ignored` (defender ids the scheme deliberately leaves unblocked — e.g.
+    the men the option handles). Reuse across fronts happens with TS spreads
+    in the data files, not in the schema.
 - **`Action`** — a semantic, typed movement: `kind` ∈
   `carry | run | route | block | motion | pitch | fake`, a path of yard
   points, optional `targetId` (a defender id). **Semantics in, styling out**:
@@ -103,7 +105,9 @@ tap-a-player interaction.
 `--dg-defense`, same size as offensive letters, 600 weight. Visually "them":
 present, legible, unmarked. The **read key** defender gets a `--dg-accent`
 dashed ring plus a small `READ` caption — the one defensive callout the
-option game needs.
+option game needs. Defenders in a plan's `ignored` list get a smaller
+`--dg-defense` dashed ring, no caption — "nobody blocks him on purpose";
+the read key never doubles up (its READ ring already says it).
 
 **Paths.** All paths smoothed (Catmull-Rom → cubic Bézier), round caps:
 

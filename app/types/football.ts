@@ -128,6 +128,11 @@ export interface FrontPlan {
   alignOverrides?: Partial<Record<OffPosId, Pt>>
   /** Defender id of the option read key, if this play reads one. */
   readKey?: string
+  /**
+   * Defender ids deliberately left unblocked in this picture (beyond the read
+   * key) — the scheme handles them, e.g. the option. Drawn with a dashed ring.
+   */
+  ignored?: string[]
 }
 
 export type PlayFamily = 'run' | 'pass'

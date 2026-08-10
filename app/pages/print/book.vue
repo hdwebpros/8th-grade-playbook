@@ -343,6 +343,34 @@ const totalPages = BACK_PAGE
             </div>
           </div>
 
+          <div class="legend-item">
+            <svg class="legend-swatch" viewBox="0 0 62 30" aria-hidden="true">
+              <circle
+                cx="18"
+                cy="15"
+                r="9"
+                fill="none"
+                stroke="#555"
+                stroke-width="1.5"
+                stroke-dasharray="3 4"
+              />
+              <text
+                x="18"
+                y="15"
+                class="lg-glyph"
+                fill="#555"
+                text-anchor="middle"
+                dominant-baseline="central"
+              >
+                W
+              </text>
+            </svg>
+            <div class="legend-text">
+              <div class="lg-name">Leave him</div>
+              <div class="lg-desc">Dashed grey ring: nobody blocks him on purpose — the play handles him.</div>
+            </div>
+          </div>
+
           <!-- Lines -->
           <div class="legend-item">
             <svg class="legend-swatch" viewBox="0 0 62 30" aria-hidden="true">

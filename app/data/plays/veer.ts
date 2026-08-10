@@ -102,28 +102,19 @@ const L_PITCH: Action[] = [
 const X_CORNER: Action[] = block('C-R')
 
 /**
- * R: tight off the read key's hip before he pins anybody. The scan draws this
- * as a tall, essentially VERTICAL stem off the read key — three-plus yards
- * straight up before he ever turns to a blocker — so the stem is authored that
- * way instead of drifting out toward the sideline.
- */
-const WING_TIGHT: Action = {
-  kind: 'run',
-  path: [
-    { x: 4.4, y: 0.8 },
-    { x: 4.8, y: 2.8 },
-  ],
-}
-
-/**
- * Y on the backside Rip. Every panel on pages 5 and 6 starts his arrow INSIDE
- * the end — it leaves the tight end going up and toward the ball, never out —
- * so the inside step is authored as a real path and the block bar then walls
- * the end off from that inside position.
+ * Y on the backside Rip. His arrow leaves the tight end going up and INSIDE
+ * (toward the ball), curving like the scan, and his bar sets around 3 yards —
+ * he is the backside anchor of the wall.
  */
 const Y_RIP: Action[] = [
-  { kind: 'run', path: [{ x: -3.9, y: 1.2 }] },
-  ...block('E-L'),
+  {
+    kind: 'block',
+    path: [
+      { x: -4.35, y: 0.9 },
+      { x: -4.05, y: 2 },
+      { x: -3.6, y: 3 },
+    ],
+  },
 ]
 
 const SKILL = {
@@ -133,31 +124,62 @@ const SKILL = {
   X: X_CORNER,
 } satisfies Partial<Record<OffPosId, Action[]>>
 
-/**
- * LT on Rip vs an even front. The scan (p5, and p6's "vs Even" panel) draws his
- * first move as a step DOWN THE LINE into the guard's spot — he ends up almost
- * standing where LG lined up — and only from there does he climb to the
- * backside backer. Authoring that first step keeps the arrow pointing inside
- * instead of leaking out toward the end.
- */
-const LT_RIP: Action[] = [
-  { kind: 'run', path: [{ x: -1.9, y: 0.3 }] },
-  ...block('B-L'),
-]
-
 // ---------------------------------------------------------------------------
-// Line work shared by the two EVEN fronts (4-4 and 4-3).
-//   Backside: LG has the down man on him, LT steps down into the guard's spot
-//             and climbs to the backside backer, Y rips inside and walls the
-//             backside end.
-//   Playside: RG bases the down man, RT veers inside to a backer.
+// Line work shared by the two EVEN fronts (4-4 and 4-3), drawn to Ryan's
+// red-line markup of the scan (2026-08-10): the blocks build one rising WALL.
+// Every path curves, every bar cuts back toward the backside, and the
+// climbers set their bars around the 3–4 yard mark.
+//   Backside: LT steps down and takes the down man on the guard; LG climbs
+//             to the wall at the backside backer; Y rips inside and anchors
+//             the backside of the wall.
+//   Playside: RG bases the down man, RT veers inside and climbs to the wall.
 // ---------------------------------------------------------------------------
 
+// Each blocker is ONE continuous `block` action — a chained run + block would
+// draw a stray arrowhead halfway up the line where the run segment ends.
 const EVEN_LINE = {
   Y: Y_RIP,
-  LT: LT_RIP,
-  LG: block('T-L'),
-  RG: block('T-R'),
+  // LT pulls: steps down the line behind the guard, comes around the far
+  // (playside) side of the man on him, and washes him AWAY from the play —
+  // the bar lands on the DT's playside shoulder, pushing backside.
+  // Down-lineman bars set a yard PAST the LOS: we block down and drive them
+  // back off the line, never stalemate on it.
+  LT: [
+    {
+      kind: 'block',
+      path: [
+        { x: -1.8, y: 0.1 },
+        { x: -0.8, y: 0.5 },
+        { x: -0.6, y: 1.2 },
+        { x: -1, y: 1.7 },
+      ],
+    },
+  ],
+  RG: [
+    {
+      kind: 'block',
+      path: [
+        { x: 2.1, y: 0.4 },
+        { x: 2.3, y: 1.1 },
+        { x: 2, y: 1.6 },
+      ],
+    },
+  ],
+  // The wing pins the SAME way vs both even fronts: barely around the read
+  // key's outside hip, bar cutting back inside on the first backer that
+  // shows. Vs the 4-4 the walked-up outside backer is IGNORED, like the read
+  // key — the option handles both.
+  R: [
+    {
+      kind: 'block',
+      path: [
+        { x: 4.8, y: 0.1 },
+        { x: 5.4, y: 1.6 },
+        { x: 5.3, y: 3.3 },
+        { x: 4.75, y: 4.1 },
+      ],
+    },
+  ],
 } satisfies Partial<Record<OffPosId, Action[]>>
 
 // ---------------------------------------------------------------------------
@@ -166,34 +188,67 @@ const EVEN_LINE = {
 
 const vs44: FrontPlan = {
   readKey: 'E-R',
+  // Two men on the playside edge are deliberately unblocked — the read-key
+  // end and the walked-up outside backer. The option handles both; the
+  // diagram rings them dashed so nobody thinks it's a missed assignment.
+  ignored: ['E-R', 'O-R'],
   actions: {
     ...SKILL,
     ...EVEN_LINE,
-    // "Uncovered: Get Vertical" — the scan draws a straight climb up the middle
-    // to about backer depth before any block bar. Our 4-4 has no unblocked
-    // second-level defender there (both backers are the tackles' men), so the
-    // climb carries on to the free safety.
-    C: [{ kind: 'run', path: [{ x: 0, y: 4.2 }] }, ...block('F')],
-    RT: block('B-R'),
-    R: [WING_TIGHT, ...block('O-R')],
+    // Uncovered: get vertical, curve back, and set the bar on the wall around
+    // 3–4 yards — on nobody in particular, exactly like the scan.
+    C: [
+      {
+        kind: 'block',
+        path: [
+          { x: 0.2, y: 1 },
+          { x: 0.1, y: 2.2 },
+          { x: -0.4, y: 3.3 },
+        ],
+      },
+    ],
+    LG: [
+      {
+        kind: 'block',
+        path: [
+          { x: -1.2, y: 0.9 },
+          { x: -1.5, y: 2.2 },
+          { x: -1.7, y: 3.3 },
+        ],
+      },
+    ],
+    RT: [
+      {
+        kind: 'block',
+        path: [
+          { x: 3.1, y: 1 },
+          { x: 2.7, y: 2.6 },
+          { x: 2.2, y: 3.5 },
+        ],
+      },
+    ],
   },
   assignments: {
     C: {
-      rule: 'Step playside. Uncovered — get vertical.',
+      rule: 'Step playside. Uncovered — get vertical and wall off.',
       detail:
-        "Nobody on your nose in an even front. Step playside, then run vertical up the middle and take the first jersey that shows — the free safety is the man nobody else has.",
+        'Nobody on your nose in an even front. Step playside, climb to the second level, and wall off the first jersey that shows. Your block is the middle of the wall — do not chase anybody deep.',
     },
     RT: {
       rule: 'Step inside, veer inside — up to the backer.',
       detail: 'The end outside you is the read key: leave him alone. Release inside him and climb to the backer over the guard.',
     },
     R: {
-      rule: 'Tight off the read key — pin the outside backer.',
-      detail: 'Run tight off the read key\'s hip, then pin the walked-up backer inside. If he beats you outside, hit the near color.',
+      rule: 'Tight off the read key — pin the first backer.',
+      detail: 'The read key AND the walked-up backer outside you are both left alone — the option takes care of them. Squeeze tight around the read key, barely off his outside hip, and pin the first backer that shows, pushing him back toward the inside. Rule two: if you miss him, hit the near color — find an opponent and block.',
     },
     LT: {
-      rule: 'Rip with the guard inside you — step down, then climb to the backside backer.',
-      detail: 'Even front, so it\'s Rip. First step is DOWN the line into the guard\'s spot — you should finish about where he lined up — then climb to the backer away from the play. Never step out, and never let him chase us from behind.',
+      rule: 'Rip — pull behind the guard, wash his man away from the play.',
+      detail: 'Even front, so it\'s Rip. Pull down the line behind the guard, come around the FAR side of the tackle on him, and push him away from the playside — your block lands on his playside shoulder, driving him back where we came from. The guard climbs to the wall.',
+    },
+    LG: {
+      rule: 'Rip — climb to the wall at the backside backer.',
+      detail: 'The tackle outside you takes the man on your nose, so you climb. Get to the second level, bend back toward the backside, and set your block on the backer around three to four yards — that is your piece of the wall.',
     },
   },
 }
@@ -203,9 +258,36 @@ const vs43: FrontPlan = {
   actions: {
     ...SKILL,
     ...EVEN_LINE,
-    C: block('M'),
-    RT: block('B-R'),
-    R: [WING_TIGHT, ...block('F-R')],
+    C: [
+      {
+        kind: 'block',
+        path: [
+          { x: 0.2, y: 1 },
+          { x: 0.1, y: 2.4 },
+          { x: -0.3, y: 3.8 },
+        ],
+      },
+    ],
+    LG: [
+      {
+        kind: 'block',
+        path: [
+          { x: -1.2, y: 0.9 },
+          { x: -1.9, y: 2.4 },
+          { x: -3.4, y: 4 },
+        ],
+      },
+    ],
+    RT: [
+      {
+        kind: 'block',
+        path: [
+          { x: 3.1, y: 1.2 },
+          { x: 3, y: 2.6 },
+          { x: 2.6, y: 3.7 },
+        ],
+      },
+    ],
   },
   assignments: {
     C: {
@@ -213,16 +295,20 @@ const vs43: FrontPlan = {
       detail: 'Even front again, and the Mike is stacked head up on you. Step playside, get vertical, and put your hat on him.',
     },
     RT: {
-      rule: 'Step inside, veer inside — up to the Sam.',
-      detail: 'Release inside the read key and climb to the backer on your side. He is the guy who tackles the dive.',
+      rule: 'Step inside, veer inside — climb to the wall.',
+      detail: 'Release inside the read key and climb. The Sam is the wing\'s man to pin, so you wall off the first jersey that shows inside him — set your block on the wall around three to four yards.',
     },
     R: {
-      rule: 'Tight off the read key — hit near color.',
-      detail: 'Both backers are already blocked in this front, so run tight off the read key and keep climbing to the safety on your side. That block is what turns a keep into a long run.',
+      rule: 'Tight off the read key — pin the Sam.',
+      detail: 'Squeeze tight around the read key — barely off his outside hip — and pin the Sam, pushing him back toward the inside. Rule two: if you miss him, hit the near color — find an opponent and block.',
     },
     LT: {
-      rule: 'Rip with the guard inside you — step down, then climb to the backside backer.',
-      detail: 'Even front, so it\'s Rip. First step is DOWN the line into the guard\'s spot, then climb and cut off the backer away from the play. The Will is wider in this front, so you have farther to run — go get him.',
+      rule: 'Rip — pull behind the guard, wash his man away from the play.',
+      detail: 'Even front, so it\'s Rip. Pull down the line behind the guard, come around the FAR side of the tackle on him, and push him away from the playside. The guard climbs behind you.',
+    },
+    LG: {
+      rule: 'Rip — climb to the wall at the backside backer.',
+      detail: 'The tackle outside you takes the man on your nose, so you climb and bend back to the backer away from the play. The Will is wider in this front, so you have farther to run — go get him.',
     },
   },
 }
@@ -232,37 +318,94 @@ const vs52: FrontPlan = {
   actions: {
     ...SKILL,
     Y: Y_RIP,
-    LT: block('T-L'),
-    LG: block('N'),
-    C: block('N'),
-    RG: block('B-L'),
-    RT: block('B-R'),
-    R: block('E-R'),
+    // Same wall as the even fronts. The scoop puts LG on the nose and frees
+    // the center to climb; every bar besides the wing's cuts backside. Bars on
+    // down linemen set a yard past the LOS — block down, drive them back.
+    LT: [
+      {
+        kind: 'block',
+        path: [
+          { x: -2.5, y: 0.3 },
+          { x: -2.2, y: 1 },
+          { x: -2.5, y: 1.6 },
+        ],
+      },
+    ],
+    LG: [
+      {
+        kind: 'block',
+        path: [
+          { x: -0.6, y: 0.3 },
+          { x: 0.6, y: 1 },
+          { x: 0.35, y: 1.6 },
+        ],
+      },
+    ],
+    C: [
+      {
+        kind: 'block',
+        path: [
+          { x: 0.5, y: 0.8 },
+          { x: -0.3, y: 2.2 },
+          { x: -1.4, y: 3.5 },
+        ],
+      },
+    ],
+    RG: [
+      {
+        kind: 'block',
+        path: [
+          { x: 1.6, y: 1 },
+          { x: 1.3, y: 2.4 },
+          { x: 0.7, y: 3.4 },
+        ],
+      },
+    ],
+    RT: [
+      {
+        kind: 'block',
+        path: [
+          { x: 2.5, y: 1 },
+          { x: 2.4, y: 2.4 },
+          { x: 1.8, y: 3.4 },
+        ],
+      },
+    ],
+    R: [
+      {
+        kind: 'block',
+        path: [
+          { x: 4, y: 0.2 },
+          { x: 4.4, y: 0.6 },
+          { x: 4.7, y: 0.8 },
+        ],
+      },
+    ],
   },
   assignments: {
     C: {
       rule: 'Step playside. Covered — Scoop with the backside guard.',
-      detail: "Odd front: the nose is head up on you. Step playside and take his playside number; the backside guard is coming behind you for him. That's Scoop.",
+      detail: "Odd front: the nose is head up on you. Step playside and take his playside number until the backside guard takes him over — then climb to the wall, bending back to the backside backer around three to four yards. That's Scoop.",
     },
     LG: {
       rule: 'Odd — Scoop with C.',
-      detail: 'Step playside and get your shoulder on the nose. If the nose slants away from us, he is yours alone and the center climbs.',
+      detail: 'Step playside and take the nose over so the center can climb. Get your hat on his playside number and push him back toward the backside. If the nose slants away from us, he is yours alone and the center climbs early.',
     },
     LT: {
       rule: 'Rip — take the man on you.',
-      detail: 'The tackle is head up on you. Step playside, get your hat across him, and wall him off from the ball.',
+      detail: 'The tackle is head up on you. Step playside, get your hat across his playside number, and push him back toward the backside — nothing chases us from behind.',
     },
     RG: {
-      rule: 'Step inside. Uncovered — base the backer.',
-      detail: 'Nobody on you in a 5-2. Step playside off the scoop and climb to the backer away from the play — he is the one chasing the dive.',
+      rule: 'Step inside. Uncovered — climb to the wall.',
+      detail: 'Nobody on you in a 5-2. Climb to the second level, bend back toward the backside, and set your block around three to four yards — your piece is the middle of the wall.',
     },
     RT: {
       rule: 'Step inside, veer inside — up to the backer.',
-      detail: 'In an odd front the read key is the man head up on YOU. Do not block him. Step inside him and climb to the backer on your side.',
+      detail: 'In an odd front the read key is the man head up on YOU. Do not block him. Release inside him, climb to the backer on your side, and bend your block back into the wall.',
     },
     R: {
-      rule: 'Tight off the read key — hit near color.',
-      detail: 'Both backers are covered inside, so come tight off the read key and take the end outside you. Kick him out and the keep lane opens.',
+      rule: 'Tight off the read key — kick out the end.',
+      detail: 'Both backers are covered inside, so come tight off the read key and kick the end outside you OUT. Yours is the one block that pushes away from the wall — the ball runs between your kick-out and the wall.',
     },
   },
 }
@@ -287,11 +430,11 @@ const assignments: Record<OffPosId, Assignment> = {
   },
   LG: {
     rule: 'Even: Rip with the tackle outside you. Odd: Scoop with C.',
-    detail: 'Look at the center\'s nose. Nobody there (even) — Rip with the tackle outside you. A nose guard there (odd) — Scoop it with the center.',
+    detail: 'Look at the center\'s nose. Nobody there (even) — Rip: the tackle steps down for the man on you, and you climb to the wall at the backside backer. A nose guard there (odd) — Scoop it with the center.',
   },
   LT: {
     rule: 'Rip with the guard inside you.',
-    detail: 'Step playside with the guard, hip to hip — your first step is DOWN the line into his outside hip, never out. Take the man in the gap or climb to the backside backer; nothing chases us from behind.',
+    detail: 'Your first step is DOWN the line behind the guard, never out. Pull around the far side of the man on him, get your hat on his playside number, and push him away from the play; nothing chases us from behind.',
   },
   Y: {
     rule: 'Backside: Rip. (Playside: base the first man outside the read key.)',
@@ -300,7 +443,7 @@ const assignments: Record<OffPosId, Assignment> = {
   },
   R: {
     rule: 'Tight off the read key — pin the backer.',
-    detail: 'Run tight off the read key\'s hip, then pin the first backer. Second job: if you miss him, hit the near color.',
+    detail: 'Rule one: squeeze barely around the read key\'s outside hip and PIN the first backer — push him back toward the inside, never chase him upfield. Rule two: if you miss him, hit the near color — find an opponent and block.',
   },
   L: {
     rule: 'Pitch man. Motion through the heels of Super.',
@@ -326,20 +469,18 @@ const assignments: Record<OffPosId, Assignment> = {
 
 const reviewNotes = [
   "Indy vs Hoosier: pages 5 and 6 title every panel 'INDY/HOOSIER' and never say which is which. Coach Ryan's read: they may not be directions at all — possibly what we call it based on what we see in the defense. Waiting on the director's answer before wiring callName to either play.",
-  "Backside Y: the table says 'Backside: Rip' and the scan shows him releasing INSIDE the end toward the backside backer — measured off p5 and both p6 panels, his arrow starts inside the end and the block bar lands about 2½ yards upfield, between the down man and the backside backer. It is not drawn on the end. Against our 4-4 and 4-3 that backer already belongs to the backside tackle, so Y is assigned to rip inside and then wall off the backside end rather than double the backer. Confirm which man you want him on.",
-  "Backside Y, arrow shape (fixed): before this pass Y's only action was a block on the end, which draws a stub bar pointing OUT toward the sideline — the opposite of every scan panel, where the arrow leaves the tight end going up and INSIDE. He now takes a real rip step inside and up first, and the block bar walls the end off from that inside position. Note that varsity aligns their backside end on the tight end's INSIDE shoulder while our 4-4/4-3 put E-L a shade outside him; that alignment difference is why the bar still finishes slightly outward instead of landing where the scan's does.",
-  "Backside LT: p5 and p6's 'vs Even' panel both draw his first move as a step down the line into the guard's spot before he climbs — that is now authored as a real path, so the arrow can never point out toward the end. The scan's block bar stops in the backside A gap about 2 yards deep; we finish it on the backside backer because he is the only man back there.",
-  "Playside wing vs the 4-3: the rule is 'tight off the read key to pin the LB', but in our 4-3 the playside backer is the tackle's man, so the wing runs his 2nd rule ('hit near color') and climbs to the playside safety. Confirm.",
-  "Playside wing vs the 4-4: the scan runs him up past the read key and then hooks him back INSIDE, with the block bar on the inside backer. In the varsity even front that backer is the one our RT already climbs to, so R is assigned to the walked-up S on his side — the outside man, which is also the defender the scan boxes as the pitch key. Confirm whether you want the wing pinning the inside backer and the tackle working elsewhere.",
+  "The wall (Ryan's red-line markup of the scan, 2026-08-10): the teaching point of veer blocking is one rising WALL. Every blocker's line now CURVES like the original drawing, and every block besides Y's cuts back toward the backside; the climbers — Y, LG, C, and RT — all set their bars around the 3–4 yard mark; the playside wing is NOT a climber, he squeezes around the read key and pins the backer back inside. Y is the mirror image: he rips up and INSIDE (toward the ball) and anchors the backside of the wall at about 3 yards instead of barring on the end. On the Rip that means LT PULLS — down the line behind the guard, around the far side of the DT, bar on the DT's playside shoulder washing him away from the play — and LG climbs to the wall at the backside backer, the reverse of how the first pass authored it. Every blocker is drawn as one continuous curved block stroke; chaining a run into a block puts a stray arrowhead mid-line.",
+  "Playside wing (fixed again, Ryan 2026-08-10): rule one everywhere — tight off the read key to pin the LB. He squeezes BARELY around the read key's outside hip (to the right on Red) and pins with his bar pushing back toward the inside, never a deep climb — the SAME stroke vs both even fronts. Vs the 4-4 the playside edge has TWO ignored defenders: the read-key end and the walked-up outside backer; the option handles both, and the wing pins the first backer that shows. Vs the 4-3 the pin lands on the Sam — which ANSWERS the old open question: the Sam is the wing's man, so RT walls off the first jersey inside him instead. Rule two only if he misses: hit the near color — find an opponent and block. The old 4-3 picture ran the wing ten yards deep to the safety; gone.",
+  "Ignored defenders (new convention, Ryan 2026-08-10): a FrontPlan can now list `ignored` defender ids — men the scheme deliberately leaves unblocked. They draw with a small dashed grey ring (the read key keeps its red READ ring instead), and the print book's legend explains it. Veer vs the 4-4 rings the walked-up outside backer; the read-key end is listed too but already carries the READ ring. Mirrors automatically.",
   "Vs the 5-2 (odd) we read the down lineman head up on RT, not the end. That is the varsity rule applied to OUR front: 'first man on or outside PST'. Note what the scan actually circles on p6's odd panel — the outside backer — because varsity's odd front aligns its extra lineman INSIDE the tackle, so the first man on/outside their PST is that backer and the tackle base-blocks the man in his B gap. Same rule, different alignment. If you want the 5-2 to look like the scan, move our T to the playside B gap instead of head up and the read flips to the end. Confirm.",
   "p6's two 'vs Odd' panels draw the same backside picture as the 'vs Even' panels — the guard-tackle strokes look copied across. Vs our 5-2 the LT has a man head up on him, so he takes him (varsity's BST rule) instead of stepping down the way the even-front picture shows.",
   "The varsity even front on p6 puts its extra down lineman on the PLAYSIDE guard; our 4-4 and 4-3 use symmetric tackles on both guards so the play mirrors cleanly. The rules resolve the same way, but the picture is not a pixel copy of the scan.",
   "Super's dive (fixed): the scan's dive arrow is SHORT — the arrowhead sits on the playside guard about ¾ yard behind the LOS, which is the aiming point ('crack of PSG'). Ours ran to six yards downfield off a two-yard lateral gain, which drew as a near-vertical climb over the center's head. The path is now angled harder at the guard's inside leg and trimmed to 4½ yards downfield. He is the ball carrier, so we still draw him past the LOS where varsity stops at the mesh.",
   "Quarterback's keep (fixed): the scan rides him FLAT at his own depth to about four line-splits outside the ball and only then breaks upfield at roughly 45°, ending wide and barely past the LOS — 'press the pitch'. Ours turned up early and finished 3½ yards deep and inside the wing, which read as a C-gap dive rather than an option keep. The break point and endpoint now match the drawing.",
   "Pitch man (fixed): with the keep re-measured, L's arc was re-hung to hold the stated 5-by-1 (about five yards outside the quarterback, one yard behind him) at the end of both paths. The scan's pitch arrow actually finishes even wider and still BEHIND the line; we let ours cross the LOS so the diagram shows where the ball goes.",
-  "Playside wing, arrow shape (fixed): every panel draws his stem as a tall, essentially vertical climb tight off the read key — three-plus yards straight up — before he turns to a blocker, then hooks back INSIDE to the bar. Ours drifted out on a short diagonal. The stem is now vertical. It still finishes outward rather than hooking in, because varsity aligns their wing OUTSIDE the read-key end while our R lines up inside E-R, so the man he can pin is the walked-up outside backer rather than the inside backer.",
-  "Center vs the 4-4 (flagged, only half fixed): the scan draws 'Uncovered: Get Vertical' as a straight climb to about backer depth — roughly three yards — and the bar lands between the two backers on nobody in particular. In our 4-4 both inside backers are already the tackles' men, so the only man left inside is the free safety at ten yards, which draws one very long line straight off the top of the diagram. He now runs a real four-yard vertical first so the arrow reads as a climb, but the block still finishes on F. If you would rather he stop at the second level and take the first jersey that shows, say so and we will drop the target.",
-  "Vs the 5-2, playside guard (flagged, NOT changed): p6's odd panels draw the playside guard climbing STRAIGHT UP toward the playside backer, and the playside tackle base-blocking the down lineman inside him. Our 5-2 has no down lineman inside RT — the man head up on him is the read key — so RT has to climb, and the only backer he can reach is the playside one. That leaves the backside backer for RG, which is why his line crosses the center's face instead of going straight up like the scan. The alternative is doubling the playside backer and leaving the backside backer free. Left as-is because the current map covers every defender exactly once; confirm which picture you want.",
+  "Center vs the 4-4 (fixed — the wall): his old block ran ten yards to the free safety, a vertical spike straight through the middle of the wall. He now curves up and back toward the backside and sets his bar on the wall at about 3½ yards, on nobody in particular — exactly how the scan draws 'Uncovered: Get Vertical'. The free safety is deliberately left unblocked in this picture.",
+  "Vs the 5-2 (rebuilt to the wall, Ryan 2026-08-10): same picture as the even fronts — one rising wall, every bar besides the wing's cutting backside. The scoop now resolves with LG taking the nose over (low bar on his playside number) and the CENTER climbing off it, bending back to the backside backer at about 3½ yards — so the old picture of RG crossing the center's face to reach that backer is gone. RG, uncovered, climbs and sets his bar mid-wall around 3½ yards on nobody in particular; RT veers inside the read key up to the playside backer; Y still anchors the backside at 3. The wing KICKS OUT the end — his is the one bar pushing away from the wall, because the lane runs between his kick-out and the wall. Every defender inside is still covered exactly once.",
+  "Down-lineman bars sit a yard OFF the line (Ryan, 2026-08-10): every block on a down lineman — the even-front LT pull and RG base, and the 5-2's LT base and LG scoop — sets its bar about a yard past the LOS, beyond the defender's alignment, not at it. The picture is the teaching point: we block DOWN(field) and drive them back off the line; a bar on the LOS reads as a stalemate.",
 ]
 
 export const veerRed: Play = {
@@ -350,7 +491,7 @@ export const veerRed: Play = {
   direction: 'right',
   ballCarrier: 'S',
   description:
-    'Our bread and butter. Super dives at the crack of the playside guard, the quarterback reads one man and gives, keeps, or pitches, and the backside wing motions across to ride in pitch relationship. Three plays in one — the defense picks which one we run.',
+    'Our bread and butter. Super dives at the crack of the playside guard, the quarterback reads one man and gives, keeps, or pitches, and the backside wing motions across to ride in pitch relationship. Up front the line veers inside and climbs downfield, building a wall for the ball to run behind. Three plays in one — the defense picks which one we run.',
   assignments,
   vs: { '44': vs44, '43': vs43, '52': vs52 } satisfies Record<FrontId, FrontPlan>,
   reviewNotes,

@@ -133,6 +133,13 @@ const players = computed<PlayerEntry[]>(() =>
 
 const readKeyId = computed(() => plan.value?.readKey ?? null)
 
+/** Deliberately-unblocked defenders. The read key keeps its own red ring. */
+const ignoredIds = computed(() => {
+  const ids = new Set(plan.value?.ignored ?? [])
+  if (readKeyId.value) ids.delete(readKeyId.value)
+  return ids
+})
+
 /* ---------------- viewport ---------------- */
 
 const fit = computed(() => {
@@ -256,6 +263,15 @@ const label = computed(
             READ
           </text>
         </template>
+        <circle
+          v-if="ignoredIds.has(d.id)"
+          :r="M.ignoredRingR"
+          fill="none"
+          :stroke="C.defense"
+          :stroke-width="M.ignoredRingStroke"
+          stroke-dasharray="3 4"
+          stroke-linecap="round"
+        />
         <text
           text-anchor="middle"
           dominant-baseline="central"

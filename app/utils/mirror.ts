@@ -110,6 +110,7 @@ export function mirrorFrontPlan(plan: FrontPlan): FrontPlan {
     out.alignOverrides = mirrorByPos(plan.alignOverrides, mirrorPt)
   }
   if (plan.readKey) out.readKey = mirrorDefenderId(plan.readKey)
+  if (plan.ignored) out.ignored = plan.ignored.map(mirrorDefenderId)
   return out
 }
 

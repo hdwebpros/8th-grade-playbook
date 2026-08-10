@@ -41,6 +41,9 @@ export const M = {
   readRingR: 16,
   readRingStroke: 2,
   readCaptionSize: 8.5,
+  /** Ring around a defender the scheme deliberately leaves unblocked. */
+  ignoredRingR: 14,
+  ignoredRingStroke: 1.5,
   /** Block bar: 0.9 yd end-to-end. */
   tbarWidth: 18,
   /** Gap between a marker and the start of its first path, in yards. */
