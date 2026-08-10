@@ -1,0 +1,76 @@
+/* ============================================================
+   Centennial Wolves Playbook — design tokens (SEAM.md §4)
+   Dark-first. Film room, not worksheet.
+   ============================================================ */
+
+:root {
+  /* Palette (decided in SEAM §4) */
+  --red: #d6202f;
+  --red-deep: #9e1420;
+  --ink: #0b0d10;
+  --field: #10141a;
+  --panel: #171c23;
+  --panel-raised: #1d242e;
+  --chalk: #e8eaed;
+  --steel: #8a939e;
+  --line: #232a33;
+
+  /* Derived, app-shell use */
+  --chalk-dim: #b7bdc4;
+  --red-glow: rgba(214, 32, 47, 0.14);
+  --focus-ring: 2px solid var(--red);
+
+  /* Type */
+  --font-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --font-body: 'Barlow', system-ui, -apple-system, sans-serif;
+
+  /* Shape */
+  --r-card: 10px;
+  --r-ctl: 8px;
+
+  /* Motion — fast and small */
+  --t-fast: 120ms;
+  --t-base: 160ms;
+  --t-slow: 200ms;
+  --ease: cubic-bezier(0.2, 0, 0.2, 1);
+
+  /* Layout */
+  --tabbar-h: 60px;
+  --header-h: 54px;
+  --content-max: 1080px;
+
+  /* ---- Diagram vars: app (dark) theme — SEAM §3 ---- */
+  --dg-field: #10141a;
+  --dg-los: #e8eaed;
+  --dg-line: #e8eaed;
+  --dg-defense: #8a939e;
+  --dg-accent: #d6202f;
+  --dg-player-fill: #10141a;
+  --dg-player-stroke: #e8eaed;
+}
+
+/* ---- Diagram vars: print (light) theme ----
+   Applied by class/attr on any subtree (print pipeline, previews),
+   and globally when actually printing. */
+.diagram-print,
+[data-diagram-theme='print'] {
+  --dg-field: #ffffff;
+  --dg-los: #111111;
+  --dg-line: #111111;
+  --dg-defense: #555555;
+  --dg-accent: #d6202f;
+  --dg-player-fill: #ffffff;
+  --dg-player-stroke: #111111;
+}
+
+@media print {
+  :root {
+    --dg-field: #ffffff;
+    --dg-los: #111111;
+    --dg-line: #111111;
+    --dg-defense: #555555;
+    --dg-accent: #d6202f;
+    --dg-player-fill: #ffffff;
+    --dg-player-stroke: #111111;
+  }
+}

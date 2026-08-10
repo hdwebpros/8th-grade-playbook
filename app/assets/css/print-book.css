@@ -1,0 +1,814 @@
+/* ============================================================
+   Print book — page geometry and paper typography.
+
+   Loaded ONLY by app/pages/print/book.vue (imported from its
+   <script setup>), so nothing here can leak into the dark app shell.
+   Adds rules only; never edits tokens.css values.
+
+   The book is composed of fixed Letter-portrait sheets. Every sheet is
+   authored to fit, so a page break can never land inside a table or
+   orphan a table header — the break is always between sheets.
+   ============================================================ */
+
+@page {
+  size: letter portrait;
+  margin: 0;
+}
+
+.book {
+  --paper: #ffffff;
+  --paper-ink: #111318;
+  --paper-mute: #5b6169;
+  --paper-rule: #d5d9de;
+  --paper-rule-soft: #e8ebee;
+  --paper-tint: #f4f6f8;
+  --paper-red: #d6202f;
+  --paper-red-deep: #9e1420;
+
+  /* Letter portrait, with a generous binder-friendly margin. */
+  --sheet-w: 8.5in;
+  --sheet-h: 11in;
+  --sheet-pad-y: 0.5in;
+  --sheet-pad-x: 0.72in;
+
+  color: var(--paper-ink);
+  font-family: var(--font-body);
+  font-size: 11pt;
+  line-height: 1.42;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* --- On screen this is a document preview: grey desk, white paper. --- */
+body.print-book-body {
+  background: #33383f;
+  color: var(--paper-ink);
+}
+
+.book {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 24px 16px 64px;
+}
+
+.sheet {
+  position: relative;
+  box-sizing: border-box;
+  width: var(--sheet-w);
+  height: var(--sheet-h);
+  /* Extra bottom padding reserves the running foot's band. */
+  padding: var(--sheet-pad-y) var(--sheet-pad-x) 0.62in;
+  background: var(--paper);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+/* --- Running head / foot ------------------------------------------- */
+
+.sheet-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 6pt;
+  border-bottom: 1.5px solid var(--paper-ink);
+  margin-bottom: 14pt;
+  flex: none;
+}
+.sheet-head-book {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 10pt;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+.sheet-head-book .hd-red {
+  color: var(--paper-red);
+}
+.sheet-head-section {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 9pt;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--paper-mute);
+}
+
+.sheet-foot {
+  position: absolute;
+  left: var(--sheet-pad-x);
+  right: var(--sheet-pad-x);
+  bottom: 0.3in;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 8pt;
+  letter-spacing: 0.06em;
+  color: var(--paper-mute);
+  text-transform: uppercase;
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+.sheet-foot-num {
+  font-variant-numeric: tabular-nums;
+}
+
+.sheet-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+/* Never let a fixed-height sheet squeeze its own sections into each other —
+   if something doesn't fit, it must be authored smaller, not compressed. */
+.sheet-body > * {
+  flex-shrink: 0;
+}
+
+/* --- Paper typography ---------------------------------------------- */
+
+.book h1,
+.book h2,
+.book h3,
+.book h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.02;
+  margin: 0;
+}
+
+.p-title {
+  font-size: 26pt;
+  line-height: 0.98;
+}
+.p-title .p-title-sub {
+  color: var(--paper-red);
+}
+.p-eyebrow {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 8.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--paper-red);
+  margin-bottom: 3pt;
+}
+.p-lead {
+  font-size: 10.5pt;
+  color: var(--paper-mute);
+  max-width: 62ch;
+  margin: 0;
+}
+.p-note {
+  font-size: 9pt;
+  color: var(--paper-mute);
+}
+
+/* --- Cover ---------------------------------------------------------- */
+
+.cover {
+  padding: 0;
+  justify-content: space-between;
+  align-items: stretch;
+  text-align: center;
+}
+.cover-rule-top {
+  height: 0.34in;
+  background: var(--paper-red);
+  flex: none;
+}
+.cover-main {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2in;
+  padding: 0.3in 0.9in;
+}
+.cover-mark {
+  width: 4.6in;
+  height: auto;
+}
+.cover-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 0.9;
+  letter-spacing: 0.01em;
+}
+.cover-title .ct-1 {
+  display: block;
+  font-size: 44pt;
+}
+.cover-title .ct-2 {
+  display: block;
+  font-size: 44pt;
+  color: var(--paper-red);
+}
+.cover-title .ct-3 {
+  display: block;
+  font-size: 19pt;
+  letter-spacing: 0.24em;
+  margin-top: 0.12in;
+}
+.cover-hair {
+  width: 2.6in;
+  height: 2px;
+  background: var(--paper-ink);
+}
+.cover-sub {
+  font-size: 11pt;
+  color: var(--paper-mute);
+  max-width: 44ch;
+}
+.cover-foot {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.14in;
+  padding: 0 0.9in 0.5in;
+}
+.cover-school {
+  width: 2.9in;
+  height: auto;
+}
+.cover-meta {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 8.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--paper-mute);
+}
+.cover-rule-bottom {
+  height: 0.14in;
+  background: var(--paper-ink);
+  flex: none;
+}
+
+/* --- Contents / legend --------------------------------------------- */
+
+.toc {
+  display: grid;
+  gap: 5pt;
+  margin: 10pt 0 0;
+}
+.toc-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8pt;
+  font-size: 10.5pt;
+}
+.toc-row .toc-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 11pt;
+}
+.toc-row .toc-dots {
+  flex: 1 1 auto;
+  border-bottom: 1px dotted var(--paper-rule);
+  transform: translateY(-3px);
+}
+.toc-row .toc-page {
+  font-variant-numeric: tabular-nums;
+  color: var(--paper-mute);
+  font-size: 10pt;
+}
+
+.legend-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10pt 22pt;
+  margin-top: 8pt;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10pt;
+  break-inside: avoid;
+}
+.legend-swatch {
+  flex: none;
+  width: 62px;
+  height: 30px;
+}
+.legend-text .lg-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 10.5pt;
+  line-height: 1.1;
+}
+.legend-text .lg-desc {
+  font-size: 9pt;
+  color: var(--paper-mute);
+  line-height: 1.3;
+}
+
+/* .book h3 { margin: 0 } outranks a bare class — scope it to win. */
+.book .section-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12pt;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  padding-bottom: 3pt;
+  border-bottom: 1px solid var(--paper-rule);
+  margin: 15pt 0 8pt;
+}
+
+/* --- Who's who ------------------------------------------------------ */
+
+.roster {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6pt 18pt;
+  margin-top: 8pt;
+}
+.roster-item {
+  display: flex;
+  align-items: baseline;
+  gap: 7pt;
+  border-bottom: 1px solid var(--paper-rule-soft);
+  padding-bottom: 3pt;
+}
+.roster-pos {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12pt;
+  min-width: 1.5em;
+  color: var(--paper-red);
+}
+.roster-name {
+  font-size: 9.5pt;
+}
+
+/* --- Diagram frames ------------------------------------------------- */
+
+/* A frame is a fixed box on the page; the SVG letterboxes inside it
+   (preserveAspectRatio) so a diagram can never push a table off the sheet. */
+.dg-frame {
+  box-sizing: border-box;
+  border: 1px solid var(--paper-rule);
+  border-radius: 6px;
+  padding: 5pt 7pt;
+  background: #fff;
+}
+.dg-frame .dg-root {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+/* --- Formations page ------------------------------------------------ */
+
+.formation-block {
+  break-inside: avoid;
+}
+.formation-head {
+  display: flex;
+  align-items: baseline;
+  gap: 9pt;
+  margin-bottom: 3pt;
+}
+.formation-name {
+  font-size: 17pt;
+}
+.formation-tag {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 8pt;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #fff;
+  background: var(--paper-ink);
+  padding: 2pt 6pt;
+  border-radius: 3px;
+}
+.formation-tag.is-red {
+  background: var(--paper-red);
+}
+.formation-block .dg-frame {
+  /* Formation aspect is ~1.94:1 — fill the measure instead of letterboxing. */
+  height: 3.15in;
+}
+.formation-desc {
+  font-size: 9.5pt;
+  color: var(--paper-mute);
+  margin-bottom: 5pt;
+  max-width: 70ch;
+}
+
+/* --- Play page ------------------------------------------------------ */
+
+.play-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16pt;
+  flex: none;
+}
+.play-title {
+  font-size: 24pt;
+  line-height: 0.95;
+}
+.play-title .pt-dir {
+  color: var(--paper-red);
+}
+.play-sub {
+  font-size: 9pt;
+  color: var(--paper-mute);
+  margin-top: 2pt;
+}
+.front-chip {
+  flex: none;
+  text-align: center;
+  border: 1.5px solid var(--paper-ink);
+  border-radius: 5px;
+  padding: 4pt 10pt 5pt;
+  min-width: 1.15in;
+}
+.front-chip .fc-vs {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 7.5pt;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--paper-mute);
+}
+.front-chip .fc-name {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 19pt;
+  line-height: 1;
+}
+
+.play-desc {
+  font-size: 8.8pt;
+  color: var(--paper-mute);
+  margin: 4pt 0 5pt;
+  max-width: 96ch;
+  flex: none;
+}
+
+/* The diagram's own aspect is ~1.4:1. Sizing the frame to that instead of to
+   the text column keeps the drawing as large as the page allows and turns the
+   leftover strip into a scouting sidebar rather than dead white. */
+.play-band {
+  display: grid;
+  grid-template-columns: 4.56in 1fr;
+  gap: 12pt;
+  align-items: stretch;
+  margin-bottom: 7pt;
+  flex: none;
+}
+.play-diagram {
+  height: 3.13in;
+}
+
+.scout {
+  border-left: 1.5px solid var(--paper-ink);
+  padding-left: 9pt;
+  display: flex;
+  flex-direction: column;
+  gap: 5pt;
+}
+.scout-title {
+  font-size: 14pt;
+  line-height: 1;
+}
+.scout-body {
+  font-size: 8.2pt;
+  line-height: 1.32;
+  color: var(--paper-mute);
+}
+.scout-read {
+  border-top: 1px solid var(--paper-rule);
+  padding-top: 5pt;
+}
+.scout-read-cap {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 7.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--paper-red);
+}
+.scout-read-key {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20pt;
+  line-height: 1;
+  margin: 1pt 0 2pt;
+}
+.scout-foot {
+  margin-top: auto;
+  border-top: 1px solid var(--paper-rule);
+  padding-top: 5pt;
+}
+.scout-foot .scout-read-cap {
+  color: var(--paper-mute);
+}
+.scout-foot .scout-body {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12pt;
+  color: var(--paper-ink);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.play-sub .read-flag {
+  color: var(--paper-red-deep);
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* --- Assignment table ----------------------------------------------- */
+
+.assign {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8.2pt;
+  table-layout: fixed;
+}
+.assign thead th {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 8pt;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  text-align: left;
+  color: #fff;
+  background: var(--paper-ink);
+  padding: 3.5pt 6pt;
+}
+.assign thead {
+  display: table-header-group;
+}
+.assign tr {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+.assign tbody td {
+  padding: 2.2pt 5pt;
+  border-bottom: 1px solid var(--paper-rule-soft);
+  vertical-align: top;
+}
+.assign tbody tr:nth-child(even) td {
+  background: var(--paper-tint);
+}
+.assign tbody tr.is-carrier td {
+  background: rgba(214, 32, 47, 0.09);
+}
+.assign tbody tr.is-carrier .a-pos {
+  color: var(--paper-red-deep);
+}
+
+.assign tbody tr.is-group-start td {
+  border-top: 1.5px solid var(--paper-rule);
+}
+
+.col-pos {
+  width: 1.12in;
+}
+.col-side {
+  width: 0.62in;
+}
+
+.a-pos {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 10.5pt;
+  letter-spacing: 0.04em;
+  margin-right: 4pt;
+}
+.a-name {
+  font-size: 7.4pt;
+  color: var(--paper-mute);
+}
+.a-rule {
+  font-weight: 600;
+}
+.assign tbody tr.is-carrier .a-rule {
+  color: var(--paper-red-deep);
+}
+.a-detail {
+  color: var(--paper-mute);
+  font-size: 7.2pt;
+  line-height: 1.26;
+}
+.side-badge {
+  display: inline-block;
+  margin-top: 1.5pt;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 7.2pt;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 1.5pt 5pt;
+  border-radius: 3px;
+  border: 1px solid var(--paper-rule);
+  color: var(--paper-mute);
+  white-space: nowrap;
+}
+.side-badge.is-playside {
+  border-color: var(--paper-red);
+  color: #fff;
+  background: var(--paper-red);
+}
+
+/* --- Route tree page ------------------------------------------------ */
+
+.routes-layout {
+  display: grid;
+  grid-template-columns: 1fr 2.55in;
+  grid-template-rows: 1fr;
+  gap: 14pt;
+  align-items: stretch;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.route-list {
+  display: grid;
+  gap: 4.5pt;
+}
+.route-row {
+  display: grid;
+  grid-template-columns: 20pt 1fr;
+  gap: 7pt;
+  align-items: start;
+  break-inside: avoid;
+}
+.route-num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12pt;
+  line-height: 1;
+  text-align: center;
+  color: #fff;
+  background: var(--paper-ink);
+  border-radius: 3px;
+  padding: 2.5pt 0 3pt;
+}
+.route-row.is-zero .route-num {
+  background: var(--paper-mute);
+}
+.route-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11pt;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1.05;
+}
+.route-desc {
+  font-size: 8.2pt;
+  color: var(--paper-mute);
+  line-height: 1.28;
+}
+.freecall {
+  margin-top: 10pt;
+  border-top: 1px solid var(--paper-rule);
+  padding-top: 7pt;
+  font-size: 9.5pt;
+  color: var(--paper-mute);
+}
+.freecall b {
+  color: var(--paper-ink);
+}
+
+/* --- Back page ------------------------------------------------------ */
+
+.backpage .sheet-body {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.22in;
+}
+.back-mark {
+  width: 2.6in;
+  height: auto;
+}
+.back-school {
+  width: 2.9in;
+  height: auto;
+}
+.back-line {
+  width: 2.2in;
+  height: 2px;
+  background: var(--paper-red);
+}
+
+/* --- Print toolbar (screen only) ------------------------------------ */
+
+.print-bar {
+  position: fixed;
+  z-index: 50;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 8px 8px 16px;
+  border-radius: 999px;
+  background: #14181d;
+  border: 1px solid #2b323b;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.5);
+  color: #e8eaed;
+}
+.print-bar-text {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+.print-bar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 999px;
+  background: var(--paper-red);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  border: none;
+}
+.print-bar-btn:hover {
+  background: #ef2735;
+}
+.print-bar-back {
+  color: #8a939e;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.print-bar-back:hover {
+  color: #e8eaed;
+}
+
+/* --- The actual print rules ----------------------------------------- */
+
+@media print {
+  html,
+  body {
+    background: #fff !important;
+    margin: 0;
+    padding: 0;
+  }
+  .print-bar {
+    display: none !important;
+  }
+  .book {
+    padding: 0;
+    gap: 0;
+    display: block;
+  }
+  .sheet {
+    box-shadow: none;
+    break-after: page;
+    page-break-after: always;
+    /* Chrome rounds fractional layout up; shaving a hair stops a stray
+       blank page after each sheet. */
+    height: 10.98in;
+  }
+  /* :last-of-type, not :last-child — the screen-only toolbar is the last
+     child of .book, and :last-child would leave a trailing blank page. */
+  .sheet:last-of-type {
+    break-after: auto;
+    page-break-after: auto;
+  }
+}
+
+@media screen and (max-width: 9in) {
+  .book {
+    padding: 16px 8px 90px;
+  }
+}

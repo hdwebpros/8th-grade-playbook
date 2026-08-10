@@ -15,5 +15,12 @@
     "nuxt": "^4.5.2",
     "vue": "^3.5.40",
     "vue-router": "^5.2.0"
+  },
+  "devDependencies": {
+    "@iconify-json/lucide": "^1.2.122",
+    "@vite-pwa/nuxt": "^1.1.1",
+    "sharp": "^0.35.3",
+    "typescript": "~5.9.0",
+    "vue-tsc": "^3.3.9"
   }
 }

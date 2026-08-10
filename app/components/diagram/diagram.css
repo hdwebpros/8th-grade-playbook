@@ -1,0 +1,58 @@
+/*
+ * Global (unscoped) styles for the diagram components. Unscoped on purpose:
+ * the theme class sits on the root <svg> of one component and must reach the
+ * child components rendered inside it.
+ *
+ * Colours are consumed as var(--dg-*, <dark fallback>) at the point of use,
+ * so the default/app theme is correct with this file's variables undefined.
+ * The print theme works by defining them.
+ */
+
+.dg-root {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.dg-root text {
+  font-family: var(--dg-font, 'Barlow Condensed', 'Barlow', system-ui, sans-serif);
+  font-synthesis: none;
+}
+
+/* theme="print" — SEAM §3 print values. */
+.dg-root--print {
+  --dg-field: #ffffff;
+  --dg-los: #111111;
+  --dg-grid: #d8dce1;
+  --dg-line: #111111;
+  --dg-defense: #555555;
+  --dg-accent: #d6202f;
+  --dg-accent-ink: #ffffff;
+  --dg-player-fill: #ffffff;
+  --dg-player-stroke: #111111;
+}
+
+/* Interactive hit targets: transparent, generous, keyboard reachable. */
+.dg-hit {
+  fill: transparent;
+  stroke: transparent;
+  cursor: pointer;
+  outline: none;
+}
+
+.dg-hit:focus-visible {
+  stroke: var(--dg-accent, #d6202f);
+  stroke-width: 2;
+  stroke-dasharray: 4 3;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dg-marker,
+  .dg-actions {
+    transition: opacity 160ms ease-out;
+  }
+}

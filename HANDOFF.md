@@ -1,4 +1,4 @@
-# Handoff — Centennial Cougars 8th Grade Football Playbook
+# Handoff — Centennial Wolves 8th Grade Football Playbook
 
 **To:** Fable, as orchestrator.
 **Your subagents:** `fable` for anything anyone will look at. `opus` for everything underneath it.
@@ -28,10 +28,10 @@ Do not imitate its layout. Do not reuse its images in the product.
 
 All vendored into `reference/brand/` — nothing here depends on a CDN or a path outside the repo.
 
-- **Team logo** — `reference/brand/cougars-team-logo.png`. Cougar mark, red/black/white, reads `CENTENNIAL` with a `'26`. Transparent PNG, 2528×1692. This is the highest-fidelity asset you have.
+- **Team logo** — `reference/brand/wolves-team-logo.png`. Wolf mark, red/black/white, reads `CENTENNIAL` with a `'26`. Transparent PNG, 2528×1692. This is the highest-fidelity asset you have.
 - **School logo** — `reference/brand/centennial-school-logo.png`. 1200×226, the largest the school's CDN serves. It's a wide horizontal lockup; there is no square or stacked variant available.
 - **Inspiration** — `reference/brand/cougar-football-inspiration.jpg`. 1200×675, the school's own Cougar Football art that Ryan pointed at. Inspiration only, not an asset to ship.
-- **Name:** Centennial Cougars 8th Grade Football. The `'26` on the mark stays; Ryan confirmed the logo is used as-is.
+- **Name:** Centennial Wolves 8th Grade Football. The `'26` on the mark stays; Ryan confirmed the logo is used as-is.
 
 These live in `reference/` rather than `public/` or `app/assets/` on purpose — moving them into the app is your call, and `public/` vs `assets/` is a real decision (processed and optimized vs. served untouched) that shouldn't be made by whoever downloads a file.
 
