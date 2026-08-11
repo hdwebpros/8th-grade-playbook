@@ -11,6 +11,7 @@ import { crushPlays } from './plays/crush'
 import { audiblePlays } from './plays/audible'
 import { splitWidePlays } from './plays/split-wide'
 import { stretchPlays } from './plays/stretch'
+import { stretchBootPlays } from './plays/stretch-boot'
 import { veerBlack, veerRed } from './plays/veer'
 import { wagglePlays } from './plays/waggle'
 
@@ -29,6 +30,7 @@ export {
 export type { AudibleCall, AudibleExample, Protection } from './plays/audible'
 export { splitWidePlays } from './plays/split-wide'
 export { stretchPlays } from './plays/stretch'
+export { stretchBootBlack, stretchBootPlays, stretchBootRed } from './plays/stretch-boot'
 export { routes } from './routes'
 export { veerBlack, veerPlays, veerRed } from './plays/veer'
 export { wagglePlays } from './plays/waggle'
@@ -36,7 +38,8 @@ export { splitWide } from './split-wide-formation'
 
 /**
  * Same plays, in book order: runs first (Veer, Crush, Buck Sweep, Stretch),
- * then passing (Waggle, the audible examples), then the Split Wide package
+ * then passing (Waggle, Stretch Boot, the audible examples), then the Split
+ * Wide package
  * (DRAFT — gated on Coach Ryan's football review, HANDOFF §10).
  */
 export const playList: Play[] = [
@@ -46,6 +49,7 @@ export const playList: Play[] = [
   ...buckSweepPlays,
   ...stretchPlays,
   ...wagglePlays,
+  ...stretchBootPlays,
   ...audiblePlays,
   ...splitWidePlays,
 ]
