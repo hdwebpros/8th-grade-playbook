@@ -290,7 +290,7 @@ const keepAssignments: Record<OffPosId, Assignment> = {
   Q: {
     rule: 'Send Super out. Wait for him to get set. Read them. Then screen fake and run the B gap.',
     detail:
-      'Call Super in motion and then WAIT — do not rush the snap. He has to be stopped and set out there before you go. While you wait, look at their linebackers. If they widen or back off the line toward Super, that is exactly what we want and you snap it. If they walk up and show blitz, do not snap it — check us into something else (ask me for the call). After the snap: take one hard step right and show the screen with your eyes and the ball, then get your shoulders square and run downhill in the gap between RG and RT. This is a keeper, not a read — the ball is yours before the snap. Do not bounce it outside.',
+      'Call Super in motion and then WAIT — do not rush the snap. He has to be stopped and set out there before you go. While you wait, look at their linebackers. If they widen or back off the line toward Super, that is exactly what we want and you snap it. If they walk up and show blitz, do not snap it — check us into something else (ask me for the call). After the snap: take one hard step right and show the screen with your eyes and the ball, then get your shoulders square and run downhill in the gap between RG and RT. This is a keeper, not a read — the ball is yours before the snap. Do not bounce it outside. Take the few yards that are there and get down — this play is worth three or four every time because their line is standing there waiting for the screen. It is not a play we are trying to break; it is a play we are trying to CASH.',
   },
 }
 
@@ -302,7 +302,7 @@ export const splitWideKeeperRight: Play = {
   direction: 'right',
   ballCarrier: 'Q',
   description:
-    'Super motions out between R and X, gets set, and shows his hands like the screen is coming. The quarterback waits for him to set, reads the linebackers, and then runs downhill in the B gap between the right guard and the right tackle — behind everybody the screen picture just pulled off the line.',
+    'Super motions out between R and X, gets set, and shows his hands like the screen is coming. The quarterback waits for him to set, reads the linebackers, and then runs downhill in the B gap between the right guard and the right tackle — behind everybody the screen picture just pulled off the line. This is a few-yards play, not a home run: we run it AFTER the screen, when their defensive line has seen that picture once and relaxes on it, and the quarterback rams it up in there for what is sitting in front of him.',
   assignments: keepAssignments,
   vs: { '44': keepVs44, '43': keepVs43, '52': keepVs52 } satisfies Record<FrontId, FrontPlan>,
   reviewNotes: [
@@ -312,6 +312,7 @@ export const splitWideKeeperRight: Play = {
     'RESOLVED, per your call: Super MOTIONS OUT AND SETTLES between R and X — he does not run a sweep track and he does not lead block. He gets set at (10.75, −1), dead between the two of them and level with the slots, turns to the quarterback and shows his hands to sell the screen. Same settle spot and the same motion path as Split Wide Screen, on purpose: the two plays are one picture until the quarterback decides.',
     'SET, NOT MOVING. Because he stops and gets set instead of staying in motion, he must be SET FOR A FULL SECOND before the snap or it is illegal motion — that is a real flag at this level and it is the opposite of the timing rule on every other motion in our book, where the kid has to still be moving. Confirm you want to teach the two different rules, or tell me to drift him slowly instead of stopping dead and the flag risk goes away.',
     'THE PRE-SNAP READ IS THE PLAY. Written into the quarterback\'s assignment: send Super, WAIT for him to set, watch the backers. Drift/widen → snap it. Blitz → check out of it. That means this play now depends on an audible that does not exist yet, and until it does, the quarterback\'s only real answer to a blitz look is a timeout or running it anyway. FLAGGED FOR THE NEXT ROUND: the audible builder (app/pages/audible.vue) is digits-and-routes today, so "check to the screen" is not something it can express. Tell me when you want to build that and what the word is that the kids hear.',
+    'PER COACH RYAN — WHAT THIS PLAY IS FOR: "used to get just a few yards, D-line relaxes thinking it\'s a screen again, QB rams a few." That is now written into the description and into the quarterback\'s detail as "cash it, do not try to break it." Two consequences worth naming: (1) this play is a SEQUENCE play — it is worth much less on the first snap of a game than it is after they have seen the screen, so it belongs on the call sheet as a follow-up, not an opener; (2) it means the "nobody blocks the deep safety" note below is not a problem at all, because we are not asking this play to go the distance. Tell me if you want the call sheet / practice script to carry that ordering explicitly.',
     'Is it a keeper or a read? Drafted as a pure keeper — the ball is the quarterback\'s before the snap, no readKey, nobody left unblocked on purpose. If you want it to be a give-or-keep off the end man, that is a different play and it needs a read key.',
     'B gap = between RG and RT, and the quarterback\'s aiming point is the outside hip of RG. Confirm that is the gap you mean by "over the right guard" — the other reading is the A gap right on top of him, which is the dive, and you already have a dive.',
     'Why nobody pulls: in both even fronts LG has a tackle head-up on him and cannot leave without giving up a free runner behind the play, so the uncovered center climbs to the B-gap backer instead. Vs the 5-2 that flips — RG is the uncovered man, so HE leads through the hole onto the backer while RT walls the man on his nose. If you would rather teach one pulling guard on every front, say so and I will change the front rules instead of the pictures.',
@@ -800,7 +801,7 @@ const screenAssignments: Record<OffPosId, Assignment> = {
   Q: {
     rule: 'Send him out, wait for him to set, open away, let the right side come free, throw it flat.',
     detail:
-      'Same start as the keep — call Super out, WAIT for him to be stopped and set, and look at their linebackers while you wait. Then snap it, take a hard three-step drop opening AWAY from the screen, and hold your eyes to the back side for one full count. The end on the right is unblocked on purpose; let him run at you. Then turn and throw it at Super\'s numbers while he is standing still — this is a short, flat, hard throw behind the line. Never throw it late and never throw it behind him.',
+      'Same start as the keep — call Super out, WAIT for him to be stopped and set, and look at their linebackers while you wait. Then snap it, take a hard three-step drop opening AWAY from the screen, and hold your eyes to the back side for one full count. The end on the right is unblocked on purpose; let him run at you. Then turn and throw it at Super\'s numbers while he is standing still — this is a short, flat, hard throw behind the line. Never throw it late and never throw it behind him. Against a team that blitzes, the ball MUST be out on time — the second you feel extra men coming, that is the snap this play was built for, and holding it one extra beat is the only way to lose it.',
   },
 }
 
@@ -812,7 +813,7 @@ export const splitWideHbScreen: Play = {
   direction: 'right',
   ballCarrier: 'S',
   description:
-    'Super motions out and settles between R and X with his hands up — the same picture as the keep. We let their right-side rush come free, the quarterback sells a drop the other way, and the ball goes out behind them to Super standing still, with both right-side linemen leading him up the sideline.',
+    'Super motions out and settles between R and X with his hands up — the same picture as the keep. We let their right-side rush come free, the quarterback sells a drop the other way, and the ball goes out behind them to Super standing still, with both right-side linemen leading him up the sideline. This is our answer to a team that blitzes: the more men they send, the fewer are left out there with Super. The ball has to come out quick — that is the whole play — and it puts Super in space.',
   assignments: screenAssignments,
   vs: { '44': screenVs44, '43': screenVs43, '52': screenVs52 } satisfies Record<FrontId, FrontPlan>,
   reviewNotes: [
@@ -826,6 +827,7 @@ export const splitWideHbScreen: Play = {
     'Lead-blocker targets, and why: RG always turns back INSIDE and walls off the first pursuit defender over the ball (the backer in the 4-4 and 5-2, the Mike in the 4-3) — he is the man who reads screen fastest and he is the one who makes this a 2-yard play. RT goes further out and takes the first man on the edge (the walked-up backer in the 4-4, the near safety in the two-high 4-3 and 5-2). Then we count hats: vs the 4-4 and the 5-2 we have one more blocker out there than they have defenders, so R takes the corner and X RUNS HIM OFF deep instead of blocking; vs the 4-3 R takes the outside backer and X stalks the corner. Deliberately NOT drawn: a block on the deep middle safety in the 4-4 — a guard cannot get to a man 10 yards deep before the ball does, so the play is coached as "get the yards and get out of bounds." Confirm that trade.',
     'THE SETTLE, per your call: Super motions out and STOPS between R and X at (10.75, −1) — same motion path, same spot, same hands-up look as Split Wide Keep, and the code literally shares the constants so the two diagrams can never drift apart. That moved the catch point about 4 yards wider than it was drafted, so three things moved with it: RT now releases all the way out to 9.8 to be in front of the catch, RG out to 7 as the inside wall, and the throw is now a flat, standing catch instead of a lead throw to a moving man. Because he is standing still, this is an easier throw and an easier catch than the drafted version — and a slower one, so RG and RT have to be moving on their release or they will not be there in time.',
     'HE IS SET, WHICH MEANS HE IS NOT MOVING AT THE SNAP. Same rule note as on the keep: a man who motions and stops must be set a full second before the snap. On this play that is also a timing tax — the quarterback cannot snap it the instant Super arrives, so the defense gets an extra beat to look at him standing out there. Worth confirming: if the linebackers start jumping the screen because it is telegraphed, the answer is the keep, which is exactly why the two share a picture.',
+    'PER COACH RYAN — WHAT THIS PLAY IS FOR: "works for blitzing teams, ball must get out quick, gets the Super in space." Now in the description and in the quarterback\'s detail. This also answers the timing worry two notes up from a different direction: against a blitzing team the extra beat Super spends standing there is bought back, because the men who would be looking at him are running at the quarterback instead. It also sharpens the choice between the two screen versions in the note above — if the trigger for this call is BLITZ, the quick/bubble version gets the ball out faster than the true screen does, and speed is the thing you just said matters most. Worth a decision.',
     'Y and L clear out on every front. Confirm — the alternative is having L block the backside pursuit, but he is 8½ yards away from anything worth blocking and his route is what empties the middle.',
     MIRROR_NOTE_PREFIX +
       'One caution before mirroring this one: a left-handed quarterback throws this screen very differently, so mirror it for the picture, not for the technique.',
@@ -939,14 +941,16 @@ const chipVs44: FrontPlan = {
     ...CHIP_ROUTES,
     Q: CHIP_Q,
     ...CHIP_EVEN_LINE,
-    C: block('B-R'),
+    // The double team, not the backer: two hats converging on T-R is the combo
+    // picture, and it keeps the center's line from running upfield. Per Ryan.
+    C: block('T-R'),
     S: CHIP_S_SCAN,
   },
   assignments: {
     C: {
-      rule: 'Ram — slide right. Your man is the backer in the right A gap.',
+      rule: 'Ram — slide right. Stay home. Double with RG until the A-gap backer comes.',
       detail:
-        'Nobody is on your nose, so on the slide your gap is the A gap to your right. The 4-4 backer stacked there is the one who blitzes it. Snap, get your eyes on him, and if he does not come, help RG.',
+        'Nobody is on your nose, so do not chase anybody upfield — sit back and stay square. Get your hands on RG\'s man and help him double it, and keep your eyes on the 4-4 backer stacked in the right A gap, because he is the one who blitzes it. If he comes, come off the double and take him by yourself. If he never comes, you finish the snap on the double.',
     },
   },
 }
@@ -956,14 +960,16 @@ const chipVs43: FrontPlan = {
     ...CHIP_ROUTES,
     Q: CHIP_Q,
     ...CHIP_EVEN_LINE,
-    C: block('M'),
+    // Same combo picture as the 4-4. The Mike is 4½ yards deep and the center
+    // does not go get him — he doubles until the Mike declares. Per Ryan.
+    C: block('T-R'),
     S: CHIP_S_SCAN,
   },
   assignments: {
     C: {
-      rule: 'Ram — slide right. Your man is the Mike.',
+      rule: 'Ram — slide right. Stay home. The Mike is yours if he comes, RG\'s man if he does not.',
       detail:
-        'The Mike is straight over you and he is the only man who can get into the A gap. Take him if he comes; help RG if he does not.',
+        'The Mike is straight over you and he is the only man who can get into the A gap — but he is four yards deep, so do not go get him. Sit back off the ball, put your hands on RG\'s man and double it, and watch the Mike the whole time. He blitzes, you leave the double and take him. He drops, you never leave the double.',
     },
   },
 }
@@ -1017,9 +1023,9 @@ const chipAssignments: Record<OffPosId, Assignment> = {
     detail: 'Set with the slide. Whoever shows in the gap to your right is yours; do not chase a man who goes away from you.',
   },
   C: {
-    rule: 'Ram — slide right. Covered: the nose is yours. Uncovered: the A gap to your right.',
+    rule: 'Ram — slide right. Never go upfield. Covered: the nose is yours. Uncovered: sit back, double, and look for the blitz.',
     detail:
-      'Ram means the whole line slides right. If there is a nose on you, forget the slide — he is yours by yourself. If not, take whoever comes into the right A gap and help the guard when nobody does.',
+      'Ram means the whole line slides right. YOU DO NOT GO UPFIELD ON THIS PLAY — not one step, ever. This is a five-step drop and your job is behind the line, not in front of it. If there is a nose on you, forget the slide — he is yours by yourself. If nobody is on you, sit back off the ball with your feet under you and your eyes inside: put your hands on the guard\'s man and help him double it, and keep looking for a backer running the A gap. The second a blitzer shows, leave the double and take him. You are the man who cleans up whatever the slide does not cover.',
   },
   RG: {
     rule: 'Ram — slide right. Block the man on you.',
@@ -1077,6 +1083,7 @@ export const splitWideChip: Play = {
     'We have no "Go" in the route tree — the tree (varsity p14) numbers 9 as FADE. Drafted as the 9, run straight up the field leaning to the sideline. If "go" to you means a pure vertical with no lean, that is a different route and it may be worth adding to the tree.',
     'SUPER IS A SCAN BLOCKER — per your correction, "chip" here means BLOCK ANYONE WHO GETS THROUGH, not punch-and-release. He is no longer aimed at a named defender on any front, which is the one place in the whole book where a blocker has no target, and that is on purpose: his man is whoever comes free, and that is a different man every snap. His arrow is a short line to the quarterback\'s blind-side hip at the depth of the drop, capped with the block bar and ending there — the picture says "this is where you stand and block," not "this is where you run." Two things to confirm: (1) WHICH HIP — drafted on the BLIND side (left, for a right-handed quarterback) since that is the runner the drop cannot see, but if you would rather he set on the throwing side or simply "behind the quarterback, square," say which and I will move the dot; (2) he is now purely a blocker on all three fronts, so this play releases FOUR receivers and has no checkdown. Y\'s in carries the whole outlet job by itself.',
     'THE TWO POSTS RUN INTO EACH OTHER. Drawn straight off the tree, both posts break at 15 yards and finish 2 yards either side of the goal post — that is two of our receivers and one safety in the same window, and it shows up plainly on the diagram. Real options: (a) leave it, and coach the quarterback to throw the one away from the safety; (b) make the back-side one a SKINNY post that stays outside the hash; (c) stagger the depths, 12 and 18, so they are never at the same level. I drafted (a) because it is literally what you called, but (b) or (c) is probably what you want on the field.',
+    'PER COACH RYAN — THE CENTER: "the C can\'t go upfield, he sits back and helps double team or pick up a blitz." Rewritten on all three fronts. The base rule now leads with NEVER GO UPFIELD and makes his default job the double team with RG, with the blitz pickup as the thing that pulls him off it — that is a real change of emphasis from the draft, which had him aimed at a named backer first and helping "if he does not come." Vs the 5-2 he is untouched: there is a nose on him and he has no one to help, which is the one front where your rule cannot apply. THE DIAGRAM IS FIXED TOO: his arrow used to run UPFIELD — 4 yards to the stacked backer vs the 4-4, 4½ yards to the Mike vs the 4-3 — which is exactly the picture you said is wrong. On both even fronts it now points at T-R, the same man RG is blocking, so the center and the guard converge on one defender. Two hats on one man is the standard combo picture and it reads as "double team" without any new symbol on the field. It also stays behind the line, which is the whole point. What the diagram now does NOT show is the conditional — "leave the double when the backer comes" lives only in the words, which is normal (no playbook draws an if/then), but say the word if you want a second, lighter line out to the blitzer and I will add one.',
     'Vs the 5-2 the scan rule solves itself — five rushers against five linemen means the extra man is Super\'s every single snap, so his assignment text on that front tells him to expect somebody rather than to look for somebody. Same picture, same arrow, all three fronts; only the coaching words change.',
     'Protection is drawn as RAM (slide right) so the language matches varsity p15 and the pass-pro page. That is why the center\'s arrow points to the right A-gap man rather than straight ahead. If you would rather this be straight man protection, say so and the center\'s picture changes on all three fronts.',
     'No ball flight is drawn on this one because the throw depends on what the safeties do — the diagram shows four routes and a progression written in the quarterback\'s assignment instead. Tell me if you want an arrow to a primary receiver on the picture.',
