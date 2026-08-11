@@ -52,18 +52,25 @@ const example = computed(() =>
 
 const play = computed<Play>(() => {
   const ex = example.value
-  if (ex) return formation.value === 'red' ? ex.red : ex.black
+  if (ex) return ex.playFor(formation.value)
   return buildAudible(ownCall.value, formation.value)
 })
 
 /** The call as it is said in the huddle, for the current formation. */
 const spokenCall = computed(() =>
   example.value
-    ? callNameOf(example.value.call, formation.value)
+    ? example.value.callNameFor(formation.value)
     : callNameOf(ownCall.value, formation.value),
 )
 
-const formationInfo = computed(() => formations[formation.value]!)
+/**
+ * Split Wide Bull 95-59 lives in one formation, so the Red/Black toggle has
+ * nothing to switch — it hides while that example is up.
+ */
+const locked = computed(() => example.value?.lockedFormation)
+
+/** Whatever formation the play we are drawing actually sets. */
+const formationInfo = computed(() => formations[play.value.formation]!)
 const frontInfo = computed(() => fronts[front.value]!)
 const frontOptions = FRONT_ORDER.map((f) => ({ value: f, label: FRONT_LABELS[f] }))
 
@@ -102,7 +109,7 @@ function callYourOwn() {
   // Carry the call you were just looking at onto the pad, so the first thing
   // you do is change a digit and watch what moves.
   const ex = example.value
-  if (ex) ownCall.value = { ...ex.call }
+  if (ex?.call) ownCall.value = { ...ex.call }
   source.value = { kind: 'own' }
 }
 
@@ -133,7 +140,7 @@ function onDiagramSelect(pos: OffPosId | null) {
           </p>
         </div>
 
-        <nav class="dir-toggle" aria-label="Formation">
+        <nav v-if="!locked" class="dir-toggle" aria-label="Formation">
           <button
             type="button"
             class="dir-btn"
@@ -194,7 +201,7 @@ function onDiagramSelect(pos: OffPosId | null) {
                 @click="chooseExample(ex.digits)"
               >
                 <span class="ex-digits">{{ ex.digits }}</span>
-                <span class="ex-call">{{ callNameOf(ex.call, formation) }}</span>
+                <span class="ex-call">{{ ex.callNameFor(formation) }}</span>
                 <span class="ex-blurb muted">{{ ex.blurb }}</span>
               </button>
             </div>
@@ -539,7 +546,7 @@ function onDiagramSelect(pos: OffPosId | null) {
 }
 @media (min-width: 560px) {
   .example-row {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   }
 }
 .ex-btn {

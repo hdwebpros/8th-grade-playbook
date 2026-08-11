@@ -54,8 +54,12 @@ import { mirrorPlay } from '../../utils/mirror'
  * defender's outside shoulder, then the push toward the fake side (left on
  * Red — mirroring flips it for Black). `defX` is the defender's x; the fronts
  * put all their down men a yard deep, so the contact point sits at that depth.
+ *
+ * Exported because Split Wide Bull 95-59 is called with "same protection as
+ * stretch-boot-red" — it shares this helper rather than redrawing it, so the
+ * two pictures can never drift apart.
  */
-const driveBlock = (defX: number, targetId: string): Action[] => [
+export const driveBlock = (defX: number, targetId: string): Action[] => [
   {
     kind: 'block',
     targetId,

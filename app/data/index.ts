@@ -29,6 +29,7 @@ export {
 } from './plays/audible'
 export type { AudibleCall, AudibleExample, Protection } from './plays/audible'
 export { splitWidePlays } from './plays/split-wide'
+export { splitWideBull9559 } from './plays/split-wide-9559'
 export { stretchPlays } from './plays/stretch'
 export { stretchBootBlack, stretchBootPlays, stretchBootRed } from './plays/stretch-boot'
 export { routes } from './routes'

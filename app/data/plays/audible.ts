@@ -73,7 +73,7 @@
  * of the backfield and caps with a bar beyond the tackle — the playside edge.
  * "Sprint: Gain Depth — Sprint Downhill Toward Sideline."
  *
- * THE THREE EXAMPLES
+ * THE EXAMPLES
  * ---------------------------------------------------------------------------
  *   Red Ram 33      — dropback, both digits the same. The simplest call there
  *                     is. (varsity p16, panel "(x2) - 33")
@@ -83,7 +83,13 @@
  *                     Reach To The Right — 54 = WR Curl, Wing Wheel."
  *                     (varsity p17 text, drawn on p18 panel "(x2) - 54")
  *
- * Each is authored to the RIGHT out of Red and mirrored into Black.
+ * Each of those three is authored to the RIGHT out of Red and mirrored into
+ * Black. A fourth example rides along that the machine did NOT build:
+ *
+ *   Split Wide Bull 95-59 — Coach Ryan's own call, four digits for four
+ *                     receivers out of Split Wide, hand-authored in
+ *                     app/data/plays/split-wide-9559.ts and only dressed as an
+ *                     example down at the bottom of this file.
  */
 
 import type {
@@ -98,6 +104,7 @@ import type {
 } from '../../types/football'
 import { mirrorPlay } from '../../utils/mirror'
 import { routes } from '../routes'
+import { splitWideBull9559 } from './split-wide-9559'
 
 // ---------------------------------------------------------------------------
 // Small authoring helpers
@@ -700,15 +707,29 @@ export function buildAudible(
 // THE THREE EXAMPLES — the calls the scans actually drew, with their prose.
 // ---------------------------------------------------------------------------
 
-/** What /audible shows in its "Examples" fieldset. */
+/**
+ * What /audible shows in its "Examples" fieldset.
+ *
+ * Most examples are a Red/Black PAIR out of the machine, and the page's
+ * formation toggle picks which one you are looking at. One of them —
+ * Split Wide Bull 95-59 — is hand-authored in another formation entirely, so
+ * an example can also be LOCKED to one formation and ignore the toggle.
+ */
 export interface AudibleExample {
-  /** Stable key for the button, and the digits the kid says: '33'. */
+  /** Stable key for the button, and the digits the kid says: '33', '95-59'. */
   digits: string
-  call: AudibleCall
-  /** One line for the button — what the two digits buy you. */
+  /** One line for the button — what the digits buy you. */
   blurb: string
-  red: Play
-  black: Play
+  /** The machine call. Absent when the example is hand-authored off-system. */
+  call?: AudibleCall
+  /** Set when this example lives in ONE formation and the toggle does not apply. */
+  lockedFormation?: FormationId
+  /** The play to draw for whichever side of the toggle the page is showing. */
+  playFor: (formation: 'red' | 'black') => Play
+  /** The call as it is said out loud, for that same side. */
+  callNameFor: (formation: 'red' | 'black') => string
+  /** Every play this example contributes to the book. */
+  plays: Play[]
 }
 
 function example(
@@ -717,12 +738,27 @@ function example(
   redAuthoring: AudibleAuthoring,
   blackAuthoring: AudibleAuthoring,
 ): AudibleExample {
+  const red = buildAudible(call, 'red', redAuthoring)
+  const black = buildAudible(call, 'black', redAuthoring, blackAuthoring)
   return {
     digits: digitsOf(call),
-    call,
     blurb,
-    red: buildAudible(call, 'red', redAuthoring),
-    black: buildAudible(call, 'black', redAuthoring, blackAuthoring),
+    call,
+    playFor: (formation) => (formation === 'red' ? red : black),
+    callNameFor: (formation) => callNameOf(call, formation),
+    plays: [red, black],
+  }
+}
+
+/** An example the machine cannot build: one hand-authored play, one formation. */
+function authoredExample(digits: string, blurb: string, play: Play): AudibleExample {
+  return {
+    digits,
+    blurb,
+    lockedFormation: play.formation,
+    playFor: () => play,
+    callNameFor: () => play.callName ?? play.name,
+    plays: [play],
   }
 }
 
@@ -845,8 +881,27 @@ const audible54 = example(
   },
 )
 
-/** The three baked-in examples, in teaching order. */
-export const audibleExamples: AudibleExample[] = [audible33, audible12, audible54]
+/**
+ * 4 — SPLIT WIDE BULL 95-59 · Coach Ryan's own call, hand-authored.
+ *
+ * The first call in the book with a digit for every receiver, and the first one
+ * the machine above cannot build — different formation, four digits, four
+ * routes. It lives in app/data/plays/split-wide-9559.ts; here it is only
+ * dressed as an example so /audible can show it beside the other three.
+ */
+const audible9559 = authoredExample(
+  '95-59',
+  'Four receivers, four digits: fades outside, curls inside.',
+  splitWideBull9559,
+)
 
-/** Every example play, both formations — what the book and the quiz see. */
-export const audiblePlays: Play[] = audibleExamples.flatMap((e) => [e.red, e.black])
+/** The baked-in examples, in teaching order. */
+export const audibleExamples: AudibleExample[] = [
+  audible33,
+  audible12,
+  audible54,
+  audible9559,
+]
+
+/** Every example play — what the book and the quiz see. */
+export const audiblePlays: Play[] = audibleExamples.flatMap((e) => e.plays)

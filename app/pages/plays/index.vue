@@ -10,8 +10,8 @@ useHead({ title: 'Plays — Wolves Playbook' })
  *
  * A card is either a CONCEPT — one play with a Red and a Black door — or a
  * single door onto something bigger. The audible is the second kind: its
- * three worked examples are not three concepts, they are three examples of
- * one system, so they collapse into one card that opens /audible.
+ * worked examples are not separate concepts, they are examples of one system,
+ * so they collapse into one card that opens /audible.
  */
 interface Concept {
   name: string
@@ -32,7 +32,7 @@ const audibleCard: Concept = {
   callName: 'Formation · protection · two digits',
   family: 'pass',
   description:
-    'The numbered passing system. Every route on the tree has a digit, and a call is just the formation, the protection, and two digits read outside-to-in. Three worked examples inside — or call your own and see it drawn.',
+    'The numbered passing system. Every route on the tree has a digit, and a call is just the formation, the protection, and the digits read outside-to-in. Four worked examples inside — including Split Wide Bull 95-59, a digit for every receiver — or call your own and see it drawn.',
   to: '/audible',
   toLabel: 'Open',
 }
