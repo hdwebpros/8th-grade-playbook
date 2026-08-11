@@ -297,6 +297,10 @@ const keepAssignments: Record<OffPosId, Assignment> = {
 export const splitWideKeeperRight: Play = {
   id: 'split-wide-keeper-right',
   name: 'Split Wide Keep',
+  call: [
+    { word: 'Split Wide', label: 'formation' },
+    { word: 'Keep', label: 'play' },
+  ],
   family: 'run',
   formation: splitWide.id,
   direction: 'right',
@@ -531,6 +535,10 @@ const diveAssignments: Record<OffPosId, Assignment> = {
 export const splitWideDive: Play = {
   id: 'split-wide-dive',
   name: 'Split Wide Dive',
+  call: [
+    { word: 'Split Wide', label: 'formation' },
+    { word: 'Dive', label: 'play' },
+  ],
   family: 'run',
   formation: splitWide.id,
   direction: 'right',
@@ -808,6 +816,10 @@ const screenAssignments: Record<OffPosId, Assignment> = {
 export const splitWideHbScreen: Play = {
   id: 'split-wide-hb-screen',
   name: 'Split Wide Screen',
+  call: [
+    { word: 'Split Wide', label: 'formation' },
+    { word: 'Screen', label: 'play' },
+  ],
   family: 'pass',
   formation: splitWide.id,
   direction: 'right',
@@ -1065,6 +1077,10 @@ const chipAssignments: Record<OffPosId, Assignment> = {
 export const splitWideChip: Play = {
   id: 'split-wide-chip',
   name: 'Split Wide Chip',
+  call: [
+    { word: 'Split Wide', label: 'formation' },
+    { word: 'Chip', label: 'play' },
+  ],
   family: 'pass',
   formation: splitWide.id,
   direction: 'right',

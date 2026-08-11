@@ -137,6 +137,14 @@ export interface FrontPlan {
 
 export type PlayFamily = 'run' | 'pass'
 
+/** One word of a play call, plus what that word means. */
+export interface CallPart {
+  /** The word as it is said out loud, e.g. 'Red', 'Ram', '33'. */
+  word: string
+  /** What that word tells you, e.g. 'formation', 'protection', 'routes'. */
+  label: string
+}
+
 export interface Play {
   /** e.g. 'veer-red', 'veer-black' — one Play per direction. */
   id: string
@@ -144,6 +152,11 @@ export interface Play {
   name: string
   /** Call-system name(s) if known from the scans, e.g. 'Indy'/'Hoosier'. */
   callName?: string
+  /**
+   * The call broken into the words you actually say, each with what that word
+   * tells the huddle. Optional — `callPartsFor` falls back to formation + name.
+   */
+  call?: CallPart[]
   family: PlayFamily
   formation: FormationId
   direction: 'left' | 'right'

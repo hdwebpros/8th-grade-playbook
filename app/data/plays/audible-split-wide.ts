@@ -41,6 +41,7 @@
 import type {
   Action,
   Assignment,
+  CallPart,
   FrontId,
   FrontPlan,
   OffPosId,
@@ -78,6 +79,13 @@ export const splitWideDigitsOf = (call: SplitWideCall): string => {
 /** "Split Wide Bull 95-59" — the whole thing as it is said in the huddle. */
 export const splitWideCallName = (call: SplitWideCall): string =>
   `Split Wide ${LEAN_LABELS[call.lean]} ${splitWideDigitsOf(call)}`
+
+/** The same call, word by word, with what each word tells the huddle. */
+export const splitWideCallParts = (call: SplitWideCall): CallPart[] => [
+  { word: 'Split Wide', label: 'formation' },
+  { word: LEAN_LABELS[call.lean], label: 'protection — which way the line leans' },
+  { word: splitWideDigitsOf(call), label: 'routes — right to left: X, R, L, Y' },
+]
 
 // ---------------------------------------------------------------------------
 // Small authoring helpers
@@ -343,6 +351,7 @@ export function buildSplitWideAudible(
     id: authoring.id ?? `split-wide-audible-${call.lean}-${call.digits.join('')}`,
     name: authoring.name ?? `Split Wide ${digits}`,
     callName: splitWideCallName(call),
+    call: splitWideCallParts(call),
     family: 'pass',
     formation: splitWide.id,
     direction: call.lean,

@@ -365,6 +365,12 @@ export const stretchBootRed: Play = {
   id: 'stretch-boot-red',
   name: 'Stretch Boot',
   callName: 'Stretch Left Boot Rt',
+  call: [
+    { word: 'Stretch', label: 'the run we fake' },
+    { word: 'Left', label: 'fake goes' },
+    { word: 'Boot', label: 'play' },
+    { word: 'Rt', label: 'QB keeps this way' },
+  ],
   family: 'pass',
   formation: 'red',
   direction: 'right',
@@ -390,6 +396,12 @@ export const stretchBootBlack: Play = mirrorPlay(stretchBootRed, {
   id: 'stretch-boot-black',
   formation: 'black',
   callName: 'Stretch Right Boot Lt',
+  call: [
+    { word: 'Stretch', label: 'the run we fake' },
+    { word: 'Right', label: 'fake goes' },
+    { word: 'Boot', label: 'play' },
+    { word: 'Lt', label: 'QB keeps this way' },
+  ],
   description:
     'Stretch Boot the other way out of Black. Fake the Stretch to the right to Super, boot left, same picture flipped: the line blocks the men in front of it, leans right with the fake, and holds; X on the post-corner is the shot, Y crossing the deep middle behind him, L on the eight-yard out, R sneaking behind the line to the flat as the outlet, Super leaking to the shallow middle after the sell.',
 })

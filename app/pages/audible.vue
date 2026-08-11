@@ -25,7 +25,7 @@ import {
   splitWideCallName,
 } from '~/data'
 import type { AudibleCall, Lean, Protection, SplitWideCall } from '~/data'
-import { FRONT_LABELS, FRONT_ORDER } from '~/utils/playbook'
+import { FRONT_LABELS, FRONT_ORDER, callPartsFor } from '~/utils/playbook'
 
 useHead({ title: 'Audible — Wolves Playbook' })
 
@@ -91,6 +91,9 @@ const locked = computed(() => example.value?.lockedFormation)
 
 /** Whatever formation the play we are drawing actually sets. */
 const formationInfo = computed(() => formations[play.value.formation]!)
+
+/** The call word by word, so the stamp explains whatever the pad just built. */
+const callParts = computed(() => callPartsFor(play.value, formationInfo.value))
 const frontInfo = computed(() => fronts[front.value]!)
 const frontOptions = FRONT_ORDER.map((f) => ({ value: f, label: FRONT_LABELS[f] }))
 
@@ -192,9 +195,7 @@ function onDiagramSelect(pos: OffPosId | null) {
       <div class="head-row">
         <div class="head-titles">
           <h1 class="title">Audible</h1>
-          <p class="subtitle muted">
-            {{ spokenCall }} &middot; {{ formationInfo.name }} formation
-          </p>
+          <PlayCallStamp :parts="callParts" />
         </div>
 
         <!-- Red and Black are a pair, so the header keeps its two-way toggle.
@@ -569,6 +570,11 @@ function onDiagramSelect(pos: OffPosId | null) {
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
+}
+.head-titles {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
 }
 .title {
   font-size: 2.4rem;

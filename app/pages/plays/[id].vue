@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { FrontId, OffPosId, Play } from '~/types/football'
 import { plays, formations, fronts } from '~/data'
-import { FRONT_LABELS, FRONT_ORDER } from '~/utils/playbook'
+import { FRONT_LABELS, FRONT_ORDER, callPartsFor } from '~/utils/playbook'
 import { labelForId } from '~/utils/defense'
 
 const route = useRoute()
@@ -23,6 +23,20 @@ const twin = computed(() =>
     (p) => p.name === play.value.name && p.id !== play.value.id,
   ),
 )
+
+const callParts = computed(() => callPartsFor(play.value, formation.value))
+
+/**
+ * The stamp already says the call, so the subtitle only mentions a `callName`
+ * that carries something the stamp does not (Crush's 'Indy/Hoosier', Waggle's
+ * 'PAP (Boot)').
+ */
+const asideCallName = computed(() => {
+  const name = play.value.callName
+  if (!name) return null
+  const spoken = callParts.value.map((p) => p.word).join(' ')
+  return spoken.toLowerCase().includes(name.toLowerCase()) ? null : name
+})
 
 /* --- Front switcher, kept in the URL so the direction toggle preserves it --- */
 const isFrontId = (v: unknown): v is FrontId => FRONT_ORDER.includes(v as FrontId)
@@ -75,9 +89,10 @@ useHead(() => ({
       <div class="head-row">
         <div class="head-titles">
           <h1 class="title">{{ play.name }}</h1>
+          <PlayCallStamp :parts="callParts" />
           <p class="subtitle muted">
-            <span v-if="play.callName">{{ play.callName }} &middot; </span>
-            {{ formation.name }} formation &middot; going {{ play.direction }}
+            Going {{ play.direction }}
+            <span v-if="asideCallName">&middot; also called {{ asideCallName }}</span>
           </p>
         </div>
 
@@ -180,12 +195,16 @@ useHead(() => ({
   gap: 12px;
   flex-wrap: wrap;
 }
+.head-titles {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+}
 .title {
   font-size: 2.4rem;
 }
 .subtitle {
   font-size: 0.95rem;
-  text-transform: capitalize;
 }
 
 .dir-toggle {

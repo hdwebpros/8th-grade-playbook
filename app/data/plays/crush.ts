@@ -432,6 +432,10 @@ const reviewNotes = [
 export const crushRed: Play = {
   id: 'crush-red',
   name: 'Crush',
+  call: [
+    { word: 'Red', label: 'formation' },
+    { word: 'Crush', label: 'play' },
+  ],
   callName: 'Indy/Hoosier — Crush',
   family: 'run',
   formation: 'red',
@@ -454,6 +458,10 @@ export const crushRed: Play = {
 export const crushBlack: Play = mirrorPlay(crushRed, {
   id: 'crush-black',
   formation: 'black',
+  call: [
+    { word: 'Black', label: 'formation' },
+    { word: 'Crush', label: 'play' },
+  ],
   description:
     'Crush to the right out of Black. Same outside-veer read, same arc, other side of the ball — L is the pitch man now and R is the wing who arcs.',
   reviewNotes: [

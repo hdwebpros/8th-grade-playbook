@@ -486,6 +486,10 @@ const reviewNotes = [
 export const veerRed: Play = {
   id: 'veer-red',
   name: 'Veer',
+  call: [
+    { word: 'Red', label: 'formation' },
+    { word: 'Veer', label: 'play' },
+  ],
   family: 'run',
   formation: 'red',
   direction: 'right',
@@ -515,6 +519,10 @@ export const veerRed: Play = {
 export const veerBlack: Play = mirrorPlay(veerRed, {
   id: 'veer-black',
   formation: 'black',
+  call: [
+    { word: 'Black', label: 'formation' },
+    { word: 'Veer', label: 'play' },
+  ],
   description:
     'Veer to the left out of Black. Same read, same pitch relationship, other side of the ball — R is the pitch man now and L is the wing who pins.',
   reviewNotes: [

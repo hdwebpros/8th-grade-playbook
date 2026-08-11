@@ -3,7 +3,14 @@
  * playside/backside ruling from SEAM.md §2 ("Position labeling").
  * Football data itself lives in app/data/** (data agent).
  */
-import type { Assignment, Formation, FrontId, OffPosId, Play } from '~/types/football'
+import type {
+  Assignment,
+  CallPart,
+  Formation,
+  FrontId,
+  OffPosId,
+  Play,
+} from '~/types/football'
 
 export type PlaySide = 'playside' | 'backside' | null
 
@@ -31,6 +38,24 @@ export function mergedAssignments(
   front: FrontId,
 ): Partial<Record<OffPosId, Assignment>> {
   return { ...play.assignments, ...(play.vs[front]?.assignments ?? {}) }
+}
+
+/**
+ * The play call, word by word, for the "Play call" stamp on the play page.
+ *
+ * Plays that are called with more than formation + name (the audibles, the
+ * boots) carry their own `call` in the data; everything else is called the way
+ * it reads — "Red Veer" — so that is the fallback.
+ */
+export function callPartsFor(play: Play, formation: Formation): CallPart[] {
+  if (play.call?.length) return play.call
+  const name = play.name.startsWith(`${formation.name} `)
+    ? play.name.slice(formation.name.length + 1)
+    : play.name
+  return [
+    { word: formation.name, label: 'formation' },
+    { word: name, label: 'play' },
+  ]
 }
 
 export const POSITION_NAMES: Record<OffPosId, string> = {

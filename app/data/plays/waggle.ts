@@ -307,6 +307,10 @@ const reviewNotes = [
 export const waggleRed: Play = {
   id: 'waggle-red',
   name: 'Waggle',
+  call: [
+    { word: 'Red', label: 'formation' },
+    { word: 'Waggle', label: 'play' },
+  ],
   callName: 'PAP (Boot)',
   family: 'pass',
   formation: 'red',
@@ -332,6 +336,10 @@ export const waggleRed: Play = {
 export const waggleBlack: Play = mirrorPlay(waggleRed, {
   id: 'waggle-black',
   formation: 'black',
+  call: [
+    { word: 'Black', label: 'formation' },
+    { word: 'Waggle', label: 'play' },
+  ],
   description:
     'Waggle the other way out of Black. Fake the Stretch to the right, boot left, and flood it: flat, over, corner, with the post clearing the middle. L is the motion man taking the fake now and the left guard pulls to open the edge.',
   reviewNotes: [

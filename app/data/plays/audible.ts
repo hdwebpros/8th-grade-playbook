@@ -98,6 +98,7 @@
 import type {
   Action,
   Assignment,
+  CallPart,
   FormationId,
   FrontId,
   FrontPlan,
@@ -574,6 +575,20 @@ export function callNameOf(call: AudibleCall, formation: 'red' | 'black'): strin
   return `${form} ${PROTECTION_LABELS[call.protection][formation]}${tag} ${digitsOf(call)}`
 }
 
+/** The same call, word by word, with what each word tells the huddle. */
+export function callPartsOf(call: AudibleCall, formation: 'red' | 'black'): CallPart[] {
+  const parts: CallPart[] = [
+    { word: formation === 'red' ? 'Red' : 'Black', label: 'formation' },
+    { word: PROTECTION_LABELS[call.protection][formation], label: 'protection' },
+  ]
+  if (call.dash) parts.push({ word: 'Dash', label: 'Super runs instead of blocking' })
+  parts.push({
+    word: digitsOf(call),
+    label: call.backside === undefined ? 'routes — X, then the wing' : 'routes — X, wing, backside wing',
+  })
+  return parts
+}
+
 const routeNameOf = (num: Digit): string => ROUTE_BY_NUM.get(num)?.name ?? `Route ${num}`
 const routeDetailOf = (num: Digit): string => ROUTE_BY_NUM.get(num)?.description ?? ''
 
@@ -663,6 +678,7 @@ function buildAudibleRed(call: AudibleCall, authoring: AudibleAuthoring = {}): P
     id: authoring.id ?? `audible-${call.protection}${call.dash ? '-dash' : ''}-${digitsOf(call)}-red`,
     name: `Audible ${call.dash ? 'Dash ' : ''}${digitsOf(call)}`,
     callName: callNameOf(call, 'red'),
+    call: callPartsOf(call, 'red'),
     family: 'pass',
     formation: 'red',
     direction: 'right',
@@ -702,6 +718,7 @@ export function buildAudible(
         ? authoring.id.replace(/-red$/, '-black')
         : `audible-${call.protection}${call.dash ? '-dash' : ''}-${digitsOf(call)}-black`),
     callName: callNameOf(call, 'black'),
+    call: callPartsOf(call, 'black'),
     formation: 'black' as FormationId,
     description: blackAuthoring.description ?? describeCall(call, 'black'),
     reviewNotes: blackAuthoring.reviewNotes ?? redPlay.reviewNotes,

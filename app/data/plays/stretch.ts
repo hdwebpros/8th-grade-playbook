@@ -374,6 +374,10 @@ const reviewNotes = [
 export const stretchRed: Play = {
   id: 'stretch-red',
   name: 'Stretch',
+  call: [
+    { word: 'Red', label: 'formation' },
+    { word: 'Stretch', label: 'play' },
+  ],
   family: 'run',
   formation: 'red',
   direction: 'left',
@@ -401,6 +405,10 @@ export const stretchRed: Play = {
 export const stretchBlack: Play = mirrorPlay(stretchRed, {
   id: 'stretch-black',
   formation: 'black',
+  call: [
+    { word: 'Black', label: 'formation' },
+    { word: 'Stretch', label: 'play' },
+  ],
   description:
     'Stretch to the right out of Black. Same 45-degree steps, same bucket step, same read on the end man — other side of the ball. R is the playside wing now and L is the one cutting off the back side.',
   reviewNotes: [

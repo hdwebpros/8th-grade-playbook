@@ -417,6 +417,10 @@ const reviewNotes = [
 export const buckSweepRed: Play = {
   id: 'buck-sweep-red',
   name: 'Buck Sweep',
+  call: [
+    { word: 'Red', label: 'formation' },
+    { word: 'Buck', label: 'play' },
+  ],
   callName: 'Buck',
   family: 'run',
   formation: 'red',
@@ -439,6 +443,10 @@ export const buckSweepRed: Play = {
 export const buckSweepBlack: Play = mirrorPlay(buckSweepRed, {
   id: 'buck-sweep-black',
   formation: 'black',
+  call: [
+    { word: 'Black', label: 'formation' },
+    { word: 'Buck', label: 'play' },
+  ],
   description:
     'Buck Sweep to the right out of Black. Same down blocks, same kick and wrap, other side of the ball — the right guard kicks, the left guard wraps, and L is the wing with the ball.',
   reviewNotes: [
