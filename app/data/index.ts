@@ -28,6 +28,13 @@ export {
   PROTECTION_LABELS,
 } from './plays/audible'
 export type { AudibleCall, AudibleExample, Protection } from './plays/audible'
+export {
+  LEAN_LABELS,
+  buildSplitWideAudible,
+  splitWideCallName,
+  splitWideDigitsOf,
+} from './plays/audible-split-wide'
+export type { Lean, SplitWideCall } from './plays/audible-split-wide'
 export { splitWidePlays } from './plays/split-wide'
 export { splitWideBull9559 } from './plays/split-wide-9559'
 export { stretchPlays } from './plays/stretch'

@@ -29,10 +29,10 @@ const audibleIds = new Set(audiblePlays.map((p) => p.id))
 
 const audibleCard: Concept = {
   name: 'Audible',
-  callName: 'Formation · protection · two digits',
+  callName: 'Formation · protection · digits',
   family: 'pass',
   description:
-    'The numbered passing system. Every route on the tree has a digit, and a call is just the formation, the protection, and the digits read outside-to-in. Four worked examples inside — including Split Wide Bull 95-59, a digit for every receiver — or call your own and see it drawn.',
+    'The numbered passing system. Every route on the tree has a digit, and a call is just the formation, the protection, and the digits read outside-to-in — two of them out of Red or Black, four out of Split Wide where every receiver gets one. Four worked examples inside, or call your own in any of the three formations and see it drawn.',
   to: '/audible',
   toLabel: 'Open',
 }

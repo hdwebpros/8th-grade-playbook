@@ -2,23 +2,29 @@
 /**
  * /audible — the numbered passing system as a thing you can operate.
  *
- * The three calls varsity actually drew are the "Examples" buttons. "Call your
- * own" hands the kid the same machine the examples came out of: pick the
- * protection and two digits, and the diagram draws what those digits mean.
- * That is the practice loop — say a call, then check yourself against the
- * picture.
+ * The calls varsity actually drew, plus Coach Ryan's own, are the "Examples"
+ * buttons. "Call your own" hands the kid the same machines those came out of:
+ * pick the FORMATION, the protection and the digits, and the diagram draws what
+ * they mean. Two machines sit behind it — Red and Black take two or three
+ * digits (app/data/plays/audible.ts), Split Wide takes four, one per receiver
+ * (app/data/plays/audible-split-wide.ts) — and the formation picker is what
+ * chooses between them. That is the practice loop: say a call, then check
+ * yourself against the picture.
  */
 import type { FrontId, OffPosId, Play } from '~/types/football'
 import {
+  LEAN_LABELS,
   PROTECTION_LABELS,
   audibleExamples,
   buildAudible,
+  buildSplitWideAudible,
   callNameOf,
   formations,
   fronts,
   routes,
+  splitWideCallName,
 } from '~/data'
-import type { AudibleCall, Protection } from '~/data'
+import type { AudibleCall, Lean, Protection, SplitWideCall } from '~/data'
 import { FRONT_LABELS, FRONT_ORDER } from '~/utils/playbook'
 
 useHead({ title: 'Audible — Wolves Playbook' })
@@ -27,16 +33,26 @@ useHead({ title: 'Audible — Wolves Playbook' })
 
 type Source = { kind: 'example'; digits: string } | { kind: 'own' }
 
+/** The three formations a call can be said out of. */
+type PadFormation = 'red' | 'black' | 'split-wide'
+
 const source = ref<Source>({ kind: 'example', digits: audibleExamples[0]!.digits })
-const formation = ref<'red' | 'black'>('red')
+const formation = ref<PadFormation>('red')
 const front = ref<FrontId>('44')
 
+const isSplitWide = computed(() => formation.value === 'split-wide')
+
+/** Red and Black are a mirrored pair; everything that takes one wants this. */
+const pairFormation = computed<'red' | 'black'>(() => (formation.value === 'black' ? 'black' : 'red'))
+
 /**
- * The call being built on the "Call your own" pad. Whatever example you were
- * looking at is copied onto it when you press the button, so this initial
- * value is only ever a fallback.
+ * The call being built on the "Call your own" pad — one per machine, because a
+ * Red call and a Split Wide call are not the same shape. Whatever example you
+ * were looking at is copied onto the matching one when you press the button, so
+ * these initial values are only ever a fallback.
  */
 const ownCall = ref<AudibleCall>({ protection: 'dropback', outside: 9, inside: 2 })
+const ownSwCall = ref<SplitWideCall>({ lean: 'left', digits: [9, 5, 5, 9] })
 
 /** Which example button is lit, if any. */
 const activeDigits = computed(() => {
@@ -52,20 +68,24 @@ const example = computed(() =>
 
 const play = computed<Play>(() => {
   const ex = example.value
-  if (ex) return ex.playFor(formation.value)
-  return buildAudible(ownCall.value, formation.value)
+  if (ex) return ex.playFor(pairFormation.value)
+  return isSplitWide.value
+    ? buildSplitWideAudible(ownSwCall.value)
+    : buildAudible(ownCall.value, pairFormation.value)
 })
 
 /** The call as it is said in the huddle, for the current formation. */
-const spokenCall = computed(() =>
-  example.value
-    ? example.value.callNameFor(formation.value)
-    : callNameOf(ownCall.value, formation.value),
-)
+const spokenCall = computed(() => {
+  const ex = example.value
+  if (ex) return ex.callNameFor(pairFormation.value)
+  return isSplitWide.value
+    ? splitWideCallName(ownSwCall.value)
+    : callNameOf(ownCall.value, pairFormation.value)
+})
 
 /**
- * Split Wide Bull 95-59 lives in one formation, so the Red/Black toggle has
- * nothing to switch — it hides while that example is up.
+ * An example that lives in one formation — Split Wide Bull 95-59 — leaves the
+ * header toggle nothing to switch, so it hides while that example is up.
  */
 const locked = computed(() => example.value?.lockedFormation)
 
@@ -80,9 +100,40 @@ const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 const routeName = (num: number) => routes.find((r) => r.num === num)?.name ?? `${num}`
 
 const protectionOptions = computed<{ value: Protection; label: string }[]>(() => [
-  { value: 'dropback', label: PROTECTION_LABELS.dropback[formation.value] },
-  { value: 'sprint', label: PROTECTION_LABELS.sprint[formation.value] },
+  { value: 'dropback', label: PROTECTION_LABELS.dropback[pairFormation.value] },
+  { value: 'sprint', label: PROTECTION_LABELS.sprint[pairFormation.value] },
 ])
+
+/**
+ * The formation is the first thing you say, so it is the first row on the pad —
+ * and it is also what picks the machine: Red and Black take two digits, Split
+ * Wide takes four.
+ */
+const formationOptions: { value: PadFormation; label: string }[] = [
+  { value: 'red', label: 'Red' },
+  { value: 'black', label: 'Black' },
+  { value: 'split-wide', label: 'Split Wide' },
+]
+
+/** Out of Split Wide the protection word only names which way the line leans. */
+const leanOptions: { value: Lean; label: string }[] = [
+  { value: 'right', label: `${LEAN_LABELS.right} — right` },
+  { value: 'left', label: `${LEAN_LABELS.left} — left` },
+]
+
+/** The four Split Wide digits, in the order they are said: right to left. */
+const swSlots = [
+  { i: 0, ord: 'First digit', who: 'X — wide right' },
+  { i: 1, ord: 'Second digit', who: 'R — right slot' },
+  { i: 2, ord: 'Third digit', who: 'L — left slot' },
+  { i: 3, ord: 'Fourth digit', who: 'Y — wide left' },
+]
+
+function setSwDigit(i: number, d: number) {
+  const next = [...ownSwCall.value.digits] as SplitWideCall['digits']
+  next[i] = d
+  ownSwCall.value = { ...ownSwCall.value, digits: next }
+}
 
 /** In Red the man inside X is the right wing; in Black it is the left wing. */
 const wingLabel = computed(() => (formation.value === 'red' ? 'R — right wing' : 'L — left wing'))
@@ -102,6 +153,11 @@ function toggleBackside(d: number) {
 }
 
 function chooseExample(d: string) {
+  // Keep the formation and the example agreeable: a Split Wide example drags
+  // the picker to Split Wide, and a Red/Black example drags it back off.
+  const ex = audibleExamples.find((e) => e.digits === d)
+  if (ex?.lockedFormation === 'split-wide') formation.value = 'split-wide'
+  else if (isSplitWide.value) formation.value = 'red'
   source.value = { kind: 'example', digits: d }
 }
 
@@ -109,7 +165,8 @@ function callYourOwn() {
   // Carry the call you were just looking at onto the pad, so the first thing
   // you do is change a digit and watch what moves.
   const ex = example.value
-  if (ex?.call) ownCall.value = { ...ex.call }
+  if (ex?.swCall) ownSwCall.value = { ...ex.swCall, digits: [...ex.swCall.digits] }
+  else if (ex?.call) ownCall.value = { ...ex.call }
   source.value = { kind: 'own' }
 }
 
@@ -140,7 +197,9 @@ function onDiagramSelect(pos: OffPosId | null) {
           </p>
         </div>
 
-        <nav v-if="!locked" class="dir-toggle" aria-label="Formation">
+        <!-- Red and Black are a pair, so the header keeps its two-way toggle.
+             Split Wide is not part of that pair — it is chosen on the pad. -->
+        <nav v-if="!locked && !isSplitWide" class="dir-toggle" aria-label="Formation">
           <button
             type="button"
             class="dir-btn"
@@ -226,113 +285,175 @@ function onDiagramSelect(pos: OffPosId | null) {
               <p class="say-phrase">{{ spokenCall }}</p>
             </div>
 
-            <div class="pad-row">
-              <span class="pad-label">Protection</span>
-              <SegmentedControl
-                v-model="ownCall.protection"
-                :options="protectionOptions"
-                label="Protection"
-              />
-            </div>
-
+            <!-- The formation is the first word out of your mouth, so it is the
+                 first row here — and it is what decides how many digits the
+                 call has. -->
             <div class="pad-row">
               <span class="pad-label">
-                First digit &middot; X — split end
-                <em class="pad-route">{{ routeName(ownCall.outside) }}</em>
-              </span>
-              <div class="digit-row" role="group" aria-label="First digit — split end">
-                <button
-                  v-for="d in digits"
-                  :key="`o${d}`"
-                  type="button"
-                  class="digit"
-                  :class="{ active: ownCall.outside === d }"
-                  :aria-pressed="ownCall.outside === d"
-                  @click="ownCall.outside = d"
-                >
-                  {{ d }}
-                </button>
-              </div>
-            </div>
-
-            <div class="pad-row">
-              <span class="pad-label">
-                Second digit &middot; {{ wingLabel }}
-                <em class="pad-route">{{ routeName(ownCall.inside) }}</em>
-              </span>
-              <div class="digit-row" role="group" aria-label="Second digit — wing">
-                <button
-                  v-for="d in digits"
-                  :key="`i${d}`"
-                  type="button"
-                  class="digit"
-                  :class="{ active: ownCall.inside === d }"
-                  :aria-pressed="ownCall.inside === d"
-                  @click="ownCall.inside = d"
-                >
-                  {{ d }}
-                </button>
-              </div>
-            </div>
-
-            <div class="pad-row">
-              <span class="pad-label">
-                Third digit &middot; {{ backWingLabel }}
+                Formation
                 <em class="pad-route">
                   {{
-                    ownCall.backside === undefined
-                      ? 'Not called — speed out away'
-                      : routeName(ownCall.backside)
+                    isSplitWide
+                      ? 'Four digits — one per receiver'
+                      : 'Two digits, three if you buy the backside wing'
                   }}
                 </em>
               </span>
-              <div class="digit-row" role="group" aria-label="Third digit — backside wing">
+              <SegmentedControl v-model="formation" :options="formationOptions" label="Formation" />
+            </div>
+
+            <template v-if="isSplitWide">
+              <div class="pad-row">
+                <span class="pad-label">
+                  Protection
+                  <em class="pad-route">
+                    Block the man in front of you, lean
+                    {{ ownSwCall.lean }} — same as Stretch Boot
+                  </em>
+                </span>
+                <SegmentedControl
+                  v-model="ownSwCall.lean"
+                  :options="leanOptions"
+                  label="Protection"
+                />
+              </div>
+
+              <div v-for="slot in swSlots" :key="slot.i" class="pad-row">
+                <span class="pad-label">
+                  {{ slot.ord }} &middot; {{ slot.who }}
+                  <em class="pad-route">{{ routeName(ownSwCall.digits[slot.i]!) }}</em>
+                </span>
+                <div class="digit-row" role="group" :aria-label="`${slot.ord} — ${slot.who}`">
+                  <button
+                    v-for="d in digits"
+                    :key="`sw${slot.i}-${d}`"
+                    type="button"
+                    class="digit"
+                    :class="{ active: ownSwCall.digits[slot.i] === d }"
+                    :aria-pressed="ownSwCall.digits[slot.i] === d"
+                    @click="setSwDigit(slot.i, d)"
+                  >
+                    {{ d }}
+                  </button>
+                </div>
+              </div>
+
+              <p class="pad-hint muted">
+                <Icon name="lucide:route" aria-hidden="true" />
+                Four receivers, four digits, said right to left across the formation.
+                <NuxtLink to="/routes" class="pad-link">See the route tree</NuxtLink>
+              </p>
+            </template>
+
+            <template v-else>
+              <div class="pad-row">
+                <span class="pad-label">Protection</span>
+                <SegmentedControl
+                  v-model="ownCall.protection"
+                  :options="protectionOptions"
+                  label="Protection"
+                />
+              </div>
+
+              <div class="pad-row">
+                <span class="pad-label">
+                  First digit &middot; X — split end
+                  <em class="pad-route">{{ routeName(ownCall.outside) }}</em>
+                </span>
+                <div class="digit-row" role="group" aria-label="First digit — split end">
+                  <button
+                    v-for="d in digits"
+                    :key="`o${d}`"
+                    type="button"
+                    class="digit"
+                    :class="{ active: ownCall.outside === d }"
+                    :aria-pressed="ownCall.outside === d"
+                    @click="ownCall.outside = d"
+                  >
+                    {{ d }}
+                  </button>
+                </div>
+              </div>
+
+              <div class="pad-row">
+                <span class="pad-label">
+                  Second digit &middot; {{ wingLabel }}
+                  <em class="pad-route">{{ routeName(ownCall.inside) }}</em>
+                </span>
+                <div class="digit-row" role="group" aria-label="Second digit — wing">
+                  <button
+                    v-for="d in digits"
+                    :key="`i${d}`"
+                    type="button"
+                    class="digit"
+                    :class="{ active: ownCall.inside === d }"
+                    :aria-pressed="ownCall.inside === d"
+                    @click="ownCall.inside = d"
+                  >
+                    {{ d }}
+                  </button>
+                </div>
+              </div>
+
+              <div class="pad-row">
+                <span class="pad-label">
+                  Third digit &middot; {{ backWingLabel }}
+                  <em class="pad-route">
+                    {{
+                      ownCall.backside === undefined
+                        ? 'Not called — speed out away'
+                        : routeName(ownCall.backside)
+                    }}
+                  </em>
+                </span>
+                <div class="digit-row" role="group" aria-label="Third digit — backside wing">
+                  <button
+                    type="button"
+                    class="digit digit-none"
+                    :class="{ active: ownCall.backside === undefined }"
+                    :aria-pressed="ownCall.backside === undefined"
+                    @click="ownCall.backside = undefined"
+                  >
+                    &mdash;
+                  </button>
+                  <button
+                    v-for="d in digits"
+                    :key="`b${d}`"
+                    type="button"
+                    class="digit"
+                    :class="{ active: ownCall.backside === d }"
+                    :aria-pressed="ownCall.backside === d"
+                    @click="toggleBackside(d)"
+                  >
+                    {{ d }}
+                  </button>
+                </div>
+              </div>
+
+              <div class="pad-row">
+                <span class="pad-label">
+                  Tag
+                  <em class="pad-route">
+                    {{ ownCall.dash ? 'Super to the flat' : 'Super blocks' }}
+                  </em>
+                </span>
                 <button
                   type="button"
-                  class="digit digit-none"
-                  :class="{ active: ownCall.backside === undefined }"
-                  :aria-pressed="ownCall.backside === undefined"
-                  @click="ownCall.backside = undefined"
+                  class="tag-btn"
+                  :class="{ active: ownCall.dash === true }"
+                  :aria-pressed="ownCall.dash === true"
+                  @click="ownCall.dash = !ownCall.dash"
                 >
-                  &mdash;
-                </button>
-                <button
-                  v-for="d in digits"
-                  :key="`b${d}`"
-                  type="button"
-                  class="digit"
-                  :class="{ active: ownCall.backside === d }"
-                  :aria-pressed="ownCall.backside === d"
-                  @click="toggleBackside(d)"
-                >
-                  {{ d }}
+                  Dash
                 </button>
               </div>
-            </div>
 
-            <div class="pad-row">
-              <span class="pad-label">
-                Tag
-                <em class="pad-route">
-                  {{ ownCall.dash ? 'Super to the flat' : 'Super blocks' }}
-                </em>
-              </span>
-              <button
-                type="button"
-                class="tag-btn"
-                :class="{ active: ownCall.dash === true }"
-                :aria-pressed="ownCall.dash === true"
-                @click="ownCall.dash = !ownCall.dash"
-              >
-                Dash
-              </button>
-            </div>
-
-            <p class="pad-hint muted">
-              <Icon name="lucide:route" aria-hidden="true" />
-              Say the whole call out loud, then check the picture.
-              <NuxtLink to="/routes" class="pad-link">See the route tree</NuxtLink>
-            </p>
+              <p class="pad-hint muted">
+                <Icon name="lucide:route" aria-hidden="true" />
+                Say the whole call out loud, then check the picture.
+                <NuxtLink to="/routes" class="pad-link">See the route tree</NuxtLink>
+              </p>
+            </template>
           </div>
 
           <!-- The words that are not digits. Learn these and the rest is math. -->
@@ -353,6 +474,17 @@ function onDiagramSelect(pos: OffPosId | null) {
                   The two dropback protections. <strong>Ram</strong> slides the line to the
                   RIGHT; <strong>Bull</strong> is the reverse — the same thing to the LEFT.
                   We slide toward the split end, so Red is Ram and Black is Bull.
+                </dd>
+              </div>
+              <div class="term">
+                <dt>Split Wide &middot; four digits</dt>
+                <dd>
+                  Out of Split Wide there are four men detached instead of two, so the call has
+                  <strong>four</strong> digits and every receiver has one — nobody is a zero, nobody
+                  has a standing rule. Said right to left across the formation:
+                  <em>Split Wide Bull 95-59</em>. The protection word only names which way the line
+                  leans, and the blocking is Stretch Boot's: block the man in front of you and drive
+                  him that way.
                 </dd>
               </div>
               <div class="term">

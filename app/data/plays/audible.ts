@@ -84,12 +84,15 @@
  *                     (varsity p17 text, drawn on p18 panel "(x2) - 54")
  *
  * Each of those three is authored to the RIGHT out of Red and mirrored into
- * Black. A fourth example rides along that the machine did NOT build:
+ * Black. A fourth example rides along that came out of a DIFFERENT machine:
  *
  *   Split Wide Bull 95-59 — Coach Ryan's own call, four digits for four
- *                     receivers out of Split Wide, hand-authored in
- *                     app/data/plays/split-wide-9559.ts and only dressed as an
- *                     example down at the bottom of this file.
+ *                     receivers out of Split Wide. Out of that formation every
+ *                     receiver carries a digit, which is a different enough
+ *                     call to get its own builder — see
+ *                     app/data/plays/audible-split-wide.ts, with this call's
+ *                     prose in app/data/plays/split-wide-9559.ts. /audible's
+ *                     formation picker is what chooses between the two.
  */
 
 import type {
@@ -104,6 +107,8 @@ import type {
 } from '../../types/football'
 import { mirrorPlay } from '../../utils/mirror'
 import { routes } from '../routes'
+import type { SplitWideCall } from './audible-split-wide'
+import { splitWideDigitsOf } from './audible-split-wide'
 import { splitWideBull9559 } from './split-wide-9559'
 
 // ---------------------------------------------------------------------------
@@ -712,16 +717,18 @@ export function buildAudible(
  *
  * Most examples are a Red/Black PAIR out of the machine, and the page's
  * formation toggle picks which one you are looking at. One of them —
- * Split Wide Bull 95-59 — is hand-authored in another formation entirely, so
- * an example can also be LOCKED to one formation and ignore the toggle.
+ * Split Wide Bull 95-59 — lives in another formation entirely, so an example
+ * can also be LOCKED to one formation and ignore that toggle.
  */
 export interface AudibleExample {
   /** Stable key for the button, and the digits the kid says: '33', '95-59'. */
   digits: string
   /** One line for the button — what the digits buy you. */
   blurb: string
-  /** The machine call. Absent when the example is hand-authored off-system. */
+  /** The Red/Black machine call. Absent when the example is not one. */
   call?: AudibleCall
+  /** The Split Wide machine call, for examples that live in that formation. */
+  swCall?: SplitWideCall
   /** Set when this example lives in ONE formation and the toggle does not apply. */
   lockedFormation?: FormationId
   /** The play to draw for whichever side of the toggle the page is showing. */
@@ -750,11 +757,16 @@ function example(
   }
 }
 
-/** An example the machine cannot build: one hand-authored play, one formation. */
-function authoredExample(digits: string, blurb: string, play: Play): AudibleExample {
+/**
+ * An example out of a formation the Red/Black machine does not build: one play,
+ * one formation, and the Split Wide call behind it, so "Call your own" can open
+ * on that exact call.
+ */
+function splitWideExample(blurb: string, call: SplitWideCall, play: Play): AudibleExample {
   return {
-    digits,
+    digits: splitWideDigitsOf(call),
     blurb,
+    swCall: call,
     lockedFormation: play.formation,
     playFor: () => play,
     callNameFor: () => play.callName ?? play.name,
@@ -882,16 +894,17 @@ const audible54 = example(
 )
 
 /**
- * 4 — SPLIT WIDE BULL 95-59 · Coach Ryan's own call, hand-authored.
+ * 4 — SPLIT WIDE BULL 95-59 · Coach Ryan's own call.
  *
- * The first call in the book with a digit for every receiver, and the first one
- * the machine above cannot build — different formation, four digits, four
- * routes. It lives in app/data/plays/split-wide-9559.ts; here it is only
- * dressed as an example so /audible can show it beside the other three.
+ * The first call in the book with a digit for every receiver, and the one the
+ * machine above cannot build — different formation, four digits, four routes.
+ * Its own machine is app/data/plays/audible-split-wide.ts and its prose is in
+ * app/data/plays/split-wide-9559.ts; here it is only dressed as an example so
+ * /audible can show it beside the other three.
  */
-const audible9559 = authoredExample(
-  '95-59',
+const audible9559 = splitWideExample(
   'Four receivers, four digits: fades outside, curls inside.',
+  { lean: 'left', digits: [9, 5, 5, 9] },
   splitWideBull9559,
 )
 

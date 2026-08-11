@@ -55,17 +55,19 @@ import { mirrorPlay } from '../../utils/mirror'
  * Red — mirroring flips it for Black). `defX` is the defender's x; the fronts
  * put all their down men a yard deep, so the contact point sits at that depth.
  *
- * Exported because Split Wide Bull 95-59 is called with "same protection as
+ * Exported because the Split Wide audible is called with "same protection as
  * stretch-boot-red" — it shares this helper rather than redrawing it, so the
- * two pictures can never drift apart.
+ * two pictures can never drift apart. That caller can also ask for the push to
+ * go the other way (`lean` = 1, drive RIGHT), which is what "Ram" means out of
+ * Split Wide; Stretch Boot itself only ever uses the default.
  */
-export const driveBlock = (defX: number, targetId: string): Action[] => [
+export const driveBlock = (defX: number, targetId: string, lean: 1 | -1 = -1): Action[] => [
   {
     kind: 'block',
     targetId,
     path: [
-      { x: defX + 0.45, y: 0.9 },
-      { x: defX - 0.75, y: 1.35 },
+      { x: defX - 0.45 * lean, y: 0.9 },
+      { x: defX + 0.75 * lean, y: 1.35 },
     ],
   },
 ]
