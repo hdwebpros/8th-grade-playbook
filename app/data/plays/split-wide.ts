@@ -8,7 +8,7 @@
  *      keeper over the right guard B gap"          → splitWideKeeperRight
  *   2. "standard hb dive, all receivers stop the crash to the middle"
  *                                                   → splitWideDiveRight / -Left
- *   3. "HB goes in motion, HB screen"               → splitWideHbScreen
+ *   3. "HB goes in motion, HB screen"               → splitWideScreenRight / -Left
  *   4. "HB chip blocks; receivers left→right run in, post, post, go"
  *                                                   → splitWideChip
  *
@@ -26,11 +26,11 @@
  * There is no scan to copy for these plays, so each target is a decision, and
  * the reasoning for the ones that aren't obvious is written into `reviewNotes`.
  *
- * DIRECTION (Coach Ryan, 2026-08-14): the DIVE is called with a direction like
- * the runs in Red and Black — it ships as a left/right pair linked by
- * `audibleFlipId` (Indy = left, Hoosier = right at the line). Split Wide is one
- * balanced formation, so there is no `formationTwinId` — a 1×2, not a 2×2.
- * Keep, Screen, and Chip stay one-way, per the same ruling.
+ * DIRECTION (Coach Ryan, 2026-08-14): the DIVE and the SCREEN are called with a
+ * direction like the runs in Red and Black — each ships as a left/right pair
+ * linked by `audibleFlipId` (Indy = left, Hoosier = right at the line). Split
+ * Wide is one balanced formation, so there is no `formationTwinId` — 1×2 pairs,
+ * not 2×2 squares. Only Keep and Chip stay one-way, per the same ruling.
  */
 
 import type {
@@ -44,6 +44,43 @@ import type {
 } from '../../types/football'
 import { mirrorPlay } from '../../utils/mirror'
 import { splitWide } from '../split-wide-formation'
+
+/**
+ * WHY SPLIT WIDE NEEDS ITS OWN MIRROR — the X/Y problem.
+ *
+ * `mirrorPlay` swaps the side-NAMED ids (LT↔RT, LG↔RG, L↔R, defender -L/-R)
+ * and negates every x, but it leaves entries keyed `X` and `Y` where they are.
+ * That is correct for Red/Black: the formation itself mirrors, so Y physically
+ * changes sides and his entry should follow him. Split Wide does NOT mirror —
+ * it is ONE balanced set, Y is always wide LEFT at −13 and X always wide RIGHT
+ * at +13 (see app/data/split-wide-formation.ts). In this set X and Y are
+ * mirror-image POSITIONS that keep their spots, so a correct mirror must ALSO
+ * exchange the X and Y entries everywhere they are keyed — actions, per-front
+ * assignment overrides, alignOverrides, and the top-level assignments.
+ * Otherwise Y inherits X's job across the whole field, which is exactly the
+ * crossed-corner-blocks bug the first shipped Dive Left had.
+ */
+function swapXY<T>(rec: Partial<Record<OffPosId, T>>): Partial<Record<OffPosId, T>> {
+  const { X, Y, ...rest } = rec
+  const out: Partial<Record<OffPosId, T>> = { ...rest }
+  if (Y !== undefined) out.X = Y
+  if (X !== undefined) out.Y = X
+  return out
+}
+
+/** `mirrorPlay`, then the X↔Y exchange a balanced one-formation set requires. */
+function mirrorSplitWidePlay(play: Play, overrides: Partial<Play>): Play {
+  const m = mirrorPlay(play)
+  const assignments = swapXY(m.assignments) as Record<OffPosId, Assignment>
+  const vs = {} as Record<FrontId, FrontPlan>
+  for (const [frontId, plan] of Object.entries(m.vs) as [FrontId, FrontPlan][]) {
+    const next: FrontPlan = { ...plan, actions: swapXY(plan.actions) }
+    if (plan.assignments) next.assignments = swapXY(plan.assignments)
+    if (plan.alignOverrides) next.alignOverrides = swapXY(plan.alignOverrides)
+    vs[frontId] = next
+  }
+  return { ...m, assignments, vs, ...overrides }
+}
 
 /** A block aimed at a defender — no path, so it can never strand a diagram. */
 const block = (targetId: string): Action[] => [{ kind: 'block', targetId }]
@@ -568,18 +605,19 @@ export const splitWideDiveRight: Play = {
     'Vs the 5-2 the crack targets change on their own: the ends are the unblocked men there, so the slots crack the ENDS. Vs the 4-4 they crack the walked-up edge backers, and vs the 4-3 they crack the outside backers. The rule the kids learn stays one sentence — "first unblocked man outside our tackle" — and the picture solves itself per front. Confirm you like teaching it as a rule rather than as three memorized names.',
     'The quarterback\'s boot fake away is my addition, not yours. It costs nothing and it is what makes the same look sell the keeper and the screen. Cut it if you want the dive taught totally clean.',
     'DIRECTION — RESOLVED (Coach Ryan, 2026-08-14): the dive IS called with a direction, like the runs in Red and Black, and Indy/Hoosier flip it at the line — Indy = left, Hoosier = right, wired through audibleFlipId. Split Wide is one balanced formation, so unlike those runs there is no Red/Black formation twin: just this left/right pair, no formationTwinId.',
-    'MIRROR — SHIPPED for the dive (superseding the file-wide "not shipped yet" stance): Split Wide is a balanced set and all three fronts are left/right symmetric, so Split Wide Dive Left is one mirrorPlay() call with zero hand corrections, and it now ships as this play\'s audible flip. Keep, Screen, and Chip remain one-way per the same ruling. Both dive plays still sit behind the HANDOFF §10 review gate like everything else in this file.',
+    'MIRROR — SHIPPED for the dive (superseding the file-wide "not shipped yet" stance): Split Wide is a balanced set and all three fronts are left/right symmetric, so Split Wide Dive Left is one mirrorSplitWidePlay() call — mirrorPlay plus the X↔Y exchange this balanced set needs — with zero hand corrections to the football, and it now ships as this play\'s audible flip. Keep and Chip remain one-way per the same ruling. Both dive plays still sit behind the HANDOFF §10 review gate like everything else in this file.',
   ],
 }
 
 // ---------------------------------------------------------------------------
 // PLAY 2b — SPLIT WIDE DIVE LEFT: the mirror of the play above, and nothing
 // else. The set is drawn exactly balanced and all three fronts are symmetric,
-// so mirrorPlay() needs zero hand corrections — the overrides below are only
-// identity (id, call, flip link) and left-handed wording.
+// so mirrorSplitWidePlay() — mirrorPlay plus the X↔Y exchange, see the helper
+// above — needs zero hand corrections. The overrides below are only identity
+// (id, call, flip link) and left-handed wording.
 // ---------------------------------------------------------------------------
 
-export const splitWideDiveLeft: Play = mirrorPlay(splitWideDiveRight, {
+export const splitWideDiveLeft: Play = mirrorSplitWidePlay(splitWideDiveRight, {
   id: 'split-wide-dive-left',
   call: [
     { word: 'Split Wide', label: 'formation' },
@@ -591,12 +629,12 @@ export const splitWideDiveLeft: Play = mirrorPlay(splitWideDiveRight, {
     'The simplest play in the book, run to the left. Super runs downhill at the playside hip of the center — the left side on this call — the line blocks the man in front of them, and all four receivers keep the defense from crashing to the middle. Four yards, every snap, out of a formation that looks like a pass.',
   reviewNotes: [
     ...(splitWideDiveRight.reviewNotes ?? []),
-    'GENERATED: this play is mirrorPlay(splitWideDiveRight) with zero hand corrections — the set is drawn exactly balanced and all three fronts are left/right symmetric, so every point, target, and side-keyed assignment flips cleanly. Review the right-handed play and you have reviewed this one.',
+    'GENERATED: this play is mirrorSplitWidePlay(splitWideDiveRight) — the straight mirror with the X↔Y exchange applied on top, because in this balanced set X and Y are mirror-image POSITIONS that keep their spots (Y is always wide left, X always wide right) and so their entries must trade places when everything else flips. The set is drawn exactly balanced and all three fronts are left/right symmetric, so nothing needed a hand correction. NOTE THE FIX: the first shipped version of this play used plain mirrorPlay() and had the wide men crossing the whole field — Y aimed at C-R and X at C-L. With the swap, Y blocks C-L and X blocks C-R on BOTH directions, which is right because the dive\'s wide-receiver job is symmetric: each man stalks his own corner. Review the right-handed play and you have reviewed this one.',
   ],
 })
 
 // ===========================================================================
-// PLAY 3 — SPLIT WIDE RT SCREEN  (motion, HB screen)
+// PLAY 3 — SPLIT WIDE SCREEN  (motion, HB screen — ships as a right/left pair)
 // ===========================================================================
 //
 // Super motions out and SETTLES between R and X — the exact same motion and the
@@ -847,17 +885,19 @@ const screenAssignments: Record<OffPosId, Assignment> = {
   },
 }
 
-export const splitWideHbScreen: Play = {
-  id: 'split-wide-hb-screen',
+export const splitWideScreenRight: Play = {
+  id: 'split-wide-screen-right',
   name: 'Screen',
   call: [
     { word: 'Split Wide', label: 'formation' },
     { word: 'Screen', label: 'play' },
+    { word: 'Right', label: 'direction' },
   ],
   family: 'pass',
   formation: splitWide.id,
   direction: 'right',
   ballCarrier: 'S',
+  audibleFlipId: 'split-wide-screen-left',
   summary: 'Quick screen to Super in space, linemen out in front.',
   description:
     'Super motions out and settles between R and X with his hands up — the same picture as the keep. We let their right-side rush come free, the quarterback sells a drop the other way, and the ball goes out behind them to Super standing still, with both right-side linemen leading him up the sideline. This is our answer to a team that blitzes: the more men they send, the fewer are left out there with Super. The ball has to come out quick — that is the whole play — and it puts Super in space.',
@@ -876,10 +916,153 @@ export const splitWideHbScreen: Play = {
     'HE IS SET, WHICH MEANS HE IS NOT MOVING AT THE SNAP. Same rule note as on the keep: a man who motions and stops must be set a full second before the snap. On this play that is also a timing tax — the quarterback cannot snap it the instant Super arrives, so the defense gets an extra beat to look at him standing out there. Worth confirming: if the linebackers start jumping the screen because it is telegraphed, the answer is the keep, which is exactly why the two share a picture.',
     'PER COACH RYAN — WHAT THIS PLAY IS FOR: "works for blitzing teams, ball must get out quick, gets the Super in space." Now in the description and in the quarterback\'s detail. This also answers the timing worry two notes up from a different direction: against a blitzing team the extra beat Super spends standing there is bought back, because the men who would be looking at him are running at the quarterback instead. It also sharpens the choice between the two screen versions in the note above — if the trigger for this call is BLITZ, the quick/bubble version gets the ball out faster than the true screen does, and speed is the thing you just said matters most. Worth a decision.',
     'Y and L clear out on every front. Confirm — the alternative is having L block the backside pursuit, but he is 8½ yards away from anything worth blocking and his route is what empties the middle.',
-    MIRROR_NOTE_PREFIX +
-      'One caution before mirroring this one: a left-handed quarterback throws this screen very differently, so mirror it for the picture, not for the technique.',
+    'DIRECTION — RESOLVED (Coach Ryan, 2026-08-14): the Screen is now called with a direction like the Dive — Indy = left, Hoosier = right at the line, wired through audibleFlipId; one balanced formation, so no formationTwinId.',
+    'MIRROR — SHIPPED for the screen: Split Wide Screen Left now ships as this play\'s audible flip, built with mirrorSplitWidePlay (the mirror plus the X↔Y exchange the balanced set needs). The old caution stands even with it shipped: a mirrored screen mirrors the PICTURE, not the quarterback\'s technique — throwing left off an away-opening drop is a different rep for a right-handed kid, and it needs its own practice time before the left call is live on game day.',
   ],
 }
+
+// ---------------------------------------------------------------------------
+// PLAY 3b — SPLIT WIDE SCREEN LEFT: the mirror of the play above. The GEOMETRY
+// is one mirrorSplitWidePlay() call — Super settles between L and Y at
+// (−10.75, −1), the LEFT rush comes free, LG and LT release and lead. The
+// PROSE is all hand-translated: mirrorPlay re-keys assignments correctly but
+// cannot rewrite "right" into "left" inside a sentence, so every rule and
+// detail below is authored fresh at the already-correct mirrored keys.
+// ---------------------------------------------------------------------------
+
+export const splitWideScreenLeft: Play = (() => {
+  const m = mirrorSplitWidePlay(splitWideScreenRight, {})
+  return {
+    ...m,
+    id: 'split-wide-screen-left',
+    call: [
+      { word: 'Split Wide', label: 'formation' },
+      { word: 'Screen', label: 'play' },
+      { word: 'Left', label: 'direction' },
+    ],
+    audibleFlipId: 'split-wide-screen-right',
+    description:
+      'Super motions out and settles between L and Y with his hands up — the same screen picture, flipped to the left. We let their left-side rush come free, the quarterback sells a drop the other way, and the ball goes out behind them to Super standing still, with both left-side linemen leading him up the sideline. This is our answer to a team that blitzes: the more men they send, the fewer are left out there with Super. The ball has to come out quick — that is the whole play — and it puts Super in space.',
+    assignments: {
+      Y: {
+        rule: '4-3: block the corner. 4-4 and 5-2: run him off deep.',
+        detail:
+          'You are the wide man on the screen side now. Count the hats outside with you. If we already have enough blockers out there, the best thing you can do is take the corner deep and out of the play — sprint up the sideline. If we are a man short, you stalk him and stay on his outside number so everything spills back inside.',
+      },
+      LT: {
+        rule: 'Set one count, then release flat and lead up the alley.',
+        detail:
+          'Same set, same release, but you go further and deeper than LG. You have the deep man who comes down to make the tackle. Run under control the last three steps so you do not run past him.',
+      },
+      LG: {
+        rule: 'Set one count, then release flat and lead inside-up.',
+        detail:
+          'Show him a pass set, let him beat you upfield — that is what we want — then get out into the flat and climb to the first backer chasing the screen. You are the inside blocker; get your head across him.',
+      },
+      C: {
+        rule: 'Pass set. Block the first man to your left; if a nose is on you, he is yours alone.',
+        detail:
+          'You are the last man protecting the middle. Two counts is all we need — the ball is out before the rush ever gets home.',
+      },
+      RG: {
+        rule: 'Pass set. Block the man on you.',
+        detail: 'Set inside-out and hold him. If he stunts inside, you go with him — the quarterback is stepping away from you.',
+      },
+      RT: {
+        rule: 'Pass set. Block the end.',
+        detail:
+          'Real pass set, real punch — you are selling a dropback. Kick-slide, hands inside, and keep him off the quarterback for two full counts.',
+      },
+      X: {
+        rule: 'Clear out — run straight up the field.',
+        detail:
+          'Nothing is coming to you and that is the point. Run hard for four seconds and take the corner and the deep help with you, away from the screen.',
+      },
+      L: {
+        rule: 'Block the first defender inside the corner.',
+        detail:
+          'Super is catching it just outside of you, so you are the block he runs off of. Come off the ball like a route so nobody smells screen, then break down and take him. Inside-out — never let him cross your face to the sideline.',
+      },
+      R: {
+        rule: 'Clear out — post across the middle.',
+        detail:
+          'Run the middle of the field empty. The safety who chases you is the safety who is not sitting in the alley waiting for Super.',
+      },
+      S: {
+        rule: 'Motion out between L and Y. STOP. Get set, hands up — then catch it and get north.',
+        detail:
+          'Same settle, other side: out behind the line to your LEFT, stop between L and Y — not past Y, not next to L, right in the middle of them. Feet set, numbers to the quarterback, hands up. Set for a full count before the snap. Stand still and let it come to you — do not drift toward him and do not start upfield until you have caught it. Look the ball all the way in, THEN find your blockers: LG is your inside wall, LT is out in front of you, L is inside you and Y is downfield. Get up the LEFT sideline. Never bounce back inside — that is where the rush ended up.',
+      },
+      Q: {
+        rule: 'Send him out, wait for him to set, open away, let the left side come free, throw it flat.',
+        detail:
+          'Same play as Screen Right, sent the other way. Call Super out to your LEFT, WAIT for him to be stopped and set, and look at their linebackers while you wait. Then snap it, take a hard three-step drop opening AWAY to the RIGHT, and hold your eyes to the back side for one full count. The end on the left is unblocked on purpose; let him run at you. Then turn and throw it at Super\'s numbers while he is standing still — this is a short, flat, hard throw behind the line, and throwing it to your left is the harder half of this pair, so it gets its own reps in practice. Never throw it late and never throw it behind him. Against a team that blitzes, the ball MUST be out on time — the second you feel extra men coming, that is the snap this play was built for, and holding it one extra beat is the only way to lose it.',
+      },
+    } satisfies Record<OffPosId, Assignment>,
+    vs: {
+      '44': {
+        ...m.vs['44'],
+        assignments: {
+          LT: {
+            rule: 'Set one count, release, and take the walked-up backer.',
+            detail:
+              'He is the first man outside on the edge and he is standing right in front of where you come out. Get to him under control and turn him inside — Super is running around your outside shoulder.',
+          },
+          L: {
+            rule: 'Block the corner.',
+            detail:
+              'Vs a 4-4 we let Y run off deep instead of blocking, so the corner is yours. Come off the ball like a route, break down, and stay on his outside number.',
+          },
+          Y: {
+            rule: 'Run him off — vertical, all the way.',
+            detail:
+              'A 4-4 keeps one man deep in the middle, and he is not blockable on a throw this fast. Instead of blocking, take the corner deep and out of the play. Sprint up the sideline and do not look back.',
+          },
+        },
+      },
+      '43': {
+        ...m.vs['43'],
+        assignments: {
+          LG: {
+            rule: 'Set one count, release, and take the Mike.',
+            detail: 'He is the first man to read screen and run at it. He is the one who ruins this play — go find him.',
+          },
+          LT: {
+            rule: 'Set one count, release, and take the safety on your side.',
+            detail: 'A 4-3 plays two deep, so your man is the near safety coming down into the alley.',
+          },
+          L: {
+            rule: 'Block the outside backer.',
+            detail: 'He is closest to the catch. Get inside-out on him and wall him off from Super.',
+          },
+        },
+      },
+      '52': {
+        ...m.vs['52'],
+        assignments: {
+          C: {
+            rule: 'Take the nose by yourself.',
+            detail: 'Odd front — he is right on you and there is nobody to help. Punch, sit down, and keep him off the quarterback for two counts.',
+          },
+          L: {
+            rule: 'Block the corner.',
+            detail:
+              'Vs a 5-2 we let Y run off instead of blocking, so the corner is yours. Come off the ball under control, break down, and stay on his outside number.',
+          },
+          Y: {
+            rule: 'Run him off — vertical, all the way.',
+            detail:
+              'A 5-2 plays two deep and gives us one more blocker than we need in the alley, so your job is to take the corner OUT of the play instead of blocking him. Sprint straight up the sideline and do not look back.',
+          },
+        },
+      },
+    } satisfies Record<FrontId, FrontPlan>,
+    reviewNotes: [
+      ...(splitWideScreenRight.reviewNotes ?? []),
+      'GENERATED: this play is mirrorSplitWidePlay(splitWideScreenRight) with every line of prose hand-translated to the left, not machine-flipped. The X↔Y exchange is applied because the balanced set keeps X and Y in their spots — they are mirror-image positions, so their entries trade places when everything else flips: Y is now the playside wide man who blocks or runs off the corner, X is the backside clear-out. Reviewing the right screen reviews the geometry of this one. What it does NOT review is the throw — throwing left off an away-opening drop is a different rep for a right-handed kid, and the left call needs its own practice time before it is live.',
+    ],
+  }
+})()
 
 // ===========================================================================
 // PLAY 4 — SPLIT WIDE CHIP  (in / post / post / go, HB chips)
@@ -1149,6 +1332,7 @@ export const splitWidePlays: Play[] = [
   splitWideKeeperRight,
   splitWideDiveRight,
   splitWideDiveLeft,
-  splitWideHbScreen,
+  splitWideScreenRight,
+  splitWideScreenLeft,
   splitWideChip,
 ]

@@ -470,5 +470,31 @@ Split Wide DRAFT gate; no git commits unless asked.
   both doors, print labels). Typecheck: only the 3 pre-existing errors.
 - STILL OPEN: Ryan to review the three new right-red pictures (reviewNotes)
   and the earlier veer-left-red; Split Wide Keep/Screen/Chip deliberately
-  one-way; audible-page 'direction' means line-lean (Bull/Ram), NOT run
+  one-way (SUPERSEDED same day: Screen became a pair — see next entry);
+  audible-page 'direction' means line-lean (Bull/Ram), NOT run
   direction — do not wire those into the flip graph.
+
+## 2026-08-14 — Split Wide Screen direction pair + X/Y mirror bug fix
+
+- Ryan revised the ruling: the Screen also gets left/right ("Screen also
+  needs a left and right variant like the others"). Only Keep and Chip stay
+  one-way now. split-wide-hb-screen → split-wide-screen-right (call Split
+  Wide · Screen · Right) + new split-wide-screen-left, linked by
+  audibleFlipId only (1×2, no formationTwinId). Left prose (description,
+  all assignments, per-front overrides) hand-translated, not machine-flipped;
+  Q's left detail flags the left-handed throw as its own practice rep.
+- BUG FOUND AND FIXED while wiring it: `mirrorPlay` leaves X/Y keys put —
+  right for Red⇄Black (the formation itself flips) but wrong for the
+  balanced Split Wide set where Y stays wide left and X wide right. The
+  shipped splitWideDiveLeft had Y: block C-R / X: block C-L (two cross-field
+  corner blocks). New local `mirrorSplitWidePlay` (mirrorPlay + X↔Y entry
+  exchange in assignments/actions/per-front overrides) now backs BOTH the
+  dive-left and screen-left; dive-left verified Y→C-L, X→C-R both ways.
+- Verified (SSR on 4667, then killed): both screen pages 200, old hb-screen
+  id 404, right yells INDY / left yells HOOSIER (wrong-yell absent), titles
+  "Screen Right · Split Wide", index Passes card shows both doors, print
+  book carries per-front sheets for both directions, data-level trace of
+  mirrored release paths/targets/links clean. Typecheck: only the 3
+  pre-existing errors. Nothing committed.
+- STILL OPEN: all Split Wide football remains behind the HANDOFF §10 review
+  gate; the left screen additionally needs its own throwing reps ruling.
