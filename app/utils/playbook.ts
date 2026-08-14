@@ -79,6 +79,9 @@ export const POSITION_GROUPS: { label: string; positions: OffPosId[] }[] = [
   { label: 'Line', positions: ['LT', 'LG', 'C', 'RG', 'RT'] },
 ]
 
+/** Line-of-scrimmage audibles that set the run's direction: Indy = left, Hoosier = right. */
+export const DIRECTION_AUDIBLES: Record<'left' | 'right', string> = { left: 'Indy', right: 'Hoosier' }
+
 export const FRONT_ORDER: FrontId[] = ['44', '43', '52']
 
 export const FRONT_LABELS: Record<FrontId, string> = {

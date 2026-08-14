@@ -17,19 +17,45 @@ const play = computed<Play>(() => {
 
 const formation = computed(() => formations[play.value.formation]!)
 
-/** The mirrored twin (veer-red ⇄ veer-black): same concept, other direction. */
+/**
+ * Legacy twin (e.g. waggle-red ⇄ waggle-black): same concept, other formation,
+ * found by name-match. Only used for plays WITHOUT the explicit variant graph
+ * below — all runs now carry the graph, so this serves the passing game.
+ */
 const twin = computed(() =>
   (Object.values(plays) as Play[]).find(
     (p) => p.name === play.value.name && p.id !== play.value.id,
   ),
 )
 
+/* --- The variant graph: direction × formation, four plays per run concept --- */
+
+/** Same formation, opposite direction — what the audible turns this play into. */
+const flipPlay = computed<Play | undefined>(() =>
+  play.value.audibleFlipId ? plays[play.value.audibleFlipId] : undefined,
+)
+/** Same play and direction, the other formation. */
+const twinPlay = computed<Play | undefined>(() =>
+  play.value.formationTwinId ? plays[play.value.formationTwinId] : undefined,
+)
+
+/**
+ * Any play with a direction flip gets the variant controls. Runs out of
+ * Red/Black have both axes; a one-formation concept (Split Wide's Dive) has a
+ * flip but no formation twin, so only the Direction toggle renders.
+ */
+const hasVariantControls = computed(() => !!flipPlay.value)
+
+/** Where each Direction control option navigates: stay put, or one flip hop. */
+const directionTarget = (dir: 'right' | 'left') =>
+  play.value.direction === dir ? play.value.id : (play.value.audibleFlipId ?? play.value.id)
+
+
 const callParts = computed(() => callPartsFor(play.value, formation.value))
 
 /**
  * The stamp already says the call, so the subtitle only mentions a `callName`
- * that carries something the stamp does not (Crush's 'Indy/Hoosier', Waggle's
- * 'PAP (Boot)').
+ * that carries something the stamp does not (e.g. Waggle's 'PAP (Boot)').
  */
 const asideCallName = computed(() => {
   const name = play.value.callName
@@ -75,9 +101,32 @@ function onDiagramSelect(pos: OffPosId | null) {
   if (pos) panel.value?.revealRow(pos)
 }
 
-useHead(() => ({
-  title: `${play.value.name} ${formation.value.name} — Wolves Playbook`,
-}))
+/**
+ * Formation options in a fixed Red-then-Black order, each pointing at the id
+ * that navigation should land on (the current play, or its formation twin).
+ */
+const variantFormationOptions = computed(() => {
+  if (!twinPlay.value) return []
+  const pair = [play.value, twinPlay.value!]
+  return (['red', 'black'] as const)
+    .map((f) => pair.find((p) => p.formation === f))
+    .filter((p): p is Play => !!p)
+    .map((p) => ({
+      id: p.id,
+      label: formations[p.formation]?.name ?? p.formation,
+      active: p.id === play.value.id,
+    }))
+})
+
+useHead(() => {
+  // "Split Wide Screen" already names its formation — don't say it twice.
+  const sayFormation = !play.value.name.startsWith(formation.value.name)
+  const base = hasVariantControls.value
+    ? `${play.value.name} ${play.value.direction === 'left' ? 'Left' : 'Right'}` +
+      (sayFormation ? ` · ${formation.value.name}` : '')
+    : play.value.name + (sayFormation ? ` ${formation.value.name}` : '')
+  return { title: `${base} — Wolves Playbook` }
+})
 </script>
 
 <template>
@@ -90,13 +139,51 @@ useHead(() => ({
         <div class="head-titles">
           <h1 class="title">{{ play.name }}</h1>
           <PlayCallStamp :parts="callParts" />
-          <p class="subtitle muted">
+          <!-- The call stamp already says the direction on variant plays, so
+               the subtitle only earns its place on the legacy two-play shape. -->
+          <p v-if="!hasVariantControls" class="subtitle muted">
             Going {{ play.direction }}
             <span v-if="asideCallName">&middot; also called {{ asideCallName }}</span>
           </p>
         </div>
 
-        <nav v-if="twin" class="dir-toggle" aria-label="Direction">
+        <!-- Direction × Formation: two link-toggles over the four-play graph.
+             One hop each way — direction rides audibleFlipId, formation rides
+             formationTwinId — and ?front= travels with every link. -->
+        <div v-if="hasVariantControls" class="variant-controls">
+          <div class="variant">
+            <span class="variant-label" aria-hidden="true">Direction</span>
+            <nav class="dir-toggle" aria-label="Direction">
+              <NuxtLink
+                v-for="dir in ['right', 'left'] as const"
+                :key="dir"
+                :to="{ path: `/plays/${directionTarget(dir)}`, query: { front } }"
+                class="dir-btn"
+                :class="{ active: play.direction === dir }"
+                :aria-current="play.direction === dir ? 'page' : undefined"
+              >
+                {{ dir }}
+              </NuxtLink>
+            </nav>
+          </div>
+          <div v-if="variantFormationOptions.length" class="variant">
+            <span class="variant-label" aria-hidden="true">Formation</span>
+            <nav class="dir-toggle" aria-label="Formation">
+              <NuxtLink
+                v-for="opt in variantFormationOptions"
+                :key="opt.id"
+                :to="{ path: `/plays/${opt.id}`, query: { front } }"
+                class="dir-btn"
+                :class="{ active: opt.active }"
+                :aria-current="opt.active ? 'page' : undefined"
+              >
+                {{ opt.label }}
+              </NuxtLink>
+            </nav>
+          </div>
+        </div>
+
+        <nav v-else-if="twin" class="dir-toggle" aria-label="Formation">
           <NuxtLink
             :to="{ path: `/plays/${play.id}`, query: { front } }"
             class="dir-btn active"
@@ -115,7 +202,7 @@ useHead(() => ({
     </header>
 
     <div class="stage-wrap">
-      <section class="stage" aria-label="Play diagram">
+      <section class="stage" :class="{ 'has-callout': flipPlay }" aria-label="Play diagram">
         <div class="stage-bar">
           <SegmentedControl v-model="front" :options="frontOptions" label="Defensive front" />
           <span v-if="readKeyLabel" class="read-chip">
@@ -138,9 +225,12 @@ useHead(() => ({
           <Icon name="lucide:pointer" aria-hidden="true" />
           Tap a player to see his job &middot; vs {{ frontInfo.name }}
         </p>
+
+        <AudibleCallout v-if="flipPlay" :play="play" :flip="flipPlay" :front="front" />
       </section>
 
       <section class="panel" aria-label="Assignments">
+        <p class="summary">{{ play.summary }}</p>
         <p class="desc">{{ play.description }}</p>
 
         <AssignmentPanel
@@ -239,6 +329,28 @@ useHead(() => ({
   color: #fff;
 }
 
+/* --- Direction × Formation controls (variant plays only) --- */
+.variant-controls {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+}
+.variant {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+}
+.variant-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--steel);
+  padding-left: 4px;
+}
+
 /* --- Stage: sticky on phones so the diagram stays up while reading jobs --- */
 .stage-wrap {
   display: grid;
@@ -286,10 +398,28 @@ useHead(() => ({
   font-size: 0.82rem;
 }
 
+/* With the audible callout aboard, the stage grows past a phone screen —
+   pinning it would bury the assignments underneath, so it scrolls normally. */
+@media (max-width: 879px) {
+  .stage.has-callout {
+    position: static;
+    box-shadow: none;
+    background: none;
+  }
+}
+
 /* --- Assignment panel --- */
 .panel {
   display: grid;
   gap: 16px;
+}
+/* The one-line gist, said the way a coach says it — sits above the detail. */
+.summary {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+.panel .summary + .desc {
+  margin-top: -8px;
 }
 .desc {
   font-size: 1rem;

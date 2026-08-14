@@ -146,11 +146,15 @@ export interface CallPart {
 }
 
 export interface Play {
-  /** e.g. 'veer-red', 'veer-black' — one Play per direction. */
+  /** e.g. 'veer-right-red', 'veer-left-red' — one Play per direction. */
   id: string
   /** Display name, e.g. 'Veer' */
   name: string
-  /** Call-system name(s) if known from the scans, e.g. 'Indy'/'Hoosier'. */
+  /**
+   * Legacy alternate call name from the scans. Runs no longer use this —
+   * direction lives in `call` and Indy/Hoosier are line audibles
+   * (DIRECTION_AUDIBLES), not names.
+   */
   callName?: string
   /**
    * The call broken into the words you actually say, each with what that word
@@ -162,11 +166,25 @@ export interface Play {
   direction: 'left' | 'right'
   /** Primary ball carrier (emphasized by the renderer). Option plays: the dive back. */
   ballCarrier: OffPosId
+  /**
+   * One line, said the way a coach says it on the sideline — the gist of the
+   * concept, not its technique. Formations and fronts change the details, so
+   * this stays above them; the specifics live in `description` and the
+   * assignments.
+   */
+  summary: string
   /** Kid-facing: what this play is and why we run it. */
   description: string
   /** Front-independent teaching table. Feeds play page, quiz, and PDF alike. */
   assignments: Record<OffPosId, Assignment>
   vs: Record<FrontId, FrontPlan>
+  /** Id of the same play run from the other formation (Red ⇄ Black). */
+  formationTwinId?: string
+  /**
+   * Id of the play this becomes when the direction audible (Indy = left,
+   * Hoosier = right) is called at the line: same formation, opposite direction.
+   */
+  audibleFlipId?: string
   /** Flags for Ryan's review, e.g. unverifiable call-name mapping. */
   reviewNotes?: string[]
 }

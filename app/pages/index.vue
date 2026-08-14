@@ -3,7 +3,7 @@ useHead({ title: 'Centennial Wolves Playbook' })
 
 const quickLinks = [
   {
-    to: '/plays/veer-red',
+    to: '/plays/veer-right-red',
     icon: 'lucide:flame',
     title: 'Veer',
     sub: 'Our bread and butter. Start here.',

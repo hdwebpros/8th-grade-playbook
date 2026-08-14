@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import type { Play } from '~/types/football'
 import { audiblePlays, plays, formations } from '~/data'
+import { DIRECTION_AUDIBLES } from '~/utils/playbook'
 
 useHead({ title: 'Plays — Wolves Playbook' })
 
 /**
- * Pair mirrored plays (veer-red / veer-black) into one card per concept,
- * grouped by family. Designed to scale to ~12 concepts.
+ * Pair same-name plays into one card per concept, grouped by family.
+ * Designed to scale to ~12 concepts.
  *
- * A card is either a CONCEPT — one play with a Red and a Black door — or a
+ * A card is a CONCEPT — one play with a Red and a Black door, or a two-way
+ * concept (Veer) with a direction × formation matrix of doors — or a
  * single door onto something bigger. The audible is the second kind: its
  * worked examples are not separate concepts, they are examples of one system,
  * so they collapse into one card that opens /audible.
@@ -17,12 +19,27 @@ interface Concept {
   name: string
   callName?: string
   family: Play['family']
-  description: string
-  directions?: { id: string; formationName: string }[]
+  /** One line — the card says the gist, the play page says the rest. */
+  summary: string
+  directions?: { id: string; formationName: string; callName?: string }[]
+  /**
+   * Set instead of `directions` when the concept runs BOTH ways out of BOTH
+   * formations (four plays). One row per direction, two formation doors each.
+   */
+  matrix?: {
+    direction: Play['direction']
+    doors: { id: string; formationName: string }[]
+  }[]
   /** Set instead of `directions` when the card is a single door. */
   to?: string
   toLabel?: string
 }
+
+/** Book order for a two-way concept's rows: the base call first, its mirror second. */
+const DIRECTION_ORDER: Play['direction'][] = ['right', 'left']
+
+/** "INDY flips it left · HOOSIER flips it right" — taught once per two-way card. */
+const audibleHint = `${DIRECTION_AUDIBLES.left.toUpperCase()} flips it left · ${DIRECTION_AUDIBLES.right.toUpperCase()} flips it right`
 
 /** The audible examples live on /audible, not on a card of their own. */
 const audibleIds = new Set(audiblePlays.map((p) => p.id))
@@ -31,8 +48,7 @@ const audibleCard: Concept = {
   name: 'Audible',
   callName: 'Formation · protection · digits',
   family: 'pass',
-  description:
-    'The numbered passing system. Every route on the tree has a digit, and a call is just the formation, the protection, and the digits read outside-to-in — two of them out of Red or Black, four out of Split Wide where every receiver gets one. Four worked examples inside, or call your own in any of the three formations and see it drawn.',
+  summary: 'The numbered passing system. Formation, protection, digits — call any pass at the line.',
   to: '/audible',
   toLabel: 'Open',
 }
@@ -47,14 +63,46 @@ const concepts = computed<Concept[]>(() => {
   }
   return [...byName.values()].map((group) => {
     const first = group[0]!
+    // A concept that runs BOTH ways (four plays: 2 directions × 2 formations)
+    // gets a matrix card — one row per direction, a formation door per cell.
+    // Direction is no longer in any call name (Indy/Hoosier are line audibles
+    // now), so the rows are what keep the four doors tellable-apart.
+    const dirs = new Set(group.map((p) => p.direction))
+    const fms = new Set(group.map((p) => p.formation))
+    if (
+      (dirs.size > 1 && fms.size > 1 && group.length > 2) ||
+      group.some((p) => p.audibleFlipId)
+    ) {
+      return {
+        name: first.name,
+        family: first.family,
+        summary: first.summary,
+        matrix: DIRECTION_ORDER.filter((d) => dirs.has(d)).map((direction) => ({
+          direction,
+          doors: group
+            .filter((p) => p.direction === direction)
+            .map((p) => ({
+              id: p.id,
+              formationName: formations[p.formation]?.name ?? p.formation,
+            })),
+        })),
+      }
+    }
+    // Mirrored plays can carry OPPOSITE call names (Veer Red is 'Hoosier', Veer
+    // Black is 'Indy'). One name at card level would then label the wrong door,
+    // so the name only sits on the card when the group speaks with one voice —
+    // otherwise it rides on each direction's own door.
+    const callNames = [...new Set(group.map((p) => p.callName).filter(Boolean))]
+    const shared = callNames.length <= 1
     return {
       name: first.name,
-      callName: first.callName,
+      callName: shared ? callNames[0] : undefined,
       family: first.family,
-      description: first.description,
+      summary: first.summary,
       directions: group.map((p) => ({
         id: p.id,
         formationName: formations[p.formation]?.name ?? p.formation,
+        callName: shared ? undefined : p.callName,
       })),
     }
   })
@@ -82,16 +130,38 @@ const passes = computed(() => [
             <h3 class="play-name">{{ c.name }}</h3>
             <span v-if="c.callName" class="call muted">{{ c.callName }}</span>
           </div>
-          <p class="play-desc muted">{{ c.description }}</p>
-          <div class="dir-row">
+          <p class="play-desc muted">{{ c.summary }}</p>
+          <div v-if="c.matrix" class="matrix">
+            <div v-for="row in c.matrix" :key="row.direction" class="matrix-row">
+              <span class="matrix-dir">{{ row.direction }}</span>
+              <div class="dir-row">
+                <NuxtLink
+                  v-for="d in row.doors"
+                  :key="d.id"
+                  :to="`/plays/${d.id}`"
+                  class="dir-link"
+                  :class="d.formationName.toLowerCase().replace(/\s+/g, '-')"
+                >
+                  {{ d.formationName }}
+                  <Icon name="lucide:arrow-right" class="dir-arrow" aria-hidden="true" />
+                </NuxtLink>
+              </div>
+            </div>
+            <p class="audible-hint muted">
+              <Icon name="lucide:megaphone" aria-hidden="true" />
+              At the line: {{ audibleHint }}
+            </p>
+          </div>
+          <div v-else class="dir-row">
             <NuxtLink
               v-for="d in c.directions"
               :key="d.id"
               :to="`/plays/${d.id}`"
               class="dir-link"
-              :class="d.formationName.toLowerCase()"
+              :class="d.formationName.toLowerCase().replace(/\s+/g, '-')"
             >
               {{ d.formationName }}
+              <span v-if="d.callName" class="dir-call">{{ d.callName }}</span>
               <Icon name="lucide:arrow-right" class="dir-arrow" aria-hidden="true" />
             </NuxtLink>
           </div>
@@ -107,8 +177,29 @@ const passes = computed(() => [
             <h3 class="play-name">{{ c.name }}</h3>
             <span v-if="c.callName" class="call muted">{{ c.callName }}</span>
           </div>
-          <p class="play-desc muted">{{ c.description }}</p>
-          <div class="dir-row">
+          <p class="play-desc muted">{{ c.summary }}</p>
+          <div v-if="c.matrix" class="matrix">
+            <div v-for="row in c.matrix" :key="row.direction" class="matrix-row">
+              <span class="matrix-dir">{{ row.direction }}</span>
+              <div class="dir-row">
+                <NuxtLink
+                  v-for="d in row.doors"
+                  :key="d.id"
+                  :to="`/plays/${d.id}`"
+                  class="dir-link"
+                  :class="d.formationName.toLowerCase().replace(/\s+/g, '-')"
+                >
+                  {{ d.formationName }}
+                  <Icon name="lucide:arrow-right" class="dir-arrow" aria-hidden="true" />
+                </NuxtLink>
+              </div>
+            </div>
+            <p class="audible-hint muted">
+              <Icon name="lucide:megaphone" aria-hidden="true" />
+              At the line: {{ audibleHint }}
+            </p>
+          </div>
+          <div v-else class="dir-row">
             <NuxtLink v-if="c.to" :to="c.to" class="dir-link">
               {{ c.toLabel ?? 'Open' }}
               <Icon name="lucide:arrow-right" class="dir-arrow" aria-hidden="true" />
@@ -118,9 +209,10 @@ const passes = computed(() => [
               :key="d.id"
               :to="`/plays/${d.id}`"
               class="dir-link"
-              :class="d.formationName.toLowerCase()"
+              :class="d.formationName.toLowerCase().replace(/\s+/g, '-')"
             >
               {{ d.formationName }}
+              <span v-if="d.callName" class="dir-call">{{ d.callName }}</span>
               <Icon name="lucide:arrow-right" class="dir-arrow" aria-hidden="true" />
             </NuxtLink>
           </div>
@@ -203,13 +295,45 @@ const passes = computed(() => [
   display: flex;
   gap: 8px;
 }
+
+/* Two-way concepts: one row per direction, formation doors as the cells. */
+.matrix {
+  display: grid;
+  gap: 8px;
+}
+.matrix-row {
+  display: grid;
+  grid-template-columns: 58px 1fr;
+  align-items: center;
+  gap: 10px;
+}
+.matrix-dir {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--steel);
+}
+.audible-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+}
+.audible-hint .iconify {
+  color: var(--red);
+  flex: none;
+}
 .dir-link {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 4px 8px;
   min-height: 44px;
+  padding: 6px 10px;
   border-radius: var(--r-ctl);
   font-family: var(--font-display);
   font-weight: 700;
@@ -233,6 +357,14 @@ const passes = computed(() => [
 .dir-link:not(.red):hover {
   border-color: var(--steel);
   color: #fff;
+}
+/* The call name for one direction, riding on its own door. Inherits the door's
+   colour so the Red hover state stays legible. */
+.dir-call {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  opacity: 0.72;
 }
 .dir-arrow {
   font-size: 15px;

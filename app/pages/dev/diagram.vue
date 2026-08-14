@@ -193,11 +193,12 @@ const assignment = (rule: string, detail?: string) => ({ rule, detail })
 const play: Play = {
   id: 'fixture-veer-red',
   name: 'Veer',
-  callName: 'Indy',
+  callName: 'Hoosier',
   family: 'run',
   formation: 'red',
   direction: 'right',
   ballCarrier: 'R',
+  summary: 'Triple option that follows the guard. DE is key.',
   description: 'Fixture play — not real data. Exists to exercise the renderer.',
   assignments: {
     X: assignment('Run the post.', 'Sell it hard off the line.'),

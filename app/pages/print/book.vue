@@ -13,6 +13,7 @@
 import type { Assignment, Front, FrontId, OffPosId, Play } from '~/types/football'
 import { formations, fronts, playList, routes } from '~/data'
 import {
+  DIRECTION_AUDIBLES,
   FRONT_LABELS,
   FRONT_ORDER,
   POSITION_GROUPS,
@@ -64,6 +65,34 @@ interface Spread {
 
 const FIRST_PLAY_PAGE = 4
 
+/**
+ * Names that appear going BOTH ways (every run concept — Veer, Crush, Buck
+ * Sweep, Stretch — is a direction × formation 2×2): "Veer Red" alone would
+ * label two different pages, so every label for these plays carries the
+ * direction too — "Veer Right — Red".
+ */
+const twoWayNames = new Set(
+  playList
+    .filter((p) => playList.some((q) => q.name === p.name && q.direction !== p.direction))
+    .map((p) => p.name),
+)
+
+const directionLabel = (p: Play) => (p.direction === 'left' ? 'Left' : 'Right')
+
+/**
+ * Unambiguous short label: "Veer Right — Red" or plain "Waggle Red". Plays
+ * whose name already starts with their formation ("Split Wide Screen") skip
+ * the formation suffix instead of saying it twice.
+ */
+const playLabel = (p: Play) => {
+  const formation = formations[p.formation]?.name ?? p.formation
+  const named = p.name.startsWith(formation)
+  if (twoWayNames.has(p.name)) {
+    return named ? `${p.name} ${directionLabel(p)}` : `${p.name} ${directionLabel(p)} — ${formation}`
+  }
+  return named ? p.name : `${p.name} ${formation}`
+}
+
 const spreads: Spread[] = playList.flatMap((play, pi) =>
   FRONT_ORDER.map((front, fi) => ({
     key: `${play.id}-${front}`,
@@ -80,10 +109,7 @@ const contents = [
   { label: 'How to read a diagram', page: 2 },
   { label: 'Formations — Red & Black', page: 3 },
   ...playList.map((p, pi) => ({
-    label: `${p.name} ${formations[p.formation]?.name ?? ''} — vs all three fronts`.replace(
-      /\s+/g,
-      ' ',
-    ),
+    label: `${playLabel(p)} — vs all three fronts`,
     page: FIRST_PLAY_PAGE + pi * FRONT_ORDER.length,
   })),
   { label: 'Route tree — 0 through 9', page: ROUTES_PAGE },
@@ -150,6 +176,7 @@ function alignmentPlay(formationId: Play['formation']): Play {
     formation: formationId,
     direction: 'right',
     ballCarrier: 'Q',
+    summary: '',
     description: '',
     assignments: EMPTY_ASSIGNMENTS,
     vs: Object.fromEntries(FRONT_ORDER.map((f) => [f, { actions: {} }])) as Play['vs'],
@@ -429,6 +456,13 @@ const totalPages = BACK_PAGE
           &mdash; you just get your own name and a badge instead of a code.
         </p>
 
+        <h3 class="section-label">At the line</h3>
+        <p class="p-lead">
+          Two words can flip a run before the snap: <b>{{ DIRECTION_AUDIBLES.left }}</b> sends it
+          left, <b>{{ DIRECTION_AUDIBLES.right }}</b> sends it right. Same play, same jobs &mdash;
+          mirrored.
+        </p>
+
         <h3 class="section-label">Who&rsquo;s who</h3>
         <div class="roster">
           <div v-for="r in roster" :key="r.pos" class="roster-item">
@@ -482,12 +516,12 @@ const totalPages = BACK_PAGE
       </footer>
     </section>
 
-    <!-- ================= 4..9 · VEER × FRONT ================= -->
+    <!-- ============ 4.. · EVERY PLAY × EVERY FRONT ============ -->
     <section v-for="s in spreads" :key="s.key" class="sheet">
       <header class="sheet-head">
         <span class="sheet-head-book">Wolves<span class="hd-red"> Playbook</span></span>
         <span class="sheet-head-section">
-          {{ s.play.name }} {{ formationName(s.play) }} &middot; vs {{ FRONT_LABELS[s.front] }}
+          {{ playLabel(s.play) }} &middot; vs {{ FRONT_LABELS[s.front] }}
         </span>
       </header>
 
@@ -495,7 +529,10 @@ const totalPages = BACK_PAGE
         <div class="play-head">
           <div>
             <h2 class="play-title">
-              {{ s.play.name }} <span class="pt-dir">{{ formationName(s.play) }}</span>
+              {{ s.play.name }}
+              <span class="pt-dir">
+                <template v-if="twoWayNames.has(s.play.name)">{{ directionLabel(s.play) }} &middot; </template>{{ formationName(s.play) }}
+              </span>
             </h2>
             <p class="play-sub">
               <template v-if="s.play.callName">{{ s.play.callName }} &middot; </template>
@@ -582,7 +619,7 @@ const totalPages = BACK_PAGE
       </div>
 
       <footer class="sheet-foot">
-        <span>{{ s.play.name }} {{ formationName(s.play) }} vs {{ FRONT_LABELS[s.front] }}</span>
+        <span>{{ playLabel(s.play) }} vs {{ FRONT_LABELS[s.front] }}</span>
         <span class="sheet-foot-num">{{ s.page }} / {{ totalPages }}</span>
       </footer>
     </section>

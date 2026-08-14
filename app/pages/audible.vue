@@ -309,7 +309,7 @@ function onDiagramSelect(pos: OffPosId | null) {
                   Protection
                   <em class="pad-route">
                     Block the man in front of you, lean
-                    {{ ownSwCall.lean }} — same as Stretch Boot
+                    {{ ownSwCall.lean }} — same as Boot
                   </em>
                 </span>
                 <SegmentedControl
@@ -484,7 +484,7 @@ function onDiagramSelect(pos: OffPosId | null) {
                   <strong>four</strong> digits and every receiver has one — nobody is a zero, nobody
                   has a standing rule. Said right to left across the formation:
                   <em>Split Wide Bull 95-59</em>. The protection word only names which way the line
-                  leans, and the blocking is Stretch Boot's: block the man in front of you and drive
+                  leans, and the blocking is Boot's: block the man in front of you and drive
                   him that way.
                 </dd>
               </div>

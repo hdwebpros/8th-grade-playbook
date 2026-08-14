@@ -1,12 +1,12 @@
 <script setup lang="ts">
 /** Dev sandbox for the Stretch and Waggle transcriptions. Not part of the book. */
-import { stretchRed, stretchBlack } from '~/data/plays/stretch'
+import { stretchLeftRed, stretchRightBlack } from '~/data/plays/stretch'
 import { waggleRed, waggleBlack } from '~/data/plays/waggle'
 import { formations } from '~/data/formations'
 import { fronts } from '~/data/fronts'
 import type { FrontId, Play } from '~/types/football'
 
-const plays: Play[] = [stretchRed, stretchBlack, waggleRed, waggleBlack]
+const plays: Play[] = [stretchLeftRed, stretchRightBlack, waggleRed, waggleBlack]
 const frontIds: FrontId[] = ['44', '43', '52']
 </script>
 

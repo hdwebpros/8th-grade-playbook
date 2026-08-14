@@ -553,6 +553,7 @@ export interface AudibleCall {
 /** Hand-written prose the generic builder cannot know. Optional. */
 export interface AudibleAuthoring {
   id?: string
+  summary?: string
   description?: string
   /** Overrides on top of the generated table — keyed by RED position ids. */
   assignments?: Partial<Record<OffPosId, Assignment>>
@@ -683,6 +684,9 @@ function buildAudibleRed(call: AudibleCall, authoring: AudibleAuthoring = {}): P
     formation: 'red',
     direction: 'right',
     ballCarrier: 'Q',
+    summary:
+      authoring.summary ??
+      `Called-at-the-line pass. ${call.protection === 'dropback' ? 'Drop back' : 'Sprint out'}; the digits hand out the routes.`,
     description: authoring.description ?? describeCall(call, 'red'),
     assignments,
     vs:
@@ -720,6 +724,7 @@ export function buildAudible(
     callName: callNameOf(call, 'black'),
     call: callPartsOf(call, 'black'),
     formation: 'black' as FormationId,
+    summary: blackAuthoring.summary ?? redPlay.summary,
     description: blackAuthoring.description ?? describeCall(call, 'black'),
     reviewNotes: blackAuthoring.reviewNotes ?? redPlay.reviewNotes,
   })

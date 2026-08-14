@@ -316,6 +316,7 @@ export const waggleRed: Play = {
   formation: 'red',
   direction: 'right',
   ballCarrier: 'Q',
+  summary: 'Play action bootleg pass play.',
   description:
     'Our play-action bread and butter. Everything up front looks exactly like Stretch going left — same steps, same fake, the wing coming across to take the ball — and then the quarterback keeps it and boots the other way into a three-level flood: Super in the flat underneath, the tight end running the over at nine, and X on the corner over the top, with L clearing the middle on the post. If they chase the run, somebody is wide open. If they do not, the run was going to work.',
   assignments,

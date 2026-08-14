@@ -181,6 +181,7 @@ const C_STEP_BACK = setBlock([{ x: -0.5, y: -0.9 }])
 export interface SplitWideAuthoring {
   id?: string
   name?: string
+  summary?: string
   description?: string
   /** Overrides on top of the generated table. */
   assignments?: Partial<Record<OffPosId, Assignment>>
@@ -248,7 +249,7 @@ export function buildSplitWideAudible(
 
   const lineJob = (extra: string): Assignment => ({
     rule: `${word} — block the man in front of you, lean ${LEAN}. HOLD, and never downfield.`,
-    detail: `Same protection you run on Stretch Boot: take the man in front of you, get your helmet to his outside shoulder, and drive him ${call.lean} with the rest of the line. Hold your ground — do not get pushed back into the quarterback, and never chase downfield, that is a penalty on a pass play. ${extra}`,
+    detail: `Same protection you run on Boot: take the man in front of you, get your helmet to his outside shoulder, and drive him ${call.lean} with the rest of the line. Hold your ground — do not get pushed back into the quarterback, and never chase downfield, that is a penalty on a pass play. ${extra}`,
   })
 
   /** One receiver's job, straight off the route tree. */
@@ -356,6 +357,8 @@ export function buildSplitWideAudible(
     formation: splitWide.id,
     direction: call.lean,
     ballCarrier: 'Q',
+    summary:
+      authoring.summary ?? 'Called-at-the-line pass. Four receivers, a digit and a route each.',
     description: authoring.description ?? describeSplitWide(call),
     assignments: { ...assignments, ...authoring.assignments },
     vs: {
@@ -379,7 +382,7 @@ function describeSplitWide(call: SplitWideCall): string {
   })
   return (
     `${splitWideCallName(call)}. Four receivers, four digits — out of Split Wide every man gets a number. ` +
-    `"${word}" is the protection: the line blocks the men in front of it and leans ${call.lean.toUpperCase()}, the same way it does on Stretch Boot, ` +
+    `"${word}" is the protection: the line blocks the men in front of it and leans ${call.lean.toUpperCase()}, the same way it does on Boot, ` +
     `and Super sets on the ${awayTackle} tackle's inside hip to take anyone who comes through the thin side. ` +
     `Then the digits, said right to left across the formation: ${parts.join('; ')}. ` +
     `The quarterback takes five steps and throws to whichever one of the four the defense left alone.`

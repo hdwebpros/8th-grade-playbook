@@ -90,8 +90,8 @@ design — not a Play; later fable phase).
    collapses fronts correctly with new plays (round lengths grow); verify
    print route picks up new plays or scope-check with Ryan.
 6. Report to Ryan WITHOUT screenshots: facts, review items (football
-   reviewNotes from all agents, block-target dimming question, Indy/Hoosier
-   pending director).
+   reviewNotes from all agents, block-target dimming question; Indy/Hoosier
+   RESOLVED 2026-08-13 — they are directions, callName wired).
 
 ## Final
 
@@ -167,6 +167,13 @@ are listed in HANDOFF §10 + any reviewNotes in data.
   reviewNote in veer.ts. Do not wire callName until the director answers.
   If it turns out defense-keyed, the natural home is per-front (vs[front])
   metadata, not the play's direction — decide when the answer arrives.
+- 2026-08-13: Ryan RESOLVED Indy/Hoosier — they ARE directions: Indy = run goes
+  LEFT, Hoosier = run goes RIGHT. Supersedes the 2026-08-09 "do not wire
+  callName until the director answers" instruction. callName wired: Veer Red
+  (right) = 'Hoosier', Veer Black (left) = 'Indy', Crush Red (left) =
+  'Indy — Crush', Crush Black (right) = 'Hoosier — Crush'. Note: mirrorPlay
+  copies callName VERBATIM (it does not flip it), so the mirrored Black plays
+  carry explicit callName overrides.
 - 2026-08-10 (post-compact): PDF agent got a FINAL order — report + terminate
   after its in-flight generate/offline verify (it had wired SW registration
   into nuxt.config head script + print route app/pages/print/book.vue exists).
@@ -316,7 +323,7 @@ PWA (nuxt.config.ts):
   re-eyeballed by Ryan (he views the app himself).
 STILL OPEN: slash-less offline gap above; print PDF re-verify at full-book
 size (measure.mjs + --print-to-pdf); Ryan's coaching rulings (reviewNotes);
-Indy/Hoosier callName; Split Wide DRAFT gate; no git commits unless asked.
+Split Wide DRAFT gate; no git commits unless asked.
 
 ## 2026-08-10 (later) — Slash-less offline gap CLOSED + Ryan's free-call→audible rename absorbed
 - Offline fix: chose ledger option (b) dual-key precache, NOT trailingSlash (Nuxt 3 has no first-class option). manifestTransforms in nuxt.config.ts now emits an extensionless twin for every `*/index.html` entry (same revision, ~KBs). 147→177 entries. Verified offline: /plays, /plays/, /plays/audible-33-red, /plays/audible-33-red/ all 200 with correct h1 under SW with network dead. Offline REFRESH on play pages now works.
@@ -403,3 +410,65 @@ Indy/Hoosier callName; Split Wide DRAFT gate; no git commits unless asked.
   fixed along the way (ghost button absent while flipped; typographic
   apostrophes in titles; tap-hint Icon svg tripping the shape detector) —
   all script-side, not app bugs.
+
+## 2026-08-14 — Direction/audible model landed on Veer (SUPERSEDES the 2026-08-13 callName wiring)
+
+- Ryan's final ruling: direction is PLAY IDENTITY (Veer Right / Veer Left are
+  two plays), formation (Red/Black) is ORTHOGONAL, and Indy/Hoosier are LINE
+  AUDIBLES that flip direction (Indy = left, Hoosier = right) — e.g. "Red,
+  Veer Right" + "INDY INDY" at the line = Veer Left out of Red. They are NOT
+  play names: the 2026-08-13 callName wiring on veer was removed (crush's
+  'Indy — Crush'/'Hoosier — Crush' callNames still carry the old model —
+  STILL OPEN, migrate when crush gets the 2×2 treatment).
+- Data (veer only, the pilot play): four plays veer-right-red /
+  veer-right-black / veer-left-red / veer-left-black. veer-left-red is a NEWLY
+  AUTHORED tight-end-side picture ("Indy out of Red", varsity p6 bottom
+  panels) — Y+L both playside, R is the pitch man, X backside; every judgment
+  call is in its reviewNotes and NEEDS RYAN'S CHECK. mirrorPlay derives the
+  diagonal twins: Black-Left = mirror(Red-Right), Black-Right =
+  mirror(Red-Left). Play gained optional formationTwinId / audibleFlipId;
+  playbook.ts exports DIRECTION_AUDIBLES.
+- UI: /plays/[id] shows Direction + Formation toggles (navigating the 2×2,
+  preserving ?front) and an "At the line" AudibleCallout under the diagram
+  (yelled word doubled, story line, "See the flip" link, Indy/Hoosier
+  glossary); legacy 2-variant plays render exactly as before. /plays index:
+  Veer card is a direction×formation matrix with an audible hint line. Print
+  book labels two-way plays "Veer Right — Red" and page 2 teaches the
+  audibles. Home quick-link and SEAM.md updated to the new ids/contract.
+- STILL OPEN: Ryan to review veer-left-red's football (reviewNotes); other
+  runs (crush, buck, stretch) still on the 2-play formation-paired model;
+  print sheet 2 needs a visual glance (3 extra lines).
+
+## 2026-08-14 — 2×2 model rolled out to ALL runs + Split Wide Dive direction pair
+
+- Crush, Buck Sweep, and Stretch migrated to the Veer-shaped 2×2 (three
+  parallel data agents, one per family; disjoint file ownership). Each family:
+  left-red = the old hand-authored football verbatim (re-id'd, callName
+  dropped — Crush's 'Indy — Crush'/'Hoosier — Crush' are GONE), right-red =
+  NEWLY AUTHORED (Crush from role logic — no right-going scan; Buck from
+  varsity p9's Buck Right panels; Stretch from p13's Stretch Right panel),
+  right-black = mirror(left-red) (the old black football), left-black =
+  mirror(right-red). All twin/flip links reciprocal; every new picture's
+  judgment calls sit in reviewNotesRight headed "NEEDS COACH RYAN'S CHECK".
+- Split Wide Dive (Ryan's follow-up ruling, same day): a 1×2, not 2×2 —
+  split-wide-dive-right / split-wide-dive-left linked by audibleFlipId only
+  (balanced set, mirror is exact football, zero hand corrections; left play
+  is pure mirrorPlay). Keep/Screen/Chip stay one-way BY RULING ("the sneak
+  doesn't need left and right, just the dive"). Direction-bearing prose
+  neutralized to "playside" before mirroring.
+- UI generalized for the one-axis shape: [id].vue hasVariantControls now
+  keys off audibleFlipId alone (Formation toggle renders only when a
+  formationTwinId exists), legacy name-match twin nav can't fire on plays
+  with a flip; page titles and print-book labels skip the formation suffix
+  when the play name already starts with it ("Split Wide Dive Right", not
+  "… — Split Wide"); index door CSS class slugified (split-wide).
+- Verified: full adversarial pass on the three runs ALL PASS (16 run plays,
+  closed 4-cycles, byte-exact mirrors, complete 11-man coverage per front,
+  correct INDY/HOOSIER yells on all 16 pages, 4 matrix cards, print book
+  unique labels/pagination, quizzes clean); dive pair SSR-verified (Direction
+  toggle only, right yells INDY / left yells HOOSIER, index matrix card with
+  both doors, print labels). Typecheck: only the 3 pre-existing errors.
+- STILL OPEN: Ryan to review the three new right-red pictures (reviewNotes)
+  and the earlier veer-left-red; Split Wide Keep/Screen/Chip deliberately
+  one-way; audible-page 'direction' means line-lean (Bull/Ram), NOT run
+  direction — do not wire those into the flip graph.

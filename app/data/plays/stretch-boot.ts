@@ -363,18 +363,17 @@ const reviewNotes = [
 
 export const stretchBootRed: Play = {
   id: 'stretch-boot-red',
-  name: 'Stretch Boot',
-  callName: 'Stretch Left Boot Rt',
+  name: 'Boot',
   call: [
-    { word: 'Stretch', label: 'the run we fake' },
-    { word: 'Left', label: 'fake goes' },
+    { word: 'Red', label: 'formation' },
     { word: 'Boot', label: 'play' },
-    { word: 'Rt', label: 'QB keeps this way' },
+    { word: 'Right', label: 'direction' },
   ],
   family: 'pass',
   formation: 'red',
   direction: 'right',
   ballCarrier: 'Q',
+  summary: 'Pure bootleg giving the QB a run or pass look.',
   description:
     'Play action off Stretch. The quarterback fakes the handoff to Super, who sells it off the left tackle’s hip like he has the ball and then leaks back to the shallow middle — while the quarterback boots back to the right behind a line that blocks the men in front of it, leans left with the fake, and HOLDS. X runs the post-corner and he is the one this play is for, but his route takes time: if he is doubled, Y is crossing the deep middle and R is snapping off an eight-yard out underneath him. If the defense just drops everybody back, L is sneaking behind the line to the flat for the easy one — or the quarterback tucks it and runs.',
   assignments,
@@ -395,15 +394,13 @@ export const stretchBootRed: Play = {
 export const stretchBootBlack: Play = mirrorPlay(stretchBootRed, {
   id: 'stretch-boot-black',
   formation: 'black',
-  callName: 'Stretch Right Boot Lt',
   call: [
-    { word: 'Stretch', label: 'the run we fake' },
-    { word: 'Right', label: 'fake goes' },
+    { word: 'Black', label: 'formation' },
     { word: 'Boot', label: 'play' },
-    { word: 'Lt', label: 'QB keeps this way' },
+    { word: 'Left', label: 'direction' },
   ],
   description:
-    'Stretch Boot the other way out of Black. Fake the Stretch to the right to Super, boot left, same picture flipped: the line blocks the men in front of it, leans right with the fake, and holds; X on the post-corner is the shot, Y crossing the deep middle behind him, L on the eight-yard out, R sneaking behind the line to the flat as the outlet, Super leaking to the shallow middle after the sell.',
+    'Boot the other way out of Black. Fake the Stretch to the right to Super, boot left, same picture flipped: the line blocks the men in front of it, leans right with the fake, and holds; X on the post-corner is the shot, Y crossing the deep middle behind him, L on the eight-yard out, R sneaking behind the line to the flat as the outlet, Super leaking to the shallow middle after the sell.',
 })
 
 export const stretchBootPlays: Play[] = [stretchBootRed, stretchBootBlack]

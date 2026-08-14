@@ -12,7 +12,7 @@ import { audiblePlays } from './plays/audible'
 import { splitWidePlays } from './plays/split-wide'
 import { stretchPlays } from './plays/stretch'
 import { stretchBootPlays } from './plays/stretch-boot'
-import { veerBlack, veerRed } from './plays/veer'
+import { veerPlays } from './plays/veer'
 import { wagglePlays } from './plays/waggle'
 
 export { black, formations, red } from './formations'
@@ -40,19 +40,18 @@ export { splitWideBull9559 } from './plays/split-wide-9559'
 export { stretchPlays } from './plays/stretch'
 export { stretchBootBlack, stretchBootPlays, stretchBootRed } from './plays/stretch-boot'
 export { routes } from './routes'
-export { veerBlack, veerPlays, veerRed } from './plays/veer'
+export { veerLeftBlack, veerLeftRed, veerPlays, veerRightBlack, veerRightRed } from './plays/veer'
 export { wagglePlays } from './plays/waggle'
 export { splitWide } from './split-wide-formation'
 
 /**
  * Same plays, in book order: runs first (Veer, Crush, Buck Sweep, Stretch),
- * then passing (Waggle, Stretch Boot, the audible examples), then the Split
+ * then passing (Waggle, Boot, the audible examples), then the Split
  * Wide package
  * (DRAFT — gated on Coach Ryan's football review, HANDOFF §10).
  */
 export const playList: Play[] = [
-  veerRed,
-  veerBlack,
+  ...veerPlays,
   ...crushPlays,
   ...buckSweepPlays,
   ...stretchPlays,
@@ -62,7 +61,7 @@ export const playList: Play[] = [
   ...splitWidePlays,
 ]
 
-/** Keyed by Play.id — 'veer-red', 'audible-33-red', … */
+/** Keyed by Play.id — 'veer-right-red', 'audible-33-red', … */
 export const plays: Record<string, Play> = Object.fromEntries(
   playList.map((p) => [p.id, p]),
 )

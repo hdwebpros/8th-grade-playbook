@@ -33,6 +33,7 @@ export const splitWideBull9559: Play = buildSplitWideAudible(
   {
     id: 'split-wide-9559',
     name: 'Split Wide 95-59',
+    summary: 'Four-receiver pass. Fades outside, curls underneath, both sides.',
     description:
       'The audible system said out of Split Wide, with a digit for every one of the four receivers instead of two. Right to left: fade, curl, curl, fade. "Bull" is the protection — the line blocks the men in front of it and leans LEFT, the same way it does on Stretch Boot, and Super sets on the right tackle\'s inside hip to take anyone who comes through the thin side. The two fades run the corners off and the two curls sit down at ten in the room they leave. Same picture on both sides of the ball: the quarterback takes five steps, picks the curl the defense left alone, and throws the fade over the top of any corner who cheats up on it.',
     assignments: {
