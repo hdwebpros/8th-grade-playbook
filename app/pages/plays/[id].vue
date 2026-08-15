@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { FrontId, OffPosId, Play } from '~/types/football'
 import { plays, formations, fronts } from '~/data'
+import { film } from '~/data/film'
 import { FRONT_LABELS, FRONT_ORDER, callPartsFor } from '~/utils/playbook'
 import { labelForId } from '~/utils/defense'
 
@@ -16,6 +17,9 @@ const play = computed<Play>(() => {
 })
 
 const formation = computed(() => formations[play.value.formation]!)
+
+/** Practice clips of this exact play, if any — see app/data/film.ts. */
+const filmClips = computed(() => film[play.value.id] ?? [])
 
 /**
  * Legacy twin (e.g. waggle-red ⇄ waggle-black): same concept, other formation,
@@ -241,6 +245,8 @@ useHead(() => {
           :selected="selected"
           @select="selected = $event"
         />
+
+        <GameFilm v-if="filmClips.length" :clips="filmClips" />
 
         <CoachNote
           v-if="play.reviewNotes?.length"

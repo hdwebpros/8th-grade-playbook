@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Play } from '~/types/football'
 import { audiblePlays, plays, formations } from '~/data'
+import { filmPlayIds } from '~/data/film'
 import { DIRECTION_AUDIBLES } from '~/utils/playbook'
 
 useHead({ title: 'Plays — Wolves Playbook' })
@@ -21,14 +22,14 @@ interface Concept {
   family: Play['family']
   /** One line — the card says the gist, the play page says the rest. */
   summary: string
-  directions?: { id: string; formationName: string; callName?: string }[]
+  directions?: { id: string; formationName: string; callName?: string; hasFilm?: boolean }[]
   /**
    * Set instead of `directions` when the concept runs BOTH ways out of BOTH
    * formations (four plays). One row per direction, two formation doors each.
    */
   matrix?: {
     direction: Play['direction']
-    doors: { id: string; formationName: string }[]
+    doors: { id: string; formationName: string; hasFilm?: boolean }[]
   }[]
   /** Set instead of `directions` when the card is a single door. */
   to?: string
@@ -84,6 +85,7 @@ const concepts = computed<Concept[]>(() => {
             .map((p) => ({
               id: p.id,
               formationName: formations[p.formation]?.name ?? p.formation,
+              hasFilm: filmPlayIds.has(p.id),
             })),
         })),
       }
@@ -103,6 +105,7 @@ const concepts = computed<Concept[]>(() => {
         id: p.id,
         formationName: formations[p.formation]?.name ?? p.formation,
         callName: shared ? undefined : p.callName,
+        hasFilm: filmPlayIds.has(p.id),
       })),
     }
   })
@@ -143,6 +146,7 @@ const passes = computed(() => [
                   :class="d.formationName.toLowerCase().replace(/\s+/g, '-')"
                 >
                   {{ d.formationName }}
+                  <Icon v-if="d.hasFilm" name="lucide:clapperboard" class="film-badge" aria-label="Has game film" />
                   <Icon name="lucide:arrow-right" class="dir-arrow" aria-hidden="true" />
                 </NuxtLink>
               </div>
@@ -162,6 +166,7 @@ const passes = computed(() => [
             >
               {{ d.formationName }}
               <span v-if="d.callName" class="dir-call">{{ d.callName }}</span>
+              <Icon v-if="d.hasFilm" name="lucide:clapperboard" class="film-badge" aria-label="Has game film" />
               <Icon name="lucide:arrow-right" class="dir-arrow" aria-hidden="true" />
             </NuxtLink>
           </div>
@@ -190,6 +195,7 @@ const passes = computed(() => [
                   :class="d.formationName.toLowerCase().replace(/\s+/g, '-')"
                 >
                   {{ d.formationName }}
+                  <Icon v-if="d.hasFilm" name="lucide:clapperboard" class="film-badge" aria-label="Has game film" />
                   <Icon name="lucide:arrow-right" class="dir-arrow" aria-hidden="true" />
                 </NuxtLink>
               </div>
@@ -213,6 +219,7 @@ const passes = computed(() => [
             >
               {{ d.formationName }}
               <span v-if="d.callName" class="dir-call">{{ d.callName }}</span>
+              <Icon v-if="d.hasFilm" name="lucide:clapperboard" class="film-badge" aria-label="Has game film" />
               <Icon name="lucide:arrow-right" class="dir-arrow" aria-hidden="true" />
             </NuxtLink>
           </div>
@@ -368,6 +375,11 @@ const passes = computed(() => [
 }
 .dir-arrow {
   font-size: 15px;
+}
+/* Little clapperboard on doors that have game film waiting inside. */
+.film-badge {
+  font-size: 14px;
+  opacity: 0.7;
 }
 
 .more {
