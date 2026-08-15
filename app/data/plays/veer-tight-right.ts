@@ -544,6 +544,12 @@ const assignments: Record<OffPosId, Assignment> = {
   },
 }
 
+const coachNotes = [
+  'Read the end. He crashes down - pull it. He stays wide - give it.',
+  "Super: full speed at the guard's hip. Never slow down for the ball.",
+  'Pitch man: stay wide, stay behind the quarterback, be ready every time.',
+]
+
 const reviewNotes = [
   "NEW PICTURE (2026-08-15) — NEEDS COACH RYAN'S CHECK. Veer Right out of Tight is the TE-side veer surface (the veer-left-red model) run to the right at X, who is a TIGHT END in this set (+4.5, on the line). Tight's playside geometry is the exact mirror of Red's TE side — X (+4.5) and R (+5.7, −1) mirror Red's Y (−4.5) and L (−5.7, −1) — so the playside strokes are veer-left-red's negated in x, and the dive/read/pitch are veer-right-red's yards verbatim (Super, Q, and the left wing stand in the same spots in Tight as in Red). Check it against the veer-left-red picture, not veer-right-red's wing-only one.",
   'BALANCED SET, NO TWIN: Tight mirrors onto itself, so like Split Wide there is no formationTwinId — this play and veer-left-tight are a 1×2 left/right pair linked by audibleFlipId (Indy = left, Hoosier = right at the line).',
@@ -575,5 +581,6 @@ export const veerRightTight: Play = {
     'Veer to the right out of the two-tight-end set. Same three-way option — dive, keep, pitch — run at a tight end surface: X bases the first man outside the read key, the right wing works outside his block, and L motions across to be the pitch man. Because Tight has a tight end on BOTH edges, the backside is stronger too — Y rips inside and anchors the wall, and the defense cannot set its front to a strength that is not there.',
   assignments,
   vs: { '44': vs44, '43': vs43, '52': vs52 } satisfies Record<FrontId, FrontPlan>,
+  coachNotes,
   reviewNotes,
 }

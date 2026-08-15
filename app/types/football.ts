@@ -185,7 +185,15 @@ export interface Play {
    * Hoosier = right) is called at the line: same formation, opposite direction.
    */
   audibleFlipId?: string
-  /** Flags for Ryan's review, e.g. unverifiable call-name mapping. */
+  /**
+   * Kid-facing sideline points. Dead simple: one short line each, three at
+   * most, said the way a coach yells it. Most plays need none.
+   */
+  coachNotes?: string[]
+  /**
+   * Flags for Ryan's review, e.g. unverifiable call-name mapping. Authoring
+   * history — NEVER rendered to players.
+   */
   reviewNotes?: string[]
 }
 

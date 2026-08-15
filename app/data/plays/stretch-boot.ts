@@ -349,6 +349,11 @@ const assignments: Record<OffPosId, Assignment> = {
   },
 }
 
+const coachNotes = [
+  'Fake the stretch like it is real, then boot back the other way.',
+  'Nobody open? Tuck it and run.',
+]
+
 const reviewNotes = [
   'Source is YOUR red-ink sketch and your description (2026-08-11), not the varsity book — the varsity page-19 "Stretch Left Boot Rt" panel was only used to fill in what you did not mention. The routes, the fake to Super, the protection rules, and the read progression are your words as given.',
   'PROTECTION, PER YOUR NOTES: every lineman blocks the man in front of him, angled away from the boot (boot right = block left — written as "toward the fake side" so it mirrors to Black correctly), holds the line without collapsing, and never goes downfield (the penalty is called out in every lineman’s coaching text). Vs the 4-4 and 4-3 the center is the one uncovered lineman — he steps BACK with a short stunted line and helps/eats any blitz. Vs the 5-2, per your note, everyone has a guy immediately: tackles take the outside men (outside shoulder, drive to the fake side), guards take the big men between them and the tackles, center takes the man on his nose — nobody is left free, no dashed rings. Note this differs from Waggle, which sells Stretch with run-action blocks and a pulling guard — on this play the line pass-sets.',
@@ -378,6 +383,7 @@ export const stretchBootRed: Play = {
     'Play action off Stretch. The quarterback fakes the handoff to Super, who sells it off the left tackle’s hip like he has the ball and then leaks back to the shallow middle — while the quarterback boots back to the right behind a line that blocks the men in front of it, leans left with the fake, and HOLDS. X runs the post-corner and he is the one this play is for, but his route takes time: if he is doubled, Y is crossing the deep middle and R is snapping off an eight-yard out underneath him. If the defense just drops everybody back, L is sneaking behind the line to the flat for the easy one — or the quarterback tucks it and runs.',
   assignments,
   vs: { '44': vs44, '43': vs43, '52': vs52 } satisfies Record<FrontId, FrontPlan>,
+  coachNotes,
   reviewNotes,
 }
 

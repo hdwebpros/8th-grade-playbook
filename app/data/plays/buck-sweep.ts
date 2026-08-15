@@ -423,6 +423,11 @@ const assignments: Record<OffPosId, Assignment> = {
   },
 }
 
+const coachNotes = [
+  'The dive fake is the play - sell it every time.',
+  'Wing: be patient behind the pullers, then cut up hard.',
+]
+
 const reviewNotes = [
   "DIRECTION. Page 8's main diagram is Buck Sweep to the LEFT out of Red — to the tight end — so that is the picture this play carries. Page 9 also draws Buck RIGHT out of Red, away from the tight end; as of 2026-08-14 that IS a separate play in the book (buck-sweep-right-red), and Indy/Hoosier audible between the two directions at the line.",
   "THE PLAYSIDE WING BLOCKS DOWN, NOT OUT. Page 9's odd panel clearly caps his block on the defender INSIDE him, and the kick-out belongs to the playside guard. That is the single most common thing a 13-year-old gets backwards on this play, so it is spelled out in his detail text. Confirm that is how you teach it.",
@@ -456,6 +461,7 @@ export const buckSweepLeftRed: Play = {
     'Our Wing-T sweep. Everybody on the play side blocks down, both guards pull — one kicks the edge out, one wraps up into the alley — Super runs the midline to freeze the linebackers, and the backside wing orbits, takes the ball and follows the wrapping guard.',
   assignments,
   vs: { '44': vs44, '43': vs43, '52': vs52 } satisfies Record<FrontId, FrontPlan>,
+  coachNotes,
   reviewNotes,
 }
 
@@ -828,6 +834,7 @@ export const buckSweepRightRed: Play = {
     'The same Wing-T sweep run AWAY from the tight end. Both guards still pull — the right guard kicks, the left guard wraps — Super runs the midline, and now it is the LEFT wing who orbits, takes the ball and follows the wrap. With no tight end playside the wing and the split end do the edge work: the wing pins or climbs, and X stalks the corner.',
   assignments: assignmentsRight,
   vs: { '44': vs44Right, '43': vs43Right, '52': vs52Right } satisfies Record<FrontId, FrontPlan>,
+  coachNotes,
   reviewNotes: reviewNotesRight,
 }
 

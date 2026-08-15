@@ -376,6 +376,11 @@ const assignments: Record<OffPosId, Assignment> = {
   },
 }
 
+const coachNotes = [
+  'Super: full speed to the edge, one cut, straight upfield. No dancing.',
+  'Linemen: win the race - get your head across to the playside.',
+]
+
 const reviewNotes = [
   "Page numbers: HANDOFF.md's map says Stretch is pages 11–12, but the actual JPEGs are off by one here — page-11.jpg is JET, page-12.jpg is the STRETCH main page, page-13.jpg is the STRETCH variants page. This file is transcribed from 12 and 13.",
   "Direction is play identity (RESOLVED, Ryan 2026-08-14): the scan draws Stretch out of our RED alignment running LEFT — to the tight end and wing — so this picture is Stretch LEFT out of Red ('Red, Stretch, Left'). Indy/Hoosier are direction AUDIBLES (Indy = left, Hoosier = right), wired via audibleFlipId; page 13's right-going weak-side picture is now its own play, stretch-right-red. This supersedes the old 'names follow the formation' framing.",
@@ -411,6 +416,7 @@ export const stretchLeftRed: Play = {
     'Outside zone at the tight end and wing. Everybody up front takes a 45-degree step to the play side and runs the defense sideways; Super takes a slow bucket step, aims OUTSIDE the playside tackle, and reads the end man on the line — bend it up inside him or bounce it around him. We are not blocking a hole, we are moving a wall and letting the back pick the crack.',
   assignments,
   vs: { '44': vs44, '43': vs43, '52': vs52 } satisfies Record<FrontId, FrontPlan>,
+  coachNotes,
   reviewNotes,
 }
 
@@ -782,6 +788,7 @@ export const stretchRightRed: Play = {
     'Outside zone away from the tight end — the weak-side stretch. Same 45-degree steps, same slow bucket step and mesh, but the split-end side has fewer bodies: the right wing sets the edge, X works back to the safety, and Y and the left wing cut off the chase. Super still aims outside the playside tackle and reads the end man — bend it up or bounce it.',
   assignments: assignmentsRight,
   vs: { '44': vs44Right, '43': vs43Right, '52': vs52Right } satisfies Record<FrontId, FrontPlan>,
+  coachNotes,
   reviewNotes: reviewNotesRight,
 }
 

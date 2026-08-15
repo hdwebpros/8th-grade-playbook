@@ -350,6 +350,10 @@ export const splitWideKeeperRight: Play = {
   direction: 'right',
   ballCarrier: 'Q',
   summary: 'Designed QB run / sneak.',
+  coachNotes: [
+    'Wait for Super to get set - one full second - before the snap.',
+    'Run it after the screen. Take your three or four yards and get down.',
+  ],
   description:
     'Super motions out between R and X, gets set, and shows his hands like the screen is coming. The quarterback waits for him to set, reads the linebackers, and then runs downhill in the B gap between the right guard and the right tackle — behind everybody the screen picture just pulled off the line. This is a few-yards play, not a home run: we run it AFTER the screen, when their defensive line has seen that picture once and relaxes on it, and the quarterback rams it up in there for what is sitting in front of him.',
   assignments: keepAssignments,
@@ -591,6 +595,10 @@ export const splitWideDiveRight: Play = {
   ballCarrier: 'S',
   audibleFlipId: 'split-wide-dive-left',
   summary: 'Simple run. Super crashes the middle.',
+  coachNotes: [
+    'Four yards, every snap. Hit the hole full speed.',
+    'Receivers: nobody crosses your face to the middle.',
+  ],
   description:
     'The simplest play in the book. Super runs downhill at the playside hip of the center — the right side on this call — the line blocks the man in front of them, and all four receivers keep the defense from crashing to the middle. Four yards, every snap, out of a formation that looks like a pass.',
   assignments: diveAssignments,
@@ -899,6 +907,10 @@ export const splitWideScreenRight: Play = {
   ballCarrier: 'S',
   audibleFlipId: 'split-wide-screen-left',
   summary: 'Quick screen to Super in space, linemen out in front.',
+  coachNotes: [
+    'Our answer to a blitzing team - the ball must be out on time.',
+    'Super: stand still, hands up. Catch it first, then run.',
+  ],
   description:
     'Super motions out and settles between R and X with his hands up — the same picture as the keep. We let their right-side rush come free, the quarterback sells a drop the other way, and the ball goes out behind them to Super standing still, with both right-side linemen leading him up the sideline. This is our answer to a team that blitzes: the more men they send, the fewer are left out there with Super. The ball has to come out quick — that is the whole play — and it puts Super in space.',
   assignments: screenAssignments,
@@ -1304,6 +1316,10 @@ export const splitWideChip: Play = {
   direction: 'right',
   ballCarrier: 'Q',
   summary: 'Four-receiver dropback pass. Super stays in and chips whoever comes free.',
+  coachNotes: [
+    'Center: never go upfield. Double with the guard and watch for the blitz.',
+    'Super: block whoever gets through. Nobody comes? Stay put until the ball is gone.',
+  ],
   description:
     'Four receivers, four routes, left to right: in, post, post, go. Super never leaves — he sits on the quarterback\'s hip, scans the line, and blocks whoever gets through. Two posts from both slots is the play, and Y\'s ten-yard in is the outlet when the middle is closed.',
   assignments: chipAssignments,

@@ -289,6 +289,11 @@ const assignments: Record<OffPosId, Assignment> = {
   },
 }
 
+const coachNotes = [
+  'Sell the run fake first, then get outside fast.',
+  'Nobody open? Tuck it and run.',
+]
+
 const reviewNotes = [
   "Page 19 has NO assignment table — it is three hand-drawn panels and nothing else. Everything in the assignment column of this play is football written from the drawn arrows plus standard boot rules. It needs your eyes more than any other play we have transcribed.",
   "BIGGEST OPEN QUESTION — who carries out the fake and who blocks the edge. On the Waggle Rt panel there is a wavy line (the book's motion mark, same one used on Jet and Rocket) running from the right wing back across the formation and out toward the left tackle, and a separate black line running out to a block bar on the boot-side edge. We read that as: R motions across and takes the fake, and the RIGHT GUARD pulls to kick out the edge. The other honest reading of the same ink is: R never motions, R blocks the edge, and Super carries out the fake. Those are very different plays for R and for Super. Please settle it — it is a small change either way. (One piece of evidence, offered not to close the question but because you should have it: on a zoom of the scan the wavy line and the line running left out of the backfield are BOTH drawn in R's red, while the line to the block bar is black like the linemen, and it can be traced back to a start point directly under the right guard. Super's black line traces up over the guard and out to the flat arrow, which is a separate line.)",
@@ -321,6 +326,7 @@ export const waggleRed: Play = {
     'Our play-action bread and butter. Everything up front looks exactly like Stretch going left — same steps, same fake, the wing coming across to take the ball — and then the quarterback keeps it and boots the other way into a three-level flood: Super in the flat underneath, the tight end running the over at nine, and X on the corner over the top, with L clearing the middle on the post. If they chase the run, somebody is wide open. If they do not, the run was going to work.',
   assignments,
   vs: { '44': vs44, '43': vs43, '52': vs52 } satisfies Record<FrontId, FrontPlan>,
+  coachNotes,
   reviewNotes,
 }
 

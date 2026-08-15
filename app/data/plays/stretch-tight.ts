@@ -382,6 +382,11 @@ const assignments: Record<OffPosId, Assignment> = {
   },
 }
 
+const coachNotes = [
+  'Super: full speed to the edge, one cut, straight upfield. No dancing.',
+  'Linemen: win the race - get your head across to the playside.',
+]
+
 const reviewNotes = [
   "NEW PICTURE (2026-08-15) — NEEDS COACH RYAN'S CHECK. Stretch out of Tight is built from two already-hand-authored halves: the PLAYSIDE of Stretch Left out of Red (varsity page-12, and Tight puts Y at −4.5 and the L wing at (−5.7, −1) exactly where Red does, so every playside stroke, target and coaching point carries over verbatim), and the BACKSIDE of Stretch Right out of Red (page-13's panel) mirrored, because that panel's backside surface — tight end at −4.5, wing at −5.7 — is the exact mirror of Tight's backside here. Nothing on the playside is new football; the backside is the page-13 answer flipped.",
   'BALANCED SET, NO TWIN: Tight mirrors onto itself, so — like Split Wide and the Veer-Tight pair — there is no formationTwinId. stretch-left-tight and stretch-right-tight are a 1×2 left/right pair linked by audibleFlipId (Indy = left, Hoosier = right, yelled at the line; the words live in DIRECTION_AUDIBLES, app/utils/playbook.ts).',
@@ -414,6 +419,7 @@ export const stretchLeftTight: Play = {
     'Outside zone to the left out of the two-tight-end set. Everybody up front takes a 45-degree step to the play side and runs the defense sideways; Super takes a slow bucket step, aims OUTSIDE the playside tackle, and reads the end man — bend it up inside him or bounce it around him. Tight gives this play a tight end on BOTH edges: Y and the left wing set the edge we are running to, and X and the right wing seal the back door behind us, so the cutback is real and nothing catches us from behind.',
   assignments,
   vs: { '44': vs44, '43': vs43, '52': vs52 } satisfies Record<FrontId, FrontPlan>,
+  coachNotes,
   reviewNotes,
 }
 

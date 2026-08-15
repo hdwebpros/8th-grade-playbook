@@ -249,9 +249,9 @@ useHead(() => {
         <GameFilm v-if="filmClips.length" :clips="filmClips" />
 
         <CoachNote
-          v-if="play.reviewNotes?.length"
-          title="Coach's film notes"
-          :notes="play.reviewNotes"
+          v-if="play.coachNotes?.length"
+          title="Coach's notes"
+          :notes="play.coachNotes"
         />
       </section>
     </div>

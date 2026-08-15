@@ -547,6 +547,12 @@ const assignments: Record<OffPosId, Assignment> = {
   },
 }
 
+const coachNotes = [
+  'Read the end. He crashes down - pull it. He stays wide - give it.',
+  "Super: full speed at the guard's hip. Never slow down for the ball.",
+  'Pitch man: stay wide, stay behind the quarterback, be ready every time.',
+]
+
 const reviewNotes = [
   "NEW PLAY (2026-08-15) — NEEDS COACH RYAN'S CHECK. Veer Left out of Tight was authored by starting from the hand-authored veer-left-red (the TE-side veer): the Tight playside surface — Y at −4.5, wing L at −5.7 — is geometrically identical to Red's left side, so every playside stroke, read key (E-L in every front, per Ryan's 2026-08-15 ruling), and rule carries over verbatim, including the judgment calls flagged on that play's own review list. What changed is the backside, and only the backside.",
   "5-2 READ RESOLVED (Ryan, 2026-08-15): the read key vs the 5-2 is the FIRST MAN OUTSIDE the playside tackle — the end E-L, not the tackle head up on LT as first drafted. LT bases the head-up tackle (bar a yard past the LOS), LG's climb is re-aimed at the playside backer, Y pins tight off the read key's hip instead of basing the end, and the wing pins the next filler outside him. Both inside backers covered exactly once (LG to B-L, C off the scoop to B-R); this 5-2 picture is the exact mirror of veer-right-tight's.",
@@ -577,5 +583,6 @@ export const veerLeftTight: Play = {
     'The tight-end-side veer out of the balanced set. Same three-way option — dive, keep, pitch — with Y and the wing both on the playside: the tight end bases the first man outside the read key, the wing works outside his block, and R motions across to be the pitch man. Because Tight has a tight end on BOTH edges, X anchors the backside with the Rip cutoff instead of splitting out — and the defense cannot set its front to stop this side without opening up the same play the other way.',
   assignments,
   vs: { '44': vs44, '43': vs43, '52': vs52 } satisfies Record<FrontId, FrontPlan>,
+  coachNotes,
   reviewNotes,
 }

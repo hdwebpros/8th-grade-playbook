@@ -406,6 +406,11 @@ const assignments: Record<OffPosId, Assignment> = {
   },
 }
 
+const coachNotes = [
+  'The dive fake is the play - sell it every time.',
+  'Wing: be patient behind the pullers, then cut up hard.',
+]
+
 const reviewNotes = [
   "NEW PLAY (2026-08-15) — NEEDS COACH RYAN'S CHECK. Buck Sweep Left out of Tight was authored by starting from the hand-authored buck-sweep-left-red (page 8's main diagram, the TE-side sweep). Tight's left surface — Y at −4.5, wing L at −5.7, the five linemen, Super and the quarterback — is geometrically IDENTICAL to Red's, so every down block, both pull paths, the midline fake and the mesh-and-boot carry over verbatim, including every judgment call already flagged on that play's own review list (the wing blocks DOWN not out; the kick puller's target per front; the wrap puller's target per front; the center's block-back; the quarterback opening away). What changed is the backside, and only the backside.",
   'WHICH PICTURE — a ruling worth confirming. Buck Sweep has two hand-authored pictures: page 8 (at the tight end) and page 9 (away from the tight end, to the split end). Tight has a tight end AND a wing on both edges, so we treated BOTH Tight directions as the page-8, TE-side picture. That is the whole reason to be in Tight, but it does mean Tight never gets the page-9 edge answers (wing pinning the end, X stalking a corner) — confirm that is what you want.',
@@ -436,6 +441,7 @@ export const buckSweepLeftTight: Play = {
     'Our Wing-T sweep out of the two-tight-end set. Everybody on the play side blocks down, both guards pull — the left guard kicks the edge out, the right guard wraps up into the alley — Super runs the midline to freeze the linebackers, and the right wing orbits, takes the ball and follows the wrapping guard. Because Tight has a tight end on BOTH edges, X anchors the back side with the rip cutoff instead of splitting out, and the defense cannot set its front to the strength — there is one on each side.',
   assignments,
   vs: { '44': vs44, '43': vs43, '52': vs52 } satisfies Record<FrontId, FrontPlan>,
+  coachNotes,
   reviewNotes,
 }
 

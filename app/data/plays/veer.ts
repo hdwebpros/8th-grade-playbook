@@ -494,6 +494,12 @@ const assignments: Record<OffPosId, Assignment> = {
   },
 }
 
+const coachNotes = [
+  'Read the end. He crashes down - pull it. He stays wide - give it.',
+  "Super: full speed at the guard's hip. Never slow down for the ball.",
+  'Pitch man: stay wide, stay behind the quarterback, be ready every time.',
+]
+
 const reviewNotes = [
   "Indy vs Hoosier: RE-RESOLVED (Ryan, 2026-08-14) — they are direction AUDIBLES yelled at the line, not play names. Indy = the play now goes LEFT, Hoosier = RIGHT. Direction is play identity (Veer Right and Veer Left are two plays), formation is orthogonal (each direction runs out of Red or Black). Wired as `audibleFlipId` on each play; the words live in DIRECTION_AUDIBLES (app/utils/playbook.ts). This supersedes the 2026-08-13 note that treated Indy/Hoosier as call names on the Red/Black pair.",
   "The wall (Ryan's red-line markup of the scan, 2026-08-10): the teaching point of veer blocking is one rising WALL. Every blocker's line now CURVES like the original drawing, and every block besides Y's cuts back toward the backside; the climbers — Y, LG, C, and RT — all set their bars around the 3–4 yard mark; the playside wing is NOT a climber, he squeezes around the read key and pins the backer back inside. Y is the mirror image: he rips up and INSIDE (toward the ball) and anchors the backside of the wall at about 3 yards instead of barring on the end. On the Rip that means LT PULLS — down the line behind the guard, around the far side of the DT, bar on the DT's playside shoulder washing him away from the play — and LG climbs to the wall at the backside backer, the reverse of how the first pass authored it. Every blocker is drawn as one continuous curved block stroke; chaining a run into a block puts a stray arrowhead mid-line.",
@@ -529,6 +535,7 @@ export const veerRightRed: Play = {
     'Our bread and butter. Super dives at the crack of the playside guard, the quarterback reads one man and gives, keeps, or pitches, and the backside wing motions across to ride in pitch relationship. Up front the line veers inside and climbs downfield, building a wall for the ball to run behind. Three plays in one — the defense picks which one we run.',
   assignments,
   vs: { '44': vs44, '43': vs43, '52': vs52 } satisfies Record<FrontId, FrontPlan>,
+  coachNotes,
   reviewNotes,
 }
 
@@ -1096,6 +1103,7 @@ export const veerLeftRed: Play = {
     'Veer run at the tight end side. Same three-way option — dive, keep, pitch — but with Y and the wing both on the playside the surface changes: the tight end bases the first man outside the read key, the wing works outside his block, and R motions across to be the pitch man. The extra blocker at the point is why we audible into this when the defense cheats away from Y.',
   assignments: assignmentsLeft,
   vs: { '44': vs44Left, '43': vs43Left, '52': vs52Left } satisfies Record<FrontId, FrontPlan>,
+  coachNotes,
   reviewNotes: reviewNotesLeft,
 }
 

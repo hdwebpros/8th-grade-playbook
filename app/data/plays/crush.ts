@@ -432,6 +432,12 @@ const assignments: Record<OffPosId, Assignment> = {
   },
 }
 
+const coachNotes = [
+  'Same as Veer, one man wider - read the second man outside the tackle.',
+  'He crashes - pull it. He sits - give it.',
+  'Pitch man: stay wide, stay behind the quarterback.',
+]
+
 const reviewNotes = [
   "Indy vs Hoosier: RE-RESOLVED (Ryan, 2026-08-14) — they are direction AUDIBLES yelled at the line, not play names. Indy = the play now goes LEFT, Hoosier = RIGHT. Direction is play identity (Crush Left and Crush Right are two plays), formation is orthogonal (each direction runs out of Red or Black). Wired as `audibleFlipId` on each play; the words live in DIRECTION_AUDIBLES (app/utils/playbook.ts). This supersedes the 2026-08-13 note that treated Indy/Hoosier as direction words in the call name.",
   "THE SCAN ONLY DRAWS THE TE SIDE. Page 7 draws Crush out of Red going LEFT — to Y and the L wing — the opposite way from Veer out of the same formation. That panel is THIS play. Crush Right out of Red (the weak-side picture) is our own translation of the roles and has its own review list on that play.",
@@ -467,6 +473,7 @@ export const crushLeftRed: Play = {
     'Outside veer at the tight end side — the scan\'s picture. Same triple option as Veer, one gap wider: Super dives outside the playside tackle, the tight end works his man rule at the point, the wing releases past the read to pin the backer, and the quarterback reads the man who has to support the pitch. Give, keep, or pitch — the defense picks.',
   assignments,
   vs: { '44': vs44, '43': vs43, '52': vs52 } satisfies Record<FrontId, FrontPlan>,
+  coachNotes,
   reviewNotes,
 }
 
@@ -843,6 +850,7 @@ export const crushRightRed: Play = {
     'Outside veer away from the tight end — the weak-side picture. Same triple option, one gap wider than Veer: Super dives off the playside tackle\'s outside hip, the tackle blocks the man Veer would read, the wing releases past the new read to pin the backer, and X — playside on this one — takes the corner. Give, keep, or pitch.',
   assignments: assignmentsRight,
   vs: { '44': vs44Right, '43': vs43Right, '52': vs52Right } satisfies Record<FrontId, FrontPlan>,
+  coachNotes,
   reviewNotes: reviewNotesRight,
 }
 

@@ -424,6 +424,12 @@ const assignments: Record<OffPosId, Assignment> = {
   },
 }
 
+const coachNotes = [
+  'Same as Veer, one man wider - read the second man outside the tackle.',
+  'He crashes - pull it. He sits - give it.',
+  'Pitch man: stay wide, stay behind the quarterback.',
+]
+
 const reviewNotes = [
   "NEW PLAY (2026-08-15) — NEEDS COACH RYAN'S CHECK. Crush Left out of Tight is the page-7 panel (crushLeftRed, the TE-side outside veer) run out of the two-tight-end set. Tight's LEFT surface is identical to Red's — Y on the line at −4.5, the L wing at (−5.7, −1) — so every playside stroke, read key and rule is crushLeftRed's verbatim, INCLUDING the judgment calls already flagged on that play (the wing pinning the backer instead of arcing to the corner, the two men on the playside backer vs the 5-2, the flat quarterback arrow, the 5-by-1 pitch). Reviewing this play is really reviewing the backside.",
   "THE ONE REAL CHANGE — X is a TIGHT END here, not a split end. In Red he is detached at +12 and his job is 'go get the corner on your side.' In Tight he is on the line at +4.5, so he takes the job the Crush family already gives a backside tight end: base the end on or outside you and hold him, every front, exactly as Y does on every front of crushRightRed. NOTE this deliberately does NOT copy the Veer-out-of-Tight answer (a Rip cutoff climb): Crush's backside linemen do not pull, and crush.ts's own backside-TE picture is a base block. Confirm you want the Crush answer and not the Veer one.",
@@ -453,6 +459,7 @@ export const crushLeftTight: Play = {
     'Outside veer to the left out of the two-tight-end set. Same triple option as Veer, one gap wider: Super dives outside the playside tackle, Y works his man rule at the point, the L wing releases past the read to pin the backer, and the quarterback reads the man who has to support the pitch. Because Tight has a tight end on BOTH edges, X shuts the back door instead of splitting out — and the defense cannot set its front to a strength that is not there.',
   assignments,
   vs: { '44': vs44, '43': vs43, '52': vs52 } satisfies Record<FrontId, FrontPlan>,
+  coachNotes,
   reviewNotes,
 }
 
