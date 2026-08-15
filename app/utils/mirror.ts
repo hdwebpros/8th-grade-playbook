@@ -115,6 +115,39 @@ export function mirrorFrontPlan(plan: FrontPlan): FrontPlan {
 }
 
 /**
+ * THE BALANCED-SET X↔Y EXCHANGE. `mirrorPlay` swaps the side-NAMED ids
+ * (LT↔RT, LG↔RG, L↔R, defender -L/-R) and negates every x, but leaves entries
+ * keyed `X` and `Y` where they are. That is right for Red/Black, where the
+ * FORMATION mirrors and Y physically changes sides with his entry. A balanced
+ * one-formation set (Tight, Split Wide) does not mirror onto a twin — Y is
+ * always the LEFT tight end and X always the RIGHT one, mirror-image POSITIONS
+ * that keep their spots — so a correct mirror must ALSO exchange the X and Y
+ * entries everywhere they are keyed. Without the swap the playside tight end's
+ * job lands on the man standing on the far edge.
+ */
+export function swapXY<T>(rec: Partial<Record<OffPosId, T>>): Partial<Record<OffPosId, T>> {
+  const { X, Y, ...rest } = rec
+  const out: Partial<Record<OffPosId, T>> = { ...rest }
+  if (Y !== undefined) out.X = Y
+  if (X !== undefined) out.Y = X
+  return out
+}
+
+/** `mirrorPlay`, then the X↔Y exchange a balanced one-formation set requires. */
+export function mirrorTightPlay(play: Play, overrides: Partial<Play> = {}): Play {
+  const m = mirrorPlay(play)
+  const assignments = swapXY(m.assignments) as Record<OffPosId, Assignment>
+  const vs = {} as Record<FrontId, FrontPlan>
+  for (const [frontId, plan] of Object.entries(m.vs) as [FrontId, FrontPlan][]) {
+    const next: FrontPlan = { ...plan, actions: swapXY(plan.actions) }
+    if (plan.assignments) next.assignments = swapXY(plan.assignments)
+    if (plan.alignOverrides) next.alignOverrides = swapXY(plan.alignOverrides)
+    vs[frontId] = next
+  }
+  return { ...m, assignments, vs, ...overrides }
+}
+
+/**
  * Mirror a whole play. Everything geometric flips; `overrides` is where the
  * author states what mirroring can't know (the new id/name/formation) and
  * hand-corrects any place where the football isn't actually symmetric.

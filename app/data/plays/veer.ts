@@ -25,10 +25,10 @@
  *     right out of Black is the TE-side picture flipped.
  *   - veerLeftBlack  = mirrorPlay(veerRightRed) — wing-side picture flipped.
  *
- * The read key is the first down defender ON or OUTSIDE the playside tackle:
- * vs our even fronts that's the end (`E-R`/`E-L`); vs the 5-2 it's the tackle
- * head up on the playside tackle (`T-R`/`T-L`), which is why the 5-2 diagram
- * looks different.
+ * The read key is the FIRST MAN OUTSIDE the playside tackle — the end
+ * (`E-R`/`E-L`) vs every front we run against. Ryan ruled 2026-08-15 that this
+ * holds vs the 5-2 too: the tackle head up on the PST is NOT the read, he gets
+ * base-blocked by the playside tackle.
  */
 
 import type {
@@ -328,13 +328,17 @@ const vs43: FrontPlan = {
 }
 
 const vs52: FrontPlan = {
-  readKey: 'T-R',
+  // Ryan's 2026-08-15 ruling: vs the 5-2 the read key is the FIRST MAN
+  // OUTSIDE the playside tackle — the end, same as the even fronts — NOT the
+  // tackle head up on RT. RT bases that head-up man instead.
+  readKey: 'E-R',
   actions: {
     ...SKILL,
     Y: Y_RIP,
     // Same wall as the even fronts. The scoop puts LG on the nose and frees
-    // the center to climb; every bar besides the wing's cuts backside. Bars on
-    // down linemen set a yard past the LOS — block down, drive them back.
+    // the center to climb; every bar cuts backside now that the wing pins
+    // instead of kicking out. Bars on down linemen set a yard past the LOS —
+    // block down, drive them back.
     LT: [
       {
         kind: 'block',
@@ -365,33 +369,42 @@ const vs52: FrontPlan = {
         ],
       },
     ],
+    // RG uncovered: climb to the playside backer, bar bending back into the
+    // wall around 3–4 yards — with RT basing the head-up tackle, the backer
+    // is the guard's man now.
     RG: [
       {
         kind: 'block',
         path: [
-          { x: 1.6, y: 1 },
-          { x: 1.3, y: 2.4 },
-          { x: 0.7, y: 3.4 },
+          { x: 1.8, y: 1 },
+          { x: 2.1, y: 2.4 },
+          { x: 1.6, y: 3.5 },
         ],
       },
     ],
+    // RT bases the tackle head up on him — hat across his playside number,
+    // bar a yard past the LOS, driving him back. The end outside is the read.
     RT: [
       {
         kind: 'block',
         path: [
-          { x: 2.5, y: 1 },
-          { x: 2.4, y: 2.4 },
-          { x: 1.8, y: 3.4 },
+          { x: 2.9, y: 0.4 },
+          { x: 3.3, y: 1.1 },
+          { x: 3, y: 1.6 },
         ],
       },
     ],
+    // Wing: rule one, same pin stroke as the even fronts — tight off the
+    // read-key end's outside hip, bar cutting back inside on the first
+    // backer that shows.
     R: [
       {
         kind: 'block',
         path: [
-          { x: 4, y: 0.2 },
-          { x: 4.4, y: 0.6 },
-          { x: 4.7, y: 0.8 },
+          { x: 5.4, y: 0.1 },
+          { x: 6, y: 1.6 },
+          { x: 5.9, y: 3.3 },
+          { x: 5.35, y: 4.1 },
         ],
       },
     ],
@@ -410,16 +423,16 @@ const vs52: FrontPlan = {
       detail: 'The tackle is head up on you. Step playside, get your hat across his playside number, and push him back toward the backside — nothing chases us from behind.',
     },
     RG: {
-      rule: 'Step inside. Uncovered — climb to the wall.',
-      detail: 'Nobody on you in a 5-2. Climb to the second level, bend back toward the backside, and set your block around three to four yards — your piece is the middle of the wall.',
+      rule: 'Step inside. Uncovered — climb to the playside backer.',
+      detail: 'Nobody on you in a 5-2, and the tackle takes the man head up on him — so the playside backer is YOURS. Climb to him, bend back into the wall, and set your block around three to four yards.',
     },
     RT: {
-      rule: 'Step inside, veer inside — up to the backer.',
-      detail: 'In an odd front the read key is the man head up on YOU. Do not block him. Release inside him, climb to the backer on your side, and bend your block back into the wall.',
+      rule: 'Base — the tackle head up on you.',
+      detail: 'The read key is the END outside you, not the man on your nose. The tackle head up on you gets BLOCKED: step playside, get your hat across his playside number, and drive him back off the line — your bar sets about a yard past it.',
     },
     R: {
-      rule: 'Tight off the read key — kick out the end.',
-      detail: 'Both backers are covered inside, so come tight off the read key and kick the end outside you OUT. Yours is the one block that pushes away from the wall — the ball runs between your kick-out and the wall.',
+      rule: 'Tight off the read key — pin the backer.',
+      detail: 'The end is the read key — leave him alone. Squeeze tight around his outside hip, same as the even fronts, and pin the first backer that shows, pushing him back toward the inside. Rule two: if you miss him, hit the near color — find an opponent and block.',
     },
   },
 }
@@ -430,9 +443,9 @@ const vs52: FrontPlan = {
 
 const assignments: Record<OffPosId, Assignment> = {
   RT: {
-    rule: 'Step inside, veer inside.',
+    rule: 'Never block the read key. Even: veer inside. Odd: base the man on you.',
     detail:
-      'You never block the read key. Step inside with your playside foot, release inside him, and take the first backer you see.',
+      'The read key is the first man OUTSIDE you — never block him. Even front: step inside with your playside foot, release inside the end, and take the first backer you see. Odd front: the man head up on you is NOT the read — base him, hat across his playside number, and drive him back off the line.',
   },
   RG: {
     rule: 'Step inside. Covered: base. Uncovered: base the backer.',
@@ -472,7 +485,7 @@ const assignments: Record<OffPosId, Assignment> = {
   Q: {
     rule: 'Step playside. Read the key: dive, keep, or pitch.',
     detail:
-      'Step to playside and pivot on your back foot. Extend the ball behind your back hip. Eyes on the read key — the first man on or outside the playside tackle. If he takes the dive: give it. If he sits: pull it and get vertical in the C gap. If he takes you: press the pitch.',
+      'Step to playside and pivot on your back foot. Extend the ball behind your back hip. Eyes on the read key — the first man OUTSIDE the playside tackle; vs every front we see, that is the end. If he takes the dive: give it. If he sits: pull it and get vertical in the C gap. If he takes you: press the pitch.',
   },
   X: {
     rule: 'Playside: block the corner.',
@@ -486,14 +499,14 @@ const reviewNotes = [
   "The wall (Ryan's red-line markup of the scan, 2026-08-10): the teaching point of veer blocking is one rising WALL. Every blocker's line now CURVES like the original drawing, and every block besides Y's cuts back toward the backside; the climbers — Y, LG, C, and RT — all set their bars around the 3–4 yard mark; the playside wing is NOT a climber, he squeezes around the read key and pins the backer back inside. Y is the mirror image: he rips up and INSIDE (toward the ball) and anchors the backside of the wall at about 3 yards instead of barring on the end. On the Rip that means LT PULLS — down the line behind the guard, around the far side of the DT, bar on the DT's playside shoulder washing him away from the play — and LG climbs to the wall at the backside backer, the reverse of how the first pass authored it. Every blocker is drawn as one continuous curved block stroke; chaining a run into a block puts a stray arrowhead mid-line.",
   "Playside wing (fixed again, Ryan 2026-08-10): rule one everywhere — tight off the read key to pin the LB. He squeezes BARELY around the read key's outside hip (to the right on Red) and pins with his bar pushing back toward the inside, never a deep climb — the SAME stroke vs both even fronts. Vs the 4-4 the playside edge has TWO ignored defenders: the read-key end and the walked-up outside backer; the option handles both, and the wing pins the first backer that shows. Vs the 4-3 the pin lands on the Sam — which ANSWERS the old open question: the Sam is the wing's man, so RT walls off the first jersey inside him instead. Rule two only if he misses: hit the near color — find an opponent and block. The old 4-3 picture ran the wing ten yards deep to the safety; gone.",
   "Ignored defenders (new convention, Ryan 2026-08-10): a FrontPlan can now list `ignored` defender ids — men the scheme deliberately leaves unblocked. They draw with a small dashed grey ring (the read key keeps its red READ ring instead), and the print book's legend explains it. Veer vs the 4-4 rings the walked-up outside backer; the read-key end is listed too but already carries the READ ring. Mirrors automatically.",
-  "Vs the 5-2 (odd) we read the down lineman head up on RT, not the end. That is the varsity rule applied to OUR front: 'first man on or outside PST'. Note what the scan actually circles on p6's odd panel — the outside backer — because varsity's odd front aligns its extra lineman INSIDE the tackle, so the first man on/outside their PST is that backer and the tackle base-blocks the man in his B gap. Same rule, different alignment. If you want the 5-2 to look like the scan, move our T to the playside B gap instead of head up and the read flips to the end. Confirm.",
+  "5-2 read key RESOLVED (Ryan, 2026-08-15): for ALL veer plays vs the 5-2 the read key is the FIRST MAN OUTSIDE the playside tackle — the end (E-R here) — NOT the tackle head up on the PST. Our front does not move (T stays head up on RT); the read and the blocking do: RT bases the head-up tackle (hat across his playside number, bar a yard past the LOS), RG's climb is re-aimed at the playside backer, and the wing's kick-out of the end is gone — he reverts to rule one, pinning tight off the read key like the even fronts. Every front now reads the end.",
   "p6's two 'vs Odd' panels draw the same backside picture as the 'vs Even' panels — the guard-tackle strokes look copied across. Vs our 5-2 the LT has a man head up on him, so he takes him (varsity's BST rule) instead of stepping down the way the even-front picture shows.",
   "The varsity even front on p6 puts its extra down lineman on the PLAYSIDE guard; our 4-4 and 4-3 use symmetric tackles on both guards so the play mirrors cleanly. The rules resolve the same way, but the picture is not a pixel copy of the scan.",
   "Super's dive (fixed): the scan's dive arrow is SHORT — the arrowhead sits on the playside guard about ¾ yard behind the LOS, which is the aiming point ('crack of PSG'). Ours ran to six yards downfield off a two-yard lateral gain, which drew as a near-vertical climb over the center's head. The path is now angled harder at the guard's inside leg and trimmed to 4½ yards downfield. He is the ball carrier, so we still draw him past the LOS where varsity stops at the mesh.",
   "Quarterback's keep (fixed): the scan rides him FLAT at his own depth to about four line-splits outside the ball and only then breaks upfield at roughly 45°, ending wide and barely past the LOS — 'press the pitch'. Ours turned up early and finished 3½ yards deep and inside the wing, which read as a C-gap dive rather than an option keep. The break point and endpoint now match the drawing.",
   "Pitch man (fixed): with the keep re-measured, L's arc was re-hung to hold the stated 5-by-1 (about five yards outside the quarterback, one yard behind him) at the end of both paths. The scan's pitch arrow actually finishes even wider and still BEHIND the line; we let ours cross the LOS so the diagram shows where the ball goes.",
   "Center vs the 4-4 (fixed — the wall): his old block ran ten yards to the free safety, a vertical spike straight through the middle of the wall. He now curves up and back toward the backside and sets his bar on the wall at about 3½ yards, on nobody in particular — exactly how the scan draws 'Uncovered: Get Vertical'. The free safety is deliberately left unblocked in this picture.",
-  "Vs the 5-2 (rebuilt to the wall, Ryan 2026-08-10): same picture as the even fronts — one rising wall, every bar besides the wing's cutting backside. The scoop now resolves with LG taking the nose over (low bar on his playside number) and the CENTER climbing off it, bending back to the backside backer at about 3½ yards — so the old picture of RG crossing the center's face to reach that backer is gone. RG, uncovered, climbs and sets his bar mid-wall around 3½ yards on nobody in particular; RT veers inside the read key up to the playside backer; Y still anchors the backside at 3. The wing KICKS OUT the end — his is the one bar pushing away from the wall, because the lane runs between his kick-out and the wall. Every defender inside is still covered exactly once.",
+  "Vs the 5-2 (rebuilt to the wall 2026-08-10, re-read 2026-08-15): same picture as the even fronts — one rising wall, every bar cutting backside. The scoop resolves with LG taking the nose over (low bar on his playside number) and the CENTER climbing off it, bending back to the backside backer at about 3½ yards. Under the 2026-08-15 read ruling: RT bases the tackle head up on him (bar a yard past the LOS), RG's climb is aimed at the playside backer instead of mid-wall on nobody, and the wing PINS tight off the read-key end — the kick-out picture is gone, so no bar pushes away from the wall anymore. Y still anchors the backside at 3. Every defender inside is still covered exactly once, the read-key end unblocked.",
   "Down-lineman bars sit a yard OFF the line (Ryan, 2026-08-10): every block on a down lineman — the even-front LT pull and RG base, and the 5-2's LT base and LG scoop — sets its bar about a yard past the LOS, beyond the defender's alignment, not at it. The picture is the teaching point: we block DOWN(field) and drive them back off the line; a bar on the LOS reads as a stalemate.",
 ]
 
@@ -865,56 +878,63 @@ const vs43Left: FrontPlan = {
 }
 
 const vs52Left: FrontPlan = {
-  readKey: 'T-L',
+  // Ryan's 2026-08-15 ruling: the read key vs the 5-2 is the FIRST MAN
+  // OUTSIDE the playside tackle — the end E-L, same as the even fronts —
+  // NOT the tackle head up on LT. LT bases that head-up man instead.
+  readKey: 'E-L',
   actions: {
     ...SKILL_LEFT,
     X: X_SAFETY_TWO_HIGH,
-    // Y: in the odd front the read key is head up on LT, so the first man
-    // outside the read key is the END just outside you — base him out. The
-    // lane runs between Y's base and the wall, the mirror of the wing's
-    // kick-out on the right-hand play.
+    // Y: the end just outside your shoulder is the READ — never block him.
+    // Release tight off his outside hip and pin the first jersey that fills,
+    // pushing back inside: the same pin shape the wing draws off the even
+    // read keys, hung off E-L's hip.
     Y: [
       {
         kind: 'block',
         path: [
-          { x: -4.9, y: 0.4 },
-          { x: -5.4, y: 1.1 },
-          { x: -5.9, y: 1.6 },
+          { x: -5.4, y: 0.1 },
+          { x: -6, y: 1.6 },
+          { x: -5.9, y: 3.3 },
+          { x: -5.35, y: 4.1 },
         ],
       },
     ],
-    // L: wrap tight outside Y's base and pin the first filler that shows.
+    // L: wrap outside Y's pin and pin the next filler — modeled as the near
+    // safety coming down, the same stroke as the 4-3 picture.
     L: [
       {
         kind: 'block',
         path: [
-          { x: -6.2, y: 0.1 },
-          { x: -6.7, y: 1.3 },
-          { x: -6.9, y: 2.7 },
-          { x: -6.4, y: 3.7 },
+          { x: -6.5, y: 0.2 },
+          { x: -7, y: 1.8 },
+          { x: -7, y: 3.3 },
+          { x: -6.4, y: 4.4 },
         ],
       },
     ],
-    // LT: the read key is head up on YOU — release inside him, climb to the
-    // playside backer, bend the bar back into the wall.
+    // LT bases the tackle head up on him — hat across his playside number,
+    // bar a yard past the LOS, driving him back. The end outside is the read.
     LT: [
       {
         kind: 'block',
         path: [
-          { x: -2.5, y: 1 },
-          { x: -2.4, y: 2.4 },
-          { x: -1.8, y: 3.4 },
+          { x: -2.9, y: 0.4 },
+          { x: -3.3, y: 1.1 },
+          { x: -3, y: 1.6 },
         ],
       },
     ],
-    // LG: uncovered — climb, bar mid-wall on nobody in particular.
+    // LG uncovered: climb to the playside backer — with LT basing the
+    // head-up tackle, the backer is the guard's man. Bar bends back into
+    // the wall around 3–4 yards.
     LG: [
       {
         kind: 'block',
         path: [
-          { x: -1.6, y: 1 },
-          { x: -1.3, y: 2.4 },
-          { x: -0.7, y: 3.4 },
+          { x: -1.8, y: 1 },
+          { x: -2.1, y: 2.4 },
+          { x: -1.6, y: 3.5 },
         ],
       },
     ],
@@ -965,20 +985,20 @@ const vs52Left: FrontPlan = {
       detail: 'The tackle is head up on you. Step playside, get your hat across his playside number, and push him back toward the backside — nothing chases us from behind.',
     },
     LG: {
-      rule: 'Step inside. Uncovered — climb to the wall.',
-      detail: 'Nobody on you in a 5-2. Climb to the second level, bend back toward the backside, and set your block around three to four yards — your piece is the middle of the wall.',
+      rule: 'Step inside. Uncovered — climb to the playside backer.',
+      detail: 'Nobody on you in a 5-2, and the tackle takes the man head up on him — so the playside backer is YOURS. Climb to him, bend back into the wall, and set your block around three to four yards.',
     },
     LT: {
-      rule: 'Step inside, veer inside — up to the backer.',
-      detail: 'In an odd front the read key is the man head up on YOU. Do not block him. Release inside him, climb to the backer on your side, and bend your block back into the wall.',
+      rule: 'Base — the tackle head up on you.',
+      detail: 'The read key is the END outside you, not the man on your nose. The tackle head up on you gets BLOCKED: step playside, get your hat across his playside number, and drive him back off the line — your bar sets about a yard past it.',
     },
     Y: {
-      rule: 'Playside — base the end outside the read key.',
-      detail: 'The read key is head up on our tackle, so the first man outside him is the END just outside you. Base him and drive him out — the ball runs between your block and the wall, the same lane the wing\'s kick-out makes on the wing-side veer.',
+      rule: 'Tight off the read key — pin the first filler.',
+      detail: 'The end just outside your shoulder is the READ KEY — never block him. Release tight off his outside hip, same as the wing does off the even read keys, and pin the first jersey that fills, pushing him back inside. Both backers are covered underneath you.',
     },
     L: {
-      rule: 'Work outside Y — pin the first filler.',
-      detail: 'Both backers are covered inside and the tight end has the end. Wrap tight outside his base and pin the first color that fills, pushing him back inside. Rule two: hit the near color — find an opponent and block.',
+      rule: 'Work outside Y — pin the next filler.',
+      detail: 'The tight end pins off the read key, so wrap outside his block and pin the next color that fills — in this front that is the near safety coming down. Rule two: hit the near color — find an opponent and block.',
     },
     X: {
       rule: 'Backside — work to the safety.',
@@ -993,9 +1013,9 @@ const vs52Left: FrontPlan = {
 
 const assignmentsLeft: Record<OffPosId, Assignment> = {
   LT: {
-    rule: 'Step inside, veer inside.',
+    rule: 'Never block the read key. Even: veer inside. Odd: base the man on you.',
     detail:
-      'You never block the read key. Step inside with your playside foot, release inside him, and take the first backer you see.',
+      'The read key is the first man OUTSIDE you — never block him. Even front: step inside with your playside foot, release inside the end, and take the first backer you see. Odd front: the man head up on you is NOT the read — base him, hat across his playside number, and drive him back off the line.',
   },
   LG: {
     rule: 'Step inside. Covered: base. Uncovered: base the backer.',
@@ -1016,7 +1036,7 @@ const assignmentsLeft: Record<OffPosId, Assignment> = {
   Y: {
     rule: 'Playside: base the first man outside the read key.',
     detail:
-      'The play comes your way. Never block the read key — release past him and BASE the first defender outside him: the walked-up backer, the playside backer, or the end, whichever this front puts there. (On the back side you Rip: step playside, get inside, and cut off the chase.)',
+      'The play comes your way. Never block the read key — release past him and BASE the first defender outside him: the walked-up backer or the playside backer, whichever this front puts there. If the front puts nobody there (the 5-2), stay tight off the read key\'s hip and pin the first color that fills. (On the back side you Rip: step playside, get inside, and cut off the chase.)',
   },
   L: {
     rule: 'Playside wing — work outside Y\'s block.',
@@ -1035,7 +1055,7 @@ const assignmentsLeft: Record<OffPosId, Assignment> = {
   Q: {
     rule: 'Step playside. Read the key: dive, keep, or pitch.',
     detail:
-      'Step to playside and pivot on your back foot. Extend the ball behind your back hip. Eyes on the read key — the first man on or outside the playside tackle. If he takes the dive: give it. If he sits: pull it and get vertical in the C gap. If he takes you: press the pitch.',
+      'Step to playside and pivot on your back foot. Extend the ball behind your back hip. Eyes on the read key — the first man OUTSIDE the playside tackle; vs every front we see, that is the end. If he takes the dive: give it. If he sits: pull it and get vertical in the C gap. If he takes you: press the pitch.',
   },
   X: {
     rule: 'Backside: work to the safety.',
@@ -1047,10 +1067,10 @@ const assignmentsLeft: Record<OffPosId, Assignment> = {
 const reviewNotesLeft = [
   "NEW PICTURE (2026-08-14) — NEEDS COACH RYAN'S CHECK. This is the newly modeled 'Indy out of Red' that varsity page 6's BOTTOM panels show: the tight end stays left and the run goes LEFT, putting Y AND the left wing on the playside. It is NOT a mirror of Veer Right out of Red (mirroring that gives Black-Left); it was authored best-effort from the role rules in the teaching table — 'Y playside: base the first man outside the read key', the wing working outside him — and needs checking against those panels stroke by stroke.",
   "Indy/Hoosier are direction AUDIBLES (Ryan, 2026-08-14): Indy = left, Hoosier = right, yelled at the line. 'Red, Veer Right' + 'INDY INDY' becomes THIS play. Wired via audibleFlipId; the words live in DIRECTION_AUDIBLES (app/utils/playbook.ts).",
-  "JUDGMENT CALL — read key per front: applied the varsity rule 'first down defender ON or OUTSIDE the playside tackle' with LT as PST. Vs both even fronts that is the end E-L (who now sits nearly head up on Y); vs the 5-2 it is the tackle T-L head up on LT. Y releases past the read key in every front and never blocks him.",
+  "Read key per front — RESOLVED (Ryan, 2026-08-15): the read is the FIRST MAN OUTSIDE the playside tackle in EVERY front — the end E-L, vs the 5-2 too (not the tackle head up on LT, as first drafted). Y releases past the read key in every front and never blocks him.",
   "JUDGMENT CALL — vs the 4-4, the walked-up outside backer is now BLOCKED, not ignored: he is the first man outside the read key, so Y bases him and drives him out of the alley. That is why this front plan has NO `ignored` list where the right-hand play ignores two men — the extra playside blocker is the point of running at the tight end. Y's bar pushes away from the wall (a base/kick-out picture), the one exception besides kick-outs to bars cutting backside.",
   "JUDGMENT CALL — vs the 4-3, the first man outside the read key is the playside backer over Y's head, so Y climbs and bases HIM; LT, whose right-hand mirror climbs to that backer, instead walls off the first jersey inside (bar mid-wall on nobody in particular, like the uncovered center). The wing then has no backer left to pin, so he pins the first color filling the alley — modeled as the near safety coming down. Confirm that division of labor: the alternative is LT to the backer and Y straight to the safety.",
-  "JUDGMENT CALL — vs the 5-2, the read key is head up on LT, so the first man outside the read key is the END outside Y: Y bases him out, making the same ball-runs-between-base-and-wall lane the wing's kick-out makes on the right-hand play. The wing wraps outside Y and pins the first filler. Both inside backers stay covered exactly once (LT to the playside backer, C off the scoop to the backside backer).",
+  "Vs the 5-2 — REWORKED to Ryan's 2026-08-15 read ruling: the read key is the end E-L, so Y's base of the end is GONE (he is deliberately unblocked). LT bases the tackle head up on him (bar a yard past the LOS), LG's climb is re-aimed at the playside backer, Y pins tight off the read key's hip (the wing's even-front pin shape hung off E-L), and the wing wraps outside Y and pins the next filler. Both inside backers stay covered exactly once (LG to the playside backer, C off the scoop to the backside backer); no bar pushes away from the wall anymore.",
   "JUDGMENT CALL — the playside corner (C-L) is unblocked in every front: there is no receiver to that side (X is split right, backside), and the wing's rule keeps him on the alley, not a ten-yard chase to the corner. The pitch man has to beat the corner with speed. Flag if Ryan wants the wing on the corner instead.",
   "X backside: 'work to the safety' per his rule — drawn as a work-to run path (no block bar) toward the free safety (4-4) / near safety (4-3, 5-2). Not a corner block; he is a full field from the play.",
   "The wall identity carries over from Veer Right (Ryan's 2026-08-10 markup): one rising wall, every blocker a single continuous curved block stroke, climbers' bars at 3–4 yards, down-lineman bars a yard past the LOS, bars cutting back toward the backside (now the RIGHT) except Y's base/kick-outs and the wing's pins. The backside Rip is the exact mirror role-swap: RT pulls behind RG and washes the DT away; RG climbs to the backside backer. Vs the 5-2 RT takes the man head up on him and RG scoops the nose with C.",
@@ -1109,7 +1129,7 @@ export const veerRightBlack: Play = mirrorPlay(veerLeftRed, {
  * by panel against varsity page 6's left-hand diagrams (2026-08-13 pass; no
  * hand corrections were needed — both fronts are left/right symmetric).
  * The wing-only surface: PSW is L, the pitch man is R motioning right-to-left,
- * the read key becomes E-L (even) / T-L (odd), Y rips on the backside, and
+ * the read key becomes E-L in every front, Y rips on the backside, and
  * X — split left in Black — blocks the corner on his side.
  */
 export const veerLeftBlack: Play = mirrorPlay(veerRightRed, {

@@ -18,6 +18,7 @@
 
 import type { Formation, FormationId } from '../types/football'
 import { splitWide } from './split-wide-formation'
+import { tight } from './tight-formation'
 import { mirrorFormation } from '../utils/mirror'
 
 export const red: Formation = {
@@ -52,4 +53,7 @@ export const formations: Partial<Record<FormationId, Formation>> = {
   red,
   black,
   'split-wide': splitWide,
+  // Tight has a tight end on BOTH sides, so unlike Red/Black it has no
+  // side to declare and no mirrored twin — it is its own mirror.
+  tight,
 }

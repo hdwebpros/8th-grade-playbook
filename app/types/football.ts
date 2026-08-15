@@ -15,7 +15,7 @@ export interface Pt {
   y: number
 }
 
-export type FormationId = 'red' | 'black' | 'split-wide'
+export type FormationId = 'red' | 'black' | 'split-wide' | 'tight'
 
 /** 4-4 and 4-3 are even fronts; 5-2 is odd. */
 export type FrontId = '44' | '43' | '52'
@@ -27,7 +27,7 @@ export type FrontScheme = 'even' | 'odd'
  * role. The UI computes playside/backside badges from Play.direction.
  */
 export type OffPosId =
-  | 'X' // split end
+  | 'X' // split end ("X" is WR vernacular) — technically the RIGHT tight end in the Tight formation
   | 'Y' // tight end
   | 'L' // left wing
   | 'R' // right wing

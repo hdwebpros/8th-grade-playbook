@@ -4,13 +4,14 @@
  * Same bus-mode contract as useFlashcards.ts: pure functions, a deck is a
  * shuffled card list, the page owns all (in-memory, disposable) drill state.
  *
- * Deck size: ONE card per formation, three cards a lap. Mirroring was
- * considered for visual variation and deliberately rejected — Black IS Red's
- * mirror (app/data/formations.ts generates it with mirrorFormation), so a
- * mirrored Red card would be a Black card with the wrong answer on the back,
- * and Split Wide is a balanced set that mirrors onto itself. With every
- * honest variation already in the formation list, three cards it is; the
- * endless relap keeps the reps coming.
+ * Deck size: ONE card per formation, so the lap is however many formations
+ * we have. Mirroring was considered for visual variation and deliberately
+ * rejected — Black IS Red's mirror (app/data/formations.ts generates it with
+ * mirrorFormation), so a mirrored Red card would be a Black card with the
+ * wrong answer on the back, and Split Wide and Tight are balanced sets that
+ * mirror onto themselves. With every honest variation already in the
+ * formation list, one card each it is; the endless relap keeps the reps
+ * coming.
  *
  * Each card carries a `cue` — the recognition one-liner for the back of the
  * card. It lives here rather than reusing Formation.description because the
@@ -33,6 +34,8 @@ const CUES: Record<FormationId, string> = {
     'Red flipped: the tight end and wing are packed in on the RIGHT, the split end is wide LEFT. Same jobs, other side of the ball.',
   'split-wide':
     'Nobody tight to the line: four receivers stretched across the field, both edges empty, one lone back deep behind the quarterback.',
+  tight:
+    'A tight end on BOTH ends of the line and a wing outside each of them — nobody split out, both sides look the same. If you cannot tell which way it is set, it is Tight.',
 }
 
 function shuffle<T>(input: readonly T[]): T[] {
