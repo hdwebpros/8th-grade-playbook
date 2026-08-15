@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const tabs = [
   { to: '/plays', label: 'Playbook', icon: 'lucide:book-open' },
+  { to: '/formations', label: 'Formations', icon: 'lucide:layout-grid' },
   { to: '/routes', label: 'Routes', icon: 'lucide:route' },
   { to: '/quiz', label: 'Quiz', icon: 'lucide:zap' },
   { to: '/export', label: 'Export', icon: 'lucide:printer' },

@@ -75,7 +75,7 @@ export const POSITION_NAMES: Record<OffPosId, string> = {
 /** Kid-facing grouping for the assignment panel. */
 export const POSITION_GROUPS: { label: string; positions: OffPosId[] }[] = [
   { label: 'Backs', positions: ['Q', 'S', 'L', 'R'] },
-  { label: 'Ends', positions: ['X', 'Y'] },
+  { label: 'Tight Ends', positions: ['X', 'Y'] },
   { label: 'Line', positions: ['LT', 'LG', 'C', 'RG', 'RT'] },
 ]
 

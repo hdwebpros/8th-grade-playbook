@@ -10,6 +10,13 @@ const quickLinks = [
     hot: true,
   },
   {
+    to: '/formations',
+    icon: 'lucide:layout-grid',
+    title: 'Formations',
+    sub: 'Where do I stand? All four sets.',
+    hot: false,
+  },
+  {
     to: '/routes',
     icon: 'lucide:route',
     title: 'Route Tree',
@@ -174,7 +181,7 @@ const quickLinks = [
     padding-top: 36px;
   }
   .quick {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 </style>
