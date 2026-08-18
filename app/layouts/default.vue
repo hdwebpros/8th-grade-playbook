@@ -21,7 +21,7 @@ const isActive = (to: string) => route.path === to || route.path.startsWith(to +
         <NuxtLink to="/" class="mark" aria-label="Wolves Playbook home">
           <img src="/brand/wolves-mark.png" alt="" class="mark-img" width="86" height="58" />
           <span class="mark-word">
-            Wolves<span class="mark-red">&nbsp;Playbook</span>
+            Wolves<span class="mark-red mark-tail">&nbsp;Playbook</span>
           </span>
         </NuxtLink>
         <nav class="topnav" aria-label="Primary">
@@ -182,21 +182,26 @@ const isActive = (to: string) => route.path === to || route.path.startsWith(to +
   .tabbar {
     display: none;
   }
+  /* Seven tabs: drop "Playbook" from the mark so the nav fits on one line. */
+  .mark-tail {
+    display: none;
+  }
   .topnav {
     display: flex;
-    gap: 4px;
+    gap: 2px;
   }
   .topnav-link {
     display: flex;
     align-items: center;
-    gap: 7px;
-    padding: 7px 14px;
+    gap: 6px;
+    padding: 7px 10px;
     border-radius: var(--r-ctl);
     font-family: var(--font-display);
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 0.95rem;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
     color: var(--steel);
     transition:
       color var(--t-fast) var(--ease),
