@@ -1,7 +1,10 @@
 <script setup lang="ts">
-const tabs = [
+/** `short` is the phone tab-bar label when the full one won't fit. */
+const tabs: { to: string; label: string; short?: string; icon: string }[] = [
   { to: '/plays', label: 'Playbook', icon: 'lucide:book-open' },
   { to: '/formations', label: 'Formations', icon: 'lucide:layout-grid' },
+  { to: '/defense', label: 'Defense', icon: 'lucide:shield' },
+  { to: '/special-teams', label: 'Special Teams', short: 'Specials', icon: 'lucide:goal' },
   { to: '/routes', label: 'Routes', icon: 'lucide:route' },
   { to: '/quiz', label: 'Quiz', icon: 'lucide:zap' },
   { to: '/export', label: 'Export', icon: 'lucide:printer' },
@@ -52,7 +55,7 @@ const isActive = (to: string) => route.path === to || route.path.startsWith(to +
       >
         <span class="tab-indicator" aria-hidden="true" />
         <Icon :name="tab.icon" class="tab-icon" aria-hidden="true" />
-        <span class="tab-label">{{ tab.label }}</span>
+        <span class="tab-label">{{ tab.short ?? tab.label }}</span>
       </NuxtLink>
     </nav>
   </div>
@@ -169,9 +172,10 @@ const isActive = (to: string) => route.path === to || route.path.startsWith(to +
 .tab-label {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 0.72rem;
+  font-size: 0.62rem;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
 }
 
 @media (min-width: 880px) {
