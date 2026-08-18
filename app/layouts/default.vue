@@ -4,7 +4,7 @@ const tabs: { to: string; label: string; short?: string; icon: string }[] = [
   { to: '/plays', label: 'Playbook', icon: 'lucide:book-open' },
   { to: '/formations', label: 'Formations', icon: 'lucide:layout-grid' },
   { to: '/defense', label: 'Defense', icon: 'lucide:shield' },
-  { to: '/special-teams', label: 'Special Teams', short: 'Specials', icon: 'lucide:goal' },
+  { to: '/special-teams', label: 'Special Teams', short: 'Specials', icon: 'wolves:goalpost' },
   { to: '/routes', label: 'Routes', icon: 'lucide:route' },
   { to: '/quiz', label: 'Quiz', icon: 'lucide:zap' },
   { to: '/export', label: 'Export', icon: 'lucide:printer' },

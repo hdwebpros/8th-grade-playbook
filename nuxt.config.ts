@@ -16,6 +16,8 @@ export default defineNuxtConfig({
   // statically-used icon into the client bundle.
   icon: {
     serverBundle: { collections: ['lucide'] },
+    // Hand-drawn icons lucide lacks (e.g. the football goalpost), bundled locally.
+    customCollections: [{ prefix: 'wolves', dir: './app/assets/icons' }],
     clientBundle: { scan: true, sizeLimitKb: 512 },
   },
 

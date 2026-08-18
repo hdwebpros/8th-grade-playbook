@@ -15,7 +15,7 @@ useHead({ title: 'Special Teams — Wolves Playbook' })
     </header>
 
     <ComingSoon
-      icon="lucide:goal"
+      icon="wolves:goalpost"
       :planned="['Kickoff Center', 'Return Center']"
     />
   </div>
