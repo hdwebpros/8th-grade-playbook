@@ -50,7 +50,7 @@ That is the entirety of the brand direction. There is no palette, no type scale,
 | Stretch | varsity p11 (+ variants p12) |
 
 **Split Wide runs** — *these do not exist in any playbook; Ryan made them up.* Drafted from his words, verbatim:
-- *"a play where the halfback goes in motion to the right, and it's a QB keeper over the right guard B gap"*
+- *"a play where the halfback goes in motion to the right, and it's a QB keeper over the right guard B gap"* — now called with a direction (Keep Right / Keep Left): the word tells Super which way to motion out and the quarterback which B gap to sneak.
 - *"standard hb dive, all receivers stop the crash to the middle"*
 
 **Passing:**

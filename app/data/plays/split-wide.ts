@@ -5,7 +5,8 @@
  *
  * Ryan's words, verbatim, and what each became:
  *   1. "a play where the halfback goes in motion to the right, and it's a QB
- *      keeper over the right guard B gap"          → splitWideKeeperRight
+ *      keeper over the right guard B gap"          → splitWideKeeperRight /
+ *                                                    splitWideKeeperLeft
  *   2. "standard hb dive, all receivers stop the crash to the middle"
  *                                                   → splitWideDiveRight / -Left
  *   3. "HB goes in motion, HB screen"               → splitWideScreenRight / -Left
@@ -26,11 +27,12 @@
  * There is no scan to copy for these plays, so each target is a decision, and
  * the reasoning for the ones that aren't obvious is written into `reviewNotes`.
  *
- * DIRECTION (Coach Ryan, 2026-08-14): the DIVE and the SCREEN are called with a
- * direction like the runs in Red and Black — each ships as a left/right pair
- * linked by `audibleFlipId` (Indy = left, Hoosier = right at the line). Split
- * Wide is one balanced formation, so there is no `formationTwinId` — 1×2 pairs,
- * not 2×2 squares. Only Keep and Victory stay one-way, per the same ruling.
+ * DIRECTION (Coach Ryan, 2026-08-14, extended to the KEEP on 2026-08-18): the
+ * DIVE, the SCREEN and the KEEP are all called with a direction like the runs
+ * in Red and Black — each ships as a left/right pair linked by `audibleFlipId`
+ * (Indy = left, Hoosier = right at the line). Split Wide is one balanced
+ * formation, so there is no `formationTwinId` — 1×2 pairs, not 2×2 squares.
+ * Only Victory stays one-way, per the same ruling.
  */
 
 import type {
@@ -128,8 +130,13 @@ const MIRROR_NOTE_PREFIX =
   'MIRROR: the football here mirrors exactly — Split Wide is a balanced set and all three of our fronts are left/right symmetric, so a left-handed twin is one mirrorPlay() call with zero hand corrections. It is deliberately NOT shipped yet: this is unapproved football, and mirroring it would double the number of wrong things a 13-year-old could read. Say the word at review and the twin appears. '
 
 // ===========================================================================
-// PLAY 1 — SPLIT WIDE RT KEEP  (motion right, QB keeper, right B gap)
+// PLAY 1 — SPLIT WIDE KEEP  (motion, QB keeper — ships as a right/left pair)
 // ===========================================================================
+//
+// The direction word is what tells Super which way to motion out to and the
+// quarterback which gap he is sneaking through. Right = motion right, run the
+// RG/RT B gap. Left = motion left, run the LG/LT B gap. Indy flips it to left
+// at the line, Hoosier to right, same as the Dive and the Screen.
 //
 // The picture: Super motions out to the right and STOPS between R and X, gets
 // set, and shows his hands like the screen is coming. The quarterback sends him
@@ -344,18 +351,20 @@ export const splitWideKeeperRight: Play = {
   call: [
     { word: 'Split Wide', label: 'formation' },
     { word: 'Keep', label: 'play' },
+    { word: 'Right', label: 'direction' },
   ],
   family: 'run',
   formation: splitWide.id,
   direction: 'right',
   ballCarrier: 'Q',
+  audibleFlipId: 'split-wide-keeper-left',
   summary: 'Designed QB run / sneak.',
   coachNotes: [
     'Wait for Super to get set - one full second - before the snap.',
     'Run it after the screen. Take your three or four yards and get down.',
   ],
   description:
-    'Super motions out between R and X, gets set, and shows his hands like the screen is coming. The quarterback waits for him to set, reads the linebackers, and then runs downhill in the B gap between the right guard and the right tackle — behind everybody the screen picture just pulled off the line. This is a few-yards play, not a home run: we run it AFTER the screen, when their defensive line has seen that picture once and relaxes on it, and the quarterback rams it up in there for what is sitting in front of him.',
+    'Super motions out to the right — between R and X on this call — gets set, and shows his hands like the screen is coming. The quarterback waits for him to set, reads the linebackers, and then runs downhill in the B gap between the right guard and the right tackle — behind everybody the screen picture just pulled off the line. This is a few-yards play, not a home run: we run it AFTER the screen, when their defensive line has seen that picture once and relaxes on it, and the quarterback rams it up in there for what is sitting in front of him.',
   assignments: keepAssignments,
   vs: { '44': keepVs44, '43': keepVs43, '52': keepVs52 } satisfies Record<FrontId, FrontPlan>,
   reviewNotes: [
@@ -371,10 +380,83 @@ export const splitWideKeeperRight: Play = {
     'Why nobody pulls: in both even fronts LG has a tackle head-up on him and cannot leave without giving up a free runner behind the play, so the uncovered center climbs to the B-gap backer instead. Vs the 5-2 that flips — RG is the uncovered man, so HE leads through the hole onto the backer while RT walls the man on his nose. If you would rather teach one pulling guard on every front, say so and I will change the front rules instead of the pictures.',
     'Vs the 4-3 the slot (R) blocks the backer at 4 yards instead of an edge man, because a 4-3 has no walked-up edge — so the center takes the Mike and R takes the outside backer. Vs the 5-2 R cracks the free end. Confirm you want the slot cracking IN on all three fronts rather than stalking the corner and letting the safety come free.',
     'Nobody blocks the deep safety on any front. That is on purpose — this play is meant to gain 4 to 6 downhill, and the safety is the guy who ends it. If you want it to be able to go the distance, someone has to leave a defender free to get to him.',
-    MIRROR_NOTE_PREFIX +
-      'The one thing that would NOT mirror is your call name, if you want "right" baked into the word the kids hear.',
+    'DIRECTION — RESOLVED (Coach Ryan, 2026-08-18): the Keep is called with a direction, and the word does two jobs at once — it tells Super which way to MOTION OUT to and it tells the quarterback which way to SNEAK. Right = motion right, settle between R and X, run the RG/RT B gap; Left = motion left, settle between L and Y, run the LG/LT B gap. Indy = left, Hoosier = right at the line, wired through audibleFlipId. One balanced formation, so no formationTwinId.',
+    'MIRROR — SHIPPED for the keep: Split Wide Keep Left is one mirrorSplitWidePlay() call (the mirror plus the X↔Y exchange this balanced set needs) with zero hand corrections to the football. What IS hand-authored over there is the prose — every rule that says "right", "R and X", "RG and RT" is rewritten, because mirrorPlay re-keys assignments but cannot rewrite a sentence. Review the right-handed play and you have reviewed the football of both; read the left one only for its words. Note that the keep and the screen must be called to the SAME side to stay one picture — Keep Right pairs with Screen Right, Keep Left with Screen Left.',
   ],
 }
+
+// ---------------------------------------------------------------------------
+// PLAY 1b — SPLIT WIDE KEEP LEFT: the same play the other way, and the reason
+// the call now carries a direction — the word tells Super which way to motion
+// out to and the quarterback which way to sneak.
+//
+// The GEOMETRY is one mirrorSplitWidePlay() call: Super motions out and settles
+// between L and Y at (−10.75, −1), and the quarterback runs the B gap between
+// LG and LT. The set is drawn exactly balanced and all three fronts are
+// symmetric, so the football needed no hand corrections.
+//
+// The PROSE is hand-translated. mirrorPlay re-keys every assignment onto the
+// right player, but it cannot rewrite "right" into "left" inside a sentence, so
+// the four rules that name a side — C, R, S and Q, plus the center vs the 5-2 —
+// are authored fresh at the already-correct keys.
+// ---------------------------------------------------------------------------
+
+export const splitWideKeeperLeft: Play = (() => {
+  const m = mirrorSplitWidePlay(splitWideKeeperRight, {})
+  return {
+    ...m,
+    id: 'split-wide-keeper-left',
+    call: [
+      { word: 'Split Wide', label: 'formation' },
+      { word: 'Keep', label: 'play' },
+      { word: 'Left', label: 'direction' },
+    ],
+    audibleFlipId: 'split-wide-keeper-right',
+    description:
+      'Super motions out to the left — between L and Y on this call — gets set, and shows his hands like the screen is coming. The quarterback waits for him to set, reads the linebackers, and then runs downhill in the B gap between the left guard and the left tackle — behind everybody the screen picture just pulled off the line. This is a few-yards play, not a home run: we run it AFTER the screen, when their defensive line has seen that picture once and relaxes on it, and the quarterback rams it up in there for what is sitting in front of him.',
+    assignments: {
+      ...m.assignments,
+      C: {
+        rule: 'Covered: Scoop with RG. Uncovered: climb to the B-gap backer.',
+        detail:
+          'Playside foot first, every time — and playside is LEFT on this call. Covered means the nose is yours with the guard. Uncovered means you climb through the B gap and block the backer who fills it.',
+      },
+      R: {
+        rule: 'Back side — cut off the first man outside our tackle.',
+        detail:
+          'Play is going away from you. Take a flat angle at the first defender outside RT and get in his path. You are not knocking anyone down; you are making him run around you.',
+      },
+      S: {
+        rule: 'Motion out between L and Y. STOP. Get set. Hands up, eyes on the quarterback.',
+        detail:
+          'The call says LEFT, so you go left. On the quarterback\'s call, run out behind the line and stop between L and Y — not past Y, not next to L, right in the middle of them. Get your feet set and stay set for a full count; if you are still moving at the snap on this play we get a flag. Then turn your numbers to the quarterback, put your hands up, and stare at him like the ball is coming right now. You are not getting it. Your whole job is that the linebackers believe you are, and every step they take out toward you is a step away from where the quarterback is running.',
+      },
+      Q: {
+        rule: 'Send Super out LEFT. Wait for him to get set. Read them. Then screen fake and run the B gap.',
+        detail:
+          'Call Super in motion to the left and then WAIT — do not rush the snap. He has to be stopped and set out there before you go. While you wait, look at their linebackers. If they widen or back off the line toward Super, that is exactly what we want and you snap it. If they walk up and show blitz, do not snap it — check us into something else (ask me for the call). After the snap: take one hard step left and show the screen with your eyes and the ball, then get your shoulders square and run downhill in the gap between LG and LT. This is a keeper, not a read — the ball is yours before the snap. Do not bounce it outside. Take the few yards that are there and get down — this play is worth three or four every time because their line is standing there waiting for the screen. It is not a play we are trying to break; it is a play we are trying to CASH.',
+      },
+    },
+    vs: {
+      ...m.vs,
+      '52': {
+        ...m.vs['52']!,
+        assignments: {
+          ...m.vs['52']!.assignments,
+          C: {
+            rule: 'Covered — Scoop the nose with RG.',
+            detail:
+              'Odd front, so the nose is right on you. Step playside — LEFT — and take his playside number; the guard is coming behind you to finish him. Same Scoop you run on Veer.',
+          },
+        },
+      },
+    } satisfies Record<FrontId, FrontPlan>,
+    reviewNotes: [
+      ...(splitWideKeeperRight.reviewNotes ?? []),
+      'GENERATED: this play is mirrorSplitWidePlay(splitWideKeeperRight) — the straight mirror plus the X↔Y exchange this balanced set needs, so Y (wide left) now runs the playside stalk and X (wide right) carries the whole back side. The football took zero hand corrections. What was hand-authored is only the language: the center now scoops with RG instead of LG, R is the backside cut-off outside RT, Super motions out between L and Y, and the quarterback steps left and runs the LG/LT B gap. Review the right-handed play for the football; read this one only for its words.',
+    ],
+  }
+})()
 
 // ===========================================================================
 // PLAY 2 — SPLIT WIDE DIVE  ("standard hb dive, all receivers stop the crash")
@@ -1346,6 +1428,7 @@ export const splitWideVictory: Play = {
 
 export const splitWidePlays: Play[] = [
   splitWideKeeperRight,
+  splitWideKeeperLeft,
   splitWideDiveRight,
   splitWideDiveLeft,
   splitWideScreenRight,
