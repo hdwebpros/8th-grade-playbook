@@ -10,7 +10,7 @@
  *                                                   → splitWideDiveRight / -Left
  *   3. "HB goes in motion, HB screen"               → splitWideScreenRight / -Left
  *   4. "HB chip blocks; receivers left→right run in, post, post, go"
- *                                                   → splitWideChip
+ *                                                   → splitWideVictory
  *
  * THE HALFBACK MAPPING (the one decision everything else hangs on).
  * `OffPosId` has no `HB`. Split Wide on varsity page 4 has exactly one back —
@@ -30,7 +30,7 @@
  * direction like the runs in Red and Black — each ships as a left/right pair
  * linked by `audibleFlipId` (Indy = left, Hoosier = right at the line). Split
  * Wide is one balanced formation, so there is no `formationTwinId` — 1×2 pairs,
- * not 2×2 squares. Only Keep and Chip stay one-way, per the same ruling.
+ * not 2×2 squares. Only Keep and Victory stay one-way, per the same ruling.
  */
 
 import type {
@@ -613,7 +613,7 @@ export const splitWideDiveRight: Play = {
     'Vs the 5-2 the crack targets change on their own: the ends are the unblocked men there, so the slots crack the ENDS. Vs the 4-4 they crack the walked-up edge backers, and vs the 4-3 they crack the outside backers. The rule the kids learn stays one sentence — "first unblocked man outside our tackle" — and the picture solves itself per front. Confirm you like teaching it as a rule rather than as three memorized names.',
     'The quarterback\'s boot fake away is my addition, not yours. It costs nothing and it is what makes the same look sell the keeper and the screen. Cut it if you want the dive taught totally clean.',
     'DIRECTION — RESOLVED (Coach Ryan, 2026-08-14): the dive IS called with a direction, like the runs in Red and Black, and Indy/Hoosier flip it at the line — Indy = left, Hoosier = right, wired through audibleFlipId. Split Wide is one balanced formation, so unlike those runs there is no Red/Black formation twin: just this left/right pair, no formationTwinId.',
-    'MIRROR — SHIPPED for the dive (superseding the file-wide "not shipped yet" stance): Split Wide is a balanced set and all three fronts are left/right symmetric, so Split Wide Dive Left is one mirrorSplitWidePlay() call — mirrorPlay plus the X↔Y exchange this balanced set needs — with zero hand corrections to the football, and it now ships as this play\'s audible flip. Keep and Chip remain one-way per the same ruling. Both dive plays still sit behind the HANDOFF §10 review gate like everything else in this file.',
+    'MIRROR — SHIPPED for the dive (superseding the file-wide "not shipped yet" stance): Split Wide is a balanced set and all three fronts are left/right symmetric, so Split Wide Dive Left is one mirrorSplitWidePlay() call — mirrorPlay plus the X↔Y exchange this balanced set needs — with zero hand corrections to the football, and it now ships as this play\'s audible flip. Keep and Victory remain one-way per the same ruling. Both dive plays still sit behind the HANDOFF §10 review gate like everything else in this file.',
   ],
 }
 
@@ -1077,7 +1077,7 @@ export const splitWideScreenLeft: Play = (() => {
 })()
 
 // ===========================================================================
-// PLAY 4 — SPLIT WIDE CHIP  (in / post / post / go, HB chips)
+// PLAY 4 — SPLIT WIDE VICTORY  (in / post / post / go, HB chips)
 // ===========================================================================
 //
 // Your route call, left to right across the formation:
@@ -1178,7 +1178,7 @@ const CHIP_EVEN_LINE = {
   RT: block('E-R'),
 } satisfies Partial<Record<OffPosId, Action[]>>
 
-const chipVs44: FrontPlan = {
+const victoryVs44: FrontPlan = {
   actions: {
     ...CHIP_ROUTES,
     Q: CHIP_Q,
@@ -1197,7 +1197,7 @@ const chipVs44: FrontPlan = {
   },
 }
 
-const chipVs43: FrontPlan = {
+const victoryVs43: FrontPlan = {
   actions: {
     ...CHIP_ROUTES,
     Q: CHIP_Q,
@@ -1216,7 +1216,7 @@ const chipVs43: FrontPlan = {
   },
 }
 
-const chipVs52: FrontPlan = {
+const victoryVs52: FrontPlan = {
   actions: {
     ...CHIP_ROUTES,
     Q: CHIP_Q,
@@ -1249,7 +1249,7 @@ const chipVs52: FrontPlan = {
   },
 }
 
-const chipAssignments: Record<OffPosId, Assignment> = {
+const victoryAssignments: Record<OffPosId, Assignment> = {
   Y: {
     rule: 'IN — ten yards, then break flat across.',
     detail:
@@ -1304,12 +1304,12 @@ const chipAssignments: Record<OffPosId, Assignment> = {
   },
 }
 
-export const splitWideChip: Play = {
-  id: 'split-wide-chip',
-  name: 'Chip',
+export const splitWideVictory: Play = {
+  id: 'split-wide-victory',
+  name: 'Victory',
   call: [
     { word: 'Split Wide', label: 'formation' },
-    { word: 'Chip', label: 'play' },
+    { word: 'Victory', label: 'play' },
   ],
   family: 'pass',
   formation: splitWide.id,
@@ -1322,8 +1322,8 @@ export const splitWideChip: Play = {
   ],
   description:
     'Four receivers, four routes, left to right: in, post, post, go. Super never leaves — he sits on the quarterback\'s hip, scans the line, and blocks whoever gets through. Two posts from both slots is the play, and Y\'s ten-yard in is the outlet when the middle is closed.',
-  assignments: chipAssignments,
-  vs: { '44': chipVs44, '43': chipVs43, '52': chipVs52 } satisfies Record<FrontId, FrontPlan>,
+  assignments: victoryAssignments,
+  vs: { '44': victoryVs44, '43': victoryVs43, '52': victoryVs52 } satisfies Record<FrontId, FrontPlan>,
   reviewNotes: [
     GATE,
     HB_NOTE,
@@ -1338,7 +1338,7 @@ export const splitWideChip: Play = {
     'Vs the 5-2 the scan rule solves itself — five rushers against five linemen means the extra man is Super\'s every single snap, so his assignment text on that front tells him to expect somebody rather than to look for somebody. Same picture, same arrow, all three fronts; only the coaching words change.',
     'Protection is drawn as RAM (slide right) so the language matches varsity p15 and the pass-pro page. That is why the center\'s arrow points to the right A-gap man rather than straight ahead. If you would rather this be straight man protection, say so and the center\'s picture changes on all three fronts.',
     'No ball flight is drawn on this one because the throw depends on what the safeties do — the diagram shows four routes and a progression written in the quarterback\'s assignment instead. Tell me if you want an arrow to a primary receiver on the picture.',
-    'No readKey is set on any of these four plays — none of them is an option and nobody is reading a defender. Say so if you want the chip to carry a formal safety read.',
+    'No readKey is set on any of these four plays — none of them is an option and nobody is reading a defender. Say so if you want Victory to carry a formal safety read.',
     MIRROR_NOTE_PREFIX +
       'This one is the least worth mirroring: flipping it puts the Go on the left and the in on the right, which is a different concept, not the same play the other way. If you want a left-handed version, tell me the route order you want and I will author it fresh.',
   ],
@@ -1350,5 +1350,5 @@ export const splitWidePlays: Play[] = [
   splitWideDiveLeft,
   splitWideScreenRight,
   splitWideScreenLeft,
-  splitWideChip,
+  splitWideVictory,
 ]

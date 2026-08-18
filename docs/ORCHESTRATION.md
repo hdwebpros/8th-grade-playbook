@@ -453,7 +453,7 @@ Split Wide DRAFT gate; no git commits unless asked.
 - Split Wide Dive (Ryan's follow-up ruling, same day): a 1×2, not 2×2 —
   split-wide-dive-right / split-wide-dive-left linked by audibleFlipId only
   (balanced set, mirror is exact football, zero hand corrections; left play
-  is pure mirrorPlay). Keep/Screen/Chip stay one-way BY RULING ("the sneak
+  is pure mirrorPlay). Keep/Screen/Victory stay one-way BY RULING ("the sneak
   doesn't need left and right, just the dive"). Direction-bearing prose
   neutralized to "playside" before mirroring.
 - UI generalized for the one-axis shape: [id].vue hasVariantControls now
@@ -469,7 +469,7 @@ Split Wide DRAFT gate; no git commits unless asked.
   toggle only, right yells INDY / left yells HOOSIER, index matrix card with
   both doors, print labels). Typecheck: only the 3 pre-existing errors.
 - STILL OPEN: Ryan to review the three new right-red pictures (reviewNotes)
-  and the earlier veer-left-red; Split Wide Keep/Screen/Chip deliberately
+  and the earlier veer-left-red; Split Wide Keep/Screen/Victory deliberately
   one-way (SUPERSEDED same day: Screen became a pair — see next entry);
   audible-page 'direction' means line-lean (Bull/Ram), NOT run
   direction — do not wire those into the flip graph.
@@ -477,7 +477,7 @@ Split Wide DRAFT gate; no git commits unless asked.
 ## 2026-08-14 — Split Wide Screen direction pair + X/Y mirror bug fix
 
 - Ryan revised the ruling: the Screen also gets left/right ("Screen also
-  needs a left and right variant like the others"). Only Keep and Chip stay
+  needs a left and right variant like the others"). Only Keep and Victory stay
   one-way now. split-wide-hb-screen → split-wide-screen-right (call Split
   Wide · Screen · Right) + new split-wide-screen-left, linked by
   audibleFlipId only (1×2, no formationTwinId). Left prose (description,
