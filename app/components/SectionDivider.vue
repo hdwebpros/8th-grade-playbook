@@ -16,7 +16,8 @@
   align-items: center;
   gap: 18px;
   max-width: 460px;
-  margin: 34px auto 64px;
+  margin: 0 auto;
+  padding: 34px 0 64px;
 }
 .rule {
   flex: 1;
