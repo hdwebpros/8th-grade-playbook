@@ -156,7 +156,9 @@ const teamNotes = [
       <h2>Our Fronts</h2>
       <p class="muted unit-lead">
         Same four down linemen and two backers every time — the call just slides
-        the tackles and flips which gaps the backers own.
+        the tackles and flips which gaps the backers own. In the huddle the
+        front comes paired with a coverage: <strong>“Red Stack”</strong> is Red
+        coverage out of the Stack front.
       </p>
       <SegmentedControl v-model="front" :options="frontOptions" label="Defensive front" />
       <DefenseFrontDiagram :front="front" />
@@ -177,7 +179,7 @@ const teamNotes = [
     <SectionDivider />
 
     <section class="unit">
-      <p class="unit-tag">Run defense</p>
+      <p class="unit-tag">If they run</p>
       <h2>Run Fits</h2>
       <p class="muted unit-lead">
         Two calls cover every run. Ask one question at the snap: is the ball
@@ -200,13 +202,17 @@ const teamNotes = [
     <SectionDivider />
 
     <section class="unit">
-      <p class="unit-tag">Pass coverage</p>
+      <p class="unit-tag">If they pass</p>
       <h2>Red — Cover 3</h2>
       <p class="muted unit-lead">
-        Our pass-coverage defense. Easy to remember: <strong>Red</strong> has
-        three letters — Red is Cover <strong>3</strong>. Three deep thirds
-        over the top, four zones underneath, four rushers. Tap a player or a
-        zone to light up their job.
+        Our pass coverage — and it's part of every call, because we never
+        know what the offense will run. The huddle call is coverage plus
+        front, like <strong>“Red Stack”</strong>: the front sets your run
+        fits, and Red is where you drop the moment it's a pass. Easy to
+        remember: <strong>Red</strong> has three letters — Red is Cover
+        <strong>3</strong>. Three deep thirds over the top, four zones
+        underneath, four rushers. Tap a player or a zone to light up their
+        job.
       </p>
       <RedCoverageDiagram v-model:active="redActive" />
       <ul class="job-list">
