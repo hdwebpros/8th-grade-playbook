@@ -5,10 +5,11 @@
  * alignment/technique numbers below it, redrawn from the coaches' handout.
  *
  * Gaps read outside-in toward the ball: D outside the TE, then C-B-A to the
- * center; the right side has no TE, so it stops at C. Technique numbers key
- * to shades on each blocker — even is head-up, odd is the outside shoulder,
- * "i" is the inside shoulder. Same SEAM §3 tokens as the play diagrams, so
- * it follows the app/print themes automatically.
+ * center; the right side has no TE, so it stops at C. Each blocker owns a
+ * triplet of technique numbers — outside shoulder / head up / inside
+ * shoulder: C = 1·0·1, G = 3·2·2i, T = 5·4·4i, TE = 7·6·6i. Same SEAM §3
+ * tokens as the play diagrams, so it follows the app/print themes
+ * automatically.
  */
 import { C, M } from './style'
 import './diagram.css'
@@ -38,27 +39,30 @@ const gaps = [
   { g: 'C', x: 462 },
 ]
 
-/* --- technique numbers: outside shade / head-up / inside shade per blocker --- */
-const techniques = [
-  { n: '7', x: 72 },
-  { n: '6', x: 98 },
-  { n: '6i', x: 123 },
-  { n: '5', x: 137 },
-  { n: '4', x: 162 },
-  { n: '4i', x: 187 },
-  { n: '3', x: 201 },
-  { n: '2', x: 226 },
-  { n: '2i', x: 251 },
-  { n: '1', x: 267 },
-  { n: '0', x: 290 },
-  { n: '1', x: 313 },
-  { n: '2i', x: 329 },
-  { n: '2', x: 354 },
-  { n: '3', x: 379 },
-  { n: '4i', x: 393 },
-  { n: '4', x: 418 },
-  { n: '5', x: 443 },
-]
+/*
+ * Technique triplets, one per blocker: outside shoulder / head up / inside
+ * shoulder. Left of the ball, outside is to the left; right of the ball it
+ * mirrors. TE = 7·6·6i, T = 5·4·4i, G = 3·2·2i, C = 1·0·1.
+ */
+const TECH_DX = 22
+const techGroups = blockers.map((b) => {
+  const byPos: Record<string, [string, string, string]> = {
+    TE: ['7', '6', '6i'],
+    T: ['5', '4', '4i'],
+    G: ['3', '2', '2i'],
+    C: ['1', '0', '1'],
+  }
+  const [out, on, inn] = byPos[b.t]!
+  const sign = b.x < 290 ? 1 : -1 // which side "inside" is on
+  return {
+    x: b.x,
+    nums: [
+      { n: out, x: b.x - sign * TECH_DX },
+      { n: on, x: b.x },
+      { n: inn, x: b.x + sign * TECH_DX },
+    ],
+  }
+})
 </script>
 
 <template>
@@ -68,7 +72,7 @@ const techniques = [
     viewBox="0 0 580 212"
     width="100%"
     role="img"
-    aria-label="Gaps and alignment techniques: gap letters D-C-B-A over the offensive line with the ball in the middle, technique numbers 0 through 7 under each blocker"
+    aria-label="Gaps and alignment techniques: gap letters D-C-B-A over the offensive line with the ball in the middle, and three technique numbers under each blocker for his outside shoulder, head up, and inside shoulder — center 1-0-1, guards 3-2-2i, tackles 5-4-4i, tight end 7-6-6i"
   >
     <!-- field -->
     <rect x="0" y="0" width="580" height="212" :fill="C.field" />
@@ -128,16 +132,32 @@ const techniques = [
       </g>
     </g>
 
-    <!-- technique numbers -->
-    <g
-      :fill="C.line"
-      font-size="13"
-      font-weight="600"
-      text-anchor="middle"
-      dominant-baseline="central"
-      opacity="0.92"
-    >
-      <text v-for="(t, i) in techniques" :key="i" :x="t.x" y="152">{{ t.n }}</text>
+    <!-- technique triplets: outside / head-up / inside under each blocker -->
+    <g>
+      <g v-for="(tg, gi) in techGroups" :key="gi">
+        <rect
+          :x="tg.x - TECH_DX - 8"
+          y="140"
+          :width="TECH_DX * 2 + 16"
+          height="24"
+          rx="7"
+          :fill="C.line"
+          fill-opacity="0.06"
+          :stroke="C.line"
+          stroke-opacity="0.18"
+          stroke-width="1"
+        />
+        <g
+          :fill="C.line"
+          font-size="13"
+          font-weight="600"
+          text-anchor="middle"
+          dominant-baseline="central"
+          opacity="0.92"
+        >
+          <text v-for="(t, i) in tg.nums" :key="i" :x="t.x" y="152">{{ t.n }}</text>
+        </g>
+      </g>
     </g>
 
     <!-- caption: techniques -->

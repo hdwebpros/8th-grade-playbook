@@ -7,22 +7,41 @@
  * the rush is solid. Offense at the bottom is the gray opponent, for
  * orientation only. Same SEAM §3 tokens as the play diagrams, so it
  * follows the app/print themes automatically.
+ *
+ * Tap or hover a defender (or their zone) to light that job up; the page
+ * can sync with it through v-model:active ('cb' | 'fs' | 'alley' | 'lb').
  */
 import { C, M } from './style'
 import './diagram.css'
 
 withDefaults(defineProps<{ theme?: 'app' | 'print' }>(), { theme: 'app' })
 
+/** Which coverage job is highlighted (tap/hover), shared with the page. */
+type RedPos = 'cb' | 'fs' | 'alley' | 'lb'
+const active = defineModel<RedPos | null>('active', { default: null })
+const toggle = (k: RedPos) => (active.value = active.value === k ? null : k)
+const hot = (k: RedPos) => active.value === k
+const dim = (k: RedPos) => active.value !== null && active.value !== k
+/* Hover only for a real mouse — on touch, hover events would fire on tap
+ * and cancel out the click toggle. */
+const hoverIn = (e: PointerEvent, k: RedPos) => {
+  if (e.pointerType === 'mouse') active.value = k
+}
+const hoverOut = (e: PointerEvent) => {
+  if (e.pointerType === 'mouse') active.value = null
+}
+
 const LOS = 430
 
 /* --- zones (rounded regions; the star of the diagram) --- */
-const deepThirds = [
-  { x: 8, w: 187, owner: 'C' },
-  { x: 200, w: 180, owner: 'F' },
-  { x: 385, w: 187, owner: 'C' },
+/** Deep thirds run all the way down behind the underneath zones. */
+const deepThirds: { x: number; w: number; owner: string; k: RedPos }[] = [
+  { x: 8, w: 187, owner: 'C', k: 'cb' },
+  { x: 200, w: 180, owner: 'F', k: 'fs' },
+  { x: 385, w: 187, owner: 'C', k: 'cb' },
 ]
 const DEEP_Y = 18
-const DEEP_H = 167
+const DEEP_H = 242
 
 /** Sideline lanes: seam (deep) over curl over flat (shallow), read top-down. */
 const scfZones = [{ x: 8 }, { x: 460 }]
@@ -44,18 +63,18 @@ const rushers = [
 ]
 const RUSH_Y = 398
 
-const droppers = [
+const droppers: { t: string; k: RedPos; x: number; y: number; tip: { x: number; y: number } }[] = [
   /* corners: bail from press depth all the way to the deep outside thirds */
-  { t: 'C', x: 70, y: 385, tip: { x: 85, y: 150 } },
-  { t: 'C', x: 510, y: 385, tip: { x: 495, y: 150 } },
+  { t: 'C', k: 'cb', x: 70, y: 385, tip: { x: 85, y: 150 } },
+  { t: 'C', k: 'cb', x: 510, y: 385, tip: { x: 495, y: 150 } },
   /* free safety: already deep, three read steps into the middle third */
-  { t: 'F', x: 290, y: 262, tip: { x: 290, y: 148 } },
+  { t: 'F', k: 'fs', x: 290, y: 262, tip: { x: 290, y: 148 } },
   /* alleys: seam-curl-flat on the sidelines */
-  { t: 'A', x: 108, y: 372, tip: { x: 74, y: 300 } },
-  { t: 'A', x: 472, y: 372, tip: { x: 506, y: 300 } },
+  { t: 'A', k: 'alley', x: 108, y: 372, tip: { x: 74, y: 300 } },
+  { t: 'A', k: 'alley', x: 472, y: 372, tip: { x: 506, y: 300 } },
   /* linebackers: hook-curl, hole of #2 working for depth */
-  { t: 'M', x: 240, y: 372, tip: { x: 212, y: 292 } },
-  { t: 'W', x: 340, y: 372, tip: { x: 368, y: 292 } },
+  { t: 'M', k: 'lb', x: 240, y: 372, tip: { x: 212, y: 292 } },
+  { t: 'W', k: 'lb', x: 340, y: 372, tip: { x: 368, y: 292 } },
 ]
 
 /* --- gray offense, orientation only --- */
@@ -104,9 +123,17 @@ const gridYs = [75, 130, 185, 240, 295, 350]
       <line v-for="y in gridYs" :key="y" x1="0" :y1="y" x2="580" :y2="y" />
     </g>
 
-    <!-- deep thirds: the accent-washed prize real estate -->
+    <!-- deep thirds: accent-washed, running down BEHIND the underneath zones -->
     <g>
-      <g v-for="z in deepThirds" :key="z.x">
+      <g
+        v-for="z in deepThirds"
+        :key="z.x"
+        class="dg-tap"
+        :opacity="dim(z.k) ? 0.35 : 1"
+        @pointerenter="hoverIn($event, z.k)"
+        @pointerleave="hoverOut"
+        @click.stop="toggle(z.k)"
+      >
         <rect
           :x="z.x"
           :y="DEEP_Y"
@@ -114,9 +141,9 @@ const gridYs = [75, 130, 185, 240, 295, 350]
           :height="DEEP_H"
           rx="10"
           :fill="C.accent"
-          fill-opacity="0.13"
+          :fill-opacity="hot(z.k) ? 0.24 : 0.13"
           :stroke="C.accent"
-          stroke-opacity="0.4"
+          :stroke-opacity="hot(z.k) ? 0.85 : 0.4"
           stroke-width="1.5"
         />
         <text
@@ -133,25 +160,33 @@ const gridYs = [75, 130, 185, 240, 295, 350]
       </g>
     </g>
 
-    <!-- underneath zones: quieter line-toned regions -->
+    <!-- underneath zones: quieter line-toned regions, lit in accent when active -->
     <g>
-      <g v-for="z in scfZones" :key="z.x">
+      <g
+        v-for="z in scfZones"
+        :key="z.x"
+        class="dg-tap"
+        :opacity="dim('alley') ? 0.35 : 1"
+        @pointerenter="hoverIn($event, 'alley')"
+        @pointerleave="hoverOut"
+        @click.stop="toggle('alley')"
+      >
         <rect
           :x="z.x"
           :y="SCF_Y"
           :width="SCF_W"
           :height="SCF_H"
           rx="10"
-          :fill="C.line"
-          fill-opacity="0.06"
-          :stroke="C.line"
-          stroke-opacity="0.28"
+          :fill="hot('alley') ? C.accent : C.line"
+          :fill-opacity="hot('alley') ? 0.16 : 0.06"
+          :stroke="hot('alley') ? C.accent : C.line"
+          :stroke-opacity="hot('alley') ? 0.8 : 0.28"
           stroke-width="1.25"
           stroke-dasharray="5 4"
         />
         <!-- seam over curl over flat: deepest word on top, like the field -->
         <g
-          :fill="C.line"
+          :fill="hot('alley') ? C.accent : C.line"
           fill-opacity="0.85"
           font-size="11"
           font-weight="700"
@@ -163,17 +198,25 @@ const gridYs = [75, 130, 185, 240, 295, 350]
           <text :x="z.x + SCF_W / 2" :y="SCF_Y + 102">FLAT</text>
         </g>
       </g>
-      <g v-for="z in hookZones" :key="z.x">
+      <g
+        v-for="z in hookZones"
+        :key="z.x"
+        class="dg-tap"
+        :opacity="dim('lb') ? 0.35 : 1"
+        @pointerenter="hoverIn($event, 'lb')"
+        @pointerleave="hoverOut"
+        @click.stop="toggle('lb')"
+      >
         <rect
           :x="z.x"
           :y="HOOK_Y"
           :width="HOOK_W"
           :height="HOOK_H"
           rx="10"
-          :fill="C.line"
-          fill-opacity="0.06"
-          :stroke="C.line"
-          stroke-opacity="0.28"
+          :fill="hot('lb') ? C.accent : C.line"
+          :fill-opacity="hot('lb') ? 0.16 : 0.06"
+          :stroke="hot('lb') ? C.accent : C.line"
+          :stroke-opacity="hot('lb') ? 0.8 : 0.28"
           stroke-width="1.25"
           stroke-dasharray="5 4"
         />
@@ -184,7 +227,7 @@ const gridYs = [75, 130, 185, 240, 295, 350]
           font-size="11"
           font-weight="700"
           letter-spacing="0.1em"
-          :fill="C.line"
+          :fill="hot('lb') ? C.accent : C.line"
           fill-opacity="0.85"
         >
           HOOK-CURL
@@ -214,7 +257,7 @@ const gridYs = [75, 130, 185, 240, 295, 350]
     </g>
 
     <!-- coverage drops: dashed paths into the zones -->
-    <g :stroke="C.line" stroke-width="2.25" fill="none" stroke-dasharray="6 4">
+    <g stroke-width="2.25" fill="none" stroke-dasharray="6 4">
       <line
         v-for="d in droppers"
         :key="`${d.t}-${d.x}`"
@@ -222,7 +265,9 @@ const gridYs = [75, 130, 185, 240, 295, 350]
         :y1="d.y - 14"
         :x2="d.tip.x"
         :y2="d.tip.y"
-        marker-end="url(#rc-drop)"
+        :stroke="hot(d.k) ? C.accent : C.line"
+        :opacity="dim(d.k) ? 0.35 : 1"
+        :marker-end="hot(d.k) ? 'url(#rc-rush)' : 'url(#rc-drop)'"
       />
     </g>
 
@@ -262,7 +307,24 @@ const gridYs = [75, 130, 185, 240, 295, 350]
           {{ r.t }}
         </text>
       </g>
-      <g v-for="d in droppers" :key="`db-${d.t}-${d.x}`" class="dg-marker">
+      <g
+        v-for="d in droppers"
+        :key="`db-${d.t}-${d.x}`"
+        class="dg-marker dg-tap"
+        :opacity="dim(d.k) ? 0.35 : 1"
+        @pointerenter="hoverIn($event, d.k)"
+        @pointerleave="hoverOut"
+        @click.stop="toggle(d.k)"
+      >
+        <circle
+          v-if="hot(d.k)"
+          :cx="d.x"
+          :cy="d.y"
+          :r="M.playerR + M.qbRingGap"
+          fill="none"
+          :stroke="C.accent"
+          :stroke-width="M.qbRingStroke"
+        />
         <circle
           :cx="d.x"
           :cy="d.y"
@@ -290,5 +352,9 @@ const gridYs = [75, 130, 185, 240, 295, 350]
 <style scoped>
 .dg-root {
   max-width: 100%;
+}
+.dg-tap {
+  cursor: pointer;
+  transition: opacity 0.15s ease;
 }
 </style>

@@ -75,25 +75,40 @@ const runFits: { call: string; meaning: string; rules: { who: string; job: strin
 ]
 
 /** Red (Cover 3) — every coverage job, position by position. */
-const redJobs: { who: string; zone: string; detail: string }[] = [
+type RedPos = 'cb' | 'fs' | 'alley' | 'lb'
+const redActive = ref<RedPos | null>(null)
+/* Hover only for a real mouse — on touch, hover events fire on tap and
+ * would cancel out the tap-to-toggle. */
+const redHoverIn = (e: PointerEvent, k: RedPos) => {
+  if (e.pointerType === 'mouse') redActive.value = k
+}
+const redHoverOut = (e: PointerEvent) => {
+  if (e.pointerType === 'mouse') redActive.value = null
+}
+
+const redJobs: { k: RedPos; who: string; zone: string; detail: string }[] = [
   {
+    k: 'lb',
     who: 'Linebackers',
     zone: 'Hook-Curl',
     detail: 'Get to the hole of #2, working for depth. Feel 2, see 1.',
   },
   {
+    k: 'alley',
     who: 'Alleys',
     zone: 'Seam-Curl-Flat',
     detail:
       'Eyes to the QB. Work for depth and disrupt the vertical threat, sit under the curl, then rally to the flat. Read the QB’s shoulder.',
   },
   {
+    k: 'fs',
     who: 'Free Safety',
     zone: 'Deep 1/3',
     detail:
       'Three read steps for depth, reading the QB and the pattern. Cheat to the passing strength — numbers or field.',
   },
   {
+    k: 'cb',
     who: 'Cornerbacks',
     zone: 'Deep 1/3',
     detail:
@@ -135,6 +150,8 @@ const teamNotes = [
       <DefenseGapsDiagram />
     </section>
 
+    <SectionDivider />
+
     <section class="unit">
       <h2>Our Fronts</h2>
       <p class="muted unit-lead">
@@ -157,7 +174,10 @@ const teamNotes = [
       </div>
     </section>
 
+    <SectionDivider />
+
     <section class="unit">
+      <p class="unit-tag">Run defense</p>
       <h2>Run Fits</h2>
       <p class="muted unit-lead">
         Two calls cover every run. Ask one question at the snap: is the ball
@@ -177,16 +197,28 @@ const teamNotes = [
       </div>
     </section>
 
+    <SectionDivider />
+
     <section class="unit">
+      <p class="unit-tag">Pass coverage</p>
       <h2>Red — Cover 3</h2>
       <p class="muted unit-lead">
-        Our zone defense. Easy to remember: <strong>Red</strong> has three
-        letters — Red is Cover <strong>3</strong>. Three deep thirds over the
-        top, four zones underneath, four rushers.
+        Our pass-coverage defense. Easy to remember: <strong>Red</strong> has
+        three letters — Red is Cover <strong>3</strong>. Three deep thirds
+        over the top, four zones underneath, four rushers. Tap a player or a
+        zone to light up their job.
       </p>
-      <RedCoverageDiagram />
+      <RedCoverageDiagram v-model:active="redActive" />
       <ul class="job-list">
-        <li v-for="j in redJobs" :key="j.who" class="job">
+        <li
+          v-for="j in redJobs"
+          :key="j.who"
+          class="job"
+          :class="{ 'job--hot': redActive === j.k, 'job--dim': redActive !== null && redActive !== j.k }"
+          @pointerenter="redHoverIn($event, j.k)"
+          @pointerleave="redHoverOut"
+          @click="redActive = redActive === j.k ? null : j.k"
+        >
           <div class="job-head">
             <span class="rule-who">{{ j.who }}</span>
             <span class="job-zone">{{ j.zone }}</span>
@@ -195,6 +227,8 @@ const teamNotes = [
         </li>
       </ul>
     </section>
+
+    <SectionDivider />
 
     <section class="unit">
       <h2>Coaching Points</h2>
@@ -232,6 +266,15 @@ const teamNotes = [
 .unit h2 {
   font-size: 1.5rem;
   margin: 0;
+}
+.unit-tag {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--red);
+  margin: 0 0 -10px;
 }
 .unit-lead {
   max-width: 52ch;
@@ -318,6 +361,17 @@ const teamNotes = [
   border: 1px solid var(--line);
   border-radius: var(--r-card);
   padding: 10px 14px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, opacity 0.15s ease;
+}
+.job--hot {
+  border-color: var(--red);
+}
+.job--hot .rule-who {
+  color: var(--chalk);
+}
+.job--dim {
+  opacity: 0.55;
 }
 .job-head {
   display: flex;
