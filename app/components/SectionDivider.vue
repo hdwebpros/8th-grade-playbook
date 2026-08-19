@@ -16,7 +16,7 @@
   align-items: center;
   gap: 18px;
   max-width: 460px;
-  margin: 10px auto 44px;
+  margin: 34px auto 64px;
 }
 .rule {
   flex: 1;
