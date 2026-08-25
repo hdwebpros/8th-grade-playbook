@@ -449,11 +449,12 @@ const totalPages = BACK_PAGE
           </div>
         </div>
 
-        <h3 class="section-label">Playside &amp; backside</h3>
+        <h3 class="section-label">Play side &amp; away side</h3>
         <p class="p-lead">
-          Every assignment table says whether you&rsquo;re <b>playside</b> (the way the play is
-          going) or <b>backside</b> (away from it). Same job the varsity book calls PSG or BST
-          &mdash; you just get your own name and a badge instead of a code.
+          Every assignment table says whether you&rsquo;re on the <b>play side</b> (the way the
+          play is going) or the <b>away side</b> (the other side of the ball). Same thing the
+          varsity book calls playside/backside (PSG, BST) &mdash; you just get your own name and a
+          badge instead of a code.
         </p>
 
         <h3 class="section-label">At the line</h3>

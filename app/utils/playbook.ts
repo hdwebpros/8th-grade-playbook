@@ -58,6 +58,11 @@ export function callPartsFor(play: Play, formation: Formation): CallPart[] {
   ]
 }
 
+/** The call said as one line, formation first, direction last: "Red Stretch Right". */
+export function callLabelFor(play: Play, formation: Formation): string {
+  return callPartsFor(play, formation).map((p) => p.word).join(' ')
+}
+
 export const POSITION_NAMES: Record<OffPosId, string> = {
   X: 'Split End',
   Y: 'Tight End',

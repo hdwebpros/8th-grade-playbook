@@ -9,7 +9,7 @@
  * styles there can't reach these elements, so the needed rules live here).
  */
 import { formations, fronts } from '~/data'
-import { FRONT_LABELS, POSITION_NAMES } from '~/utils/playbook'
+import { FRONT_LABELS, POSITION_NAMES, callLabelFor } from '~/utils/playbook'
 import type { JobCard } from '~/composables/useJobDeck'
 
 const props = defineProps<{ card: JobCard }>()
@@ -17,12 +17,14 @@ const props = defineProps<{ card: JobCard }>()
 const formation = computed(() => formations[props.card.play.formation]!)
 const posName = computed(() => POSITION_NAMES[props.card.pos])
 const frontLabel = computed(() => FRONT_LABELS[props.card.front])
+/** The full call, formation first — "Red Keep", not just "Keep". */
+const callLabel = computed(() => callLabelFor(props.card.play, formation.value))
 </script>
 
 <template>
   <span class="face front card" aria-hidden="false">
     <span class="face-context">
-      {{ card.play.name }} · vs the {{ frontLabel }}
+      {{ callLabel }} · vs the {{ frontLabel }}
     </span>
     <span class="face-diagram">
       <PlayDiagram
@@ -49,7 +51,7 @@ const frontLabel = computed(() => FRONT_LABELS[props.card.front])
       {{ card.answer.detail }}
     </span>
     <span class="back-context muted">
-      {{ card.play.name }} · vs the {{ frontLabel }}
+      {{ callLabel }} · vs the {{ frontLabel }}
     </span>
   </span>
 </template>

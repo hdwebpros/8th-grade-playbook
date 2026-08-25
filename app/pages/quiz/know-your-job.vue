@@ -6,6 +6,7 @@ import {
   POSITION_GROUPS,
   POSITION_NAMES,
   playSideOf,
+  callLabelFor,
 } from '~/utils/playbook'
 import { buildRound, type JobQuestion, type JobResult } from '~/composables/useKnowYourJob'
 
@@ -116,9 +117,8 @@ const verdict = computed(() => {
   return 'Back to the film. Run it until it sticks.'
 })
 
-/** Context line: "Veer · out of Red · going right" */
-const contextOf = (question: JobQuestion) =>
-  `${question.play.name} · out of ${formationOf(question).name} · going ${question.play.direction}`
+/** Context line — the play call as it's said in the huddle: "Red Veer Right". */
+const contextOf = (question: JobQuestion) => callLabelFor(question.play, formationOf(question))
 </script>
 
 <template>

@@ -6,7 +6,7 @@ defineProps<{ side: PlaySide }>()
 
 <template>
   <span v-if="side" class="badge" :class="side">
-    {{ side === 'playside' ? 'Playside' : 'Backside' }}
+    {{ side === 'playside' ? 'Play side' : 'Away side' }}
   </span>
 </template>
 

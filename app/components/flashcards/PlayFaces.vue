@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { formations, fronts } from '~/data'
-import { FRONT_LABELS } from '~/utils/playbook'
+import { FRONT_LABELS, callLabelFor, callPartsFor } from '~/utils/playbook'
 import type { PlayCard } from '~/composables/useFlashcards'
 
 const props = defineProps<{ card: PlayCard }>()
 
 const formation = computed(() => formations[props.card.play.formation]!)
+/** Same word-by-word breakdown the play page stamps — Red is the formation, Veer is the play. */
+const callParts = computed(() => callPartsFor(props.card.play, formation.value))
+const callLabel = computed(() => callLabelFor(props.card.play, formation.value))
 </script>
 
 <template>
@@ -32,13 +35,10 @@ const formation = computed(() => formations[props.card.play.formation]!)
 
   <span class="face back card" role="status" aria-live="polite">
     <span class="face-context">
-      {{ card.play.family === 'run' ? 'Run' : 'Pass' }} · out of
-      {{ formation.name }} · going {{ card.play.direction }}
+      {{ card.play.family === 'run' ? 'Run' : 'Pass' }}
     </span>
-    <span class="answer-name">{{ card.play.name }}</span>
-    <span v-if="card.play.callName" class="answer-call">
-      We call it: {{ card.play.callName }}
-    </span>
+    <span class="answer-name">{{ callLabel }}</span>
+    <PlayCallStamp :parts="callParts" />
     <span class="answer-desc muted">{{ card.play.description }}</span>
   </span>
 </template>
@@ -103,17 +103,6 @@ const formation = computed(() => formations[props.card.play.formation]!)
   text-transform: uppercase;
   letter-spacing: 0.03em;
   color: var(--chalk);
-}
-.answer-call {
-  padding: 3px 12px;
-  border-radius: 999px;
-  background: var(--red-glow);
-  color: var(--red);
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
 }
 .answer-desc {
   font-size: 0.95rem;
