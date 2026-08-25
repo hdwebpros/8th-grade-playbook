@@ -13,7 +13,8 @@
  *
  * The shape is drawn with the shared SEAM §3 diagram parts (same field, same
  * smoothing, same arrowhead as PlayDiagram / RouteTreeDiagram), in the accent
- * colour because the lone route is the star of the card. No number badge and
+ * colour because the lone route is the star of the card, with the ball and the
+ * sideline in frame (DiagramSideCue) so the break direction is unambiguous. No number badge and
  * no name anywhere near a front-side shape — the front never leaks the answer.
  */
 import { computed } from 'vue'
@@ -22,6 +23,7 @@ import type { RouteCard } from '~/composables/useRouteDeck'
 import { fitViewBox } from '~/components/diagram/geometry'
 import { C, M } from '~/components/diagram/style'
 import DiagramField from '~/components/diagram/DiagramField.vue'
+import DiagramSideCue from '~/components/diagram/DiagramSideCue.vue'
 import DiagramActionPath from '~/components/diagram/DiagramActionPath.vue'
 import '~/components/diagram/diagram.css'
 
@@ -31,9 +33,23 @@ const ORIGIN: Pt = { x: 0, y: 0 }
 
 const points = computed<Pt[]>(() => [ORIGIN, ...props.card.route.path])
 
-const fit = computed(() =>
-  fitViewBox(points.value, { pad: 1.6, minWidth: 14, minHeight: 10 }),
-)
+/**
+ * Same frame as the route tree: the lone route, plus room for the ball on the
+ * inside edge and the sideline on the outside edge, so "inside" and "outside"
+ * mean the same thing here as on /routes. Cards are always drawn as a receiver
+ * split right (Red) — the tree's default side.
+ */
+const fit = computed(() => {
+  const pts = [...points.value]
+  let minX = 0
+  let maxX = 0
+  for (const p of pts) {
+    if (p.x < minX) minX = p.x
+    if (p.x > maxX) maxX = p.x
+  }
+  pts.push({ x: minX - 2.2, y: -1.9 }, { x: maxX + 2.2, y: -1.9 })
+  return fitViewBox(pts, { pad: 1.6, minWidth: 14, minHeight: 10 })
+})
 
 const numFirst = computed(() => props.card.direction === 'number-to-route')
 </script>
@@ -63,6 +79,7 @@ const numFirst = computed(() => props.card.direction === 'number-to-route')
           aria-label="A drawn route shape — name its number"
         >
           <DiagramField :box="fit.box" />
+          <DiagramSideCue :box="fit.box" side="right" />
           <g class="dg-actions">
             <DiagramActionPath
               :points="points"
@@ -103,6 +120,7 @@ const numFirst = computed(() => props.card.direction === 'number-to-route')
           :aria-label="`The ${card.route.name} route, drawn`"
         >
           <DiagramField :box="fit.box" />
+          <DiagramSideCue :box="fit.box" side="right" />
           <g class="dg-actions">
             <DiagramActionPath
               :points="points"
