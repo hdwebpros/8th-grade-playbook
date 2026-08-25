@@ -40,6 +40,7 @@ const source = ref<Source>({ kind: 'example', digits: audibleExamples[0]!.digits
 const formation = ref<PadFormation>('red')
 const front = ref<FrontId>('44')
 
+
 const isSplitWide = computed(() => formation.value === 'split-wide')
 
 /** Red and Black are a mirrored pair; everything that takes one wants this. */
@@ -53,6 +54,23 @@ const pairFormation = computed<'red' | 'black'>(() => (formation.value === 'blac
  */
 const ownCall = ref<AudibleCall>({ protection: 'dropback', outside: 9, inside: 2 })
 const ownSwCall = ref<SplitWideCall>({ lean: 'left', digits: [9, 5, 5, 9] })
+
+/**
+ * Deep links from the route tree: `?formation=red|black` opens the pad on the
+ * side the kid was just looking at, and `?outside=5` puts that route on X so
+ * he sees the number he picked drawn as a real call.
+ */
+const route = useRoute()
+const isPadFormation = (v: unknown): v is PadFormation =>
+  v === 'red' || v === 'black' || v === 'split-wide'
+if (isPadFormation(route.query.formation)) formation.value = route.query.formation
+{
+  const n = Number(route.query.outside)
+  if (Number.isInteger(n) && n >= 0 && n <= 9 && formation.value !== 'split-wide') {
+    ownCall.value = { ...ownCall.value, outside: n }
+    source.value = { kind: 'own' }
+  }
+}
 
 /** Which example button is lit, if any. */
 const activeDigits = computed(() => {
