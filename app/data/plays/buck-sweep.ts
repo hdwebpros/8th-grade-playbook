@@ -447,7 +447,7 @@ export const buckSweepLeftRed: Play = {
   name: 'Buck Sweep',
   call: [
     { word: 'Red', label: 'formation' },
-    { word: 'Buck', label: 'play' },
+    { word: 'Buck Sweep', label: 'play' },
     { word: 'Left', label: 'direction' },
   ],
   family: 'run',
@@ -820,7 +820,7 @@ export const buckSweepRightRed: Play = {
   name: 'Buck Sweep',
   call: [
     { word: 'Red', label: 'formation' },
-    { word: 'Buck', label: 'play' },
+    { word: 'Buck Sweep', label: 'play' },
     { word: 'Right', label: 'direction' },
   ],
   family: 'run',
@@ -850,7 +850,7 @@ export const buckSweepRightBlack: Play = mirrorPlay(buckSweepLeftRed, {
   formation: 'black',
   call: [
     { word: 'Black', label: 'formation' },
-    { word: 'Buck', label: 'play' },
+    { word: 'Buck Sweep', label: 'play' },
     { word: 'Right', label: 'direction' },
   ],
   formationTwinId: 'buck-sweep-right-red',
@@ -875,7 +875,7 @@ export const buckSweepLeftBlack: Play = mirrorPlay(buckSweepRightRed, {
   formation: 'black',
   call: [
     { word: 'Black', label: 'formation' },
-    { word: 'Buck', label: 'play' },
+    { word: 'Buck Sweep', label: 'play' },
     { word: 'Left', label: 'direction' },
   ],
   formationTwinId: 'buck-sweep-left-red',

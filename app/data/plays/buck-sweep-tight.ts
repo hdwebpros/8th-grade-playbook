@@ -428,7 +428,7 @@ export const buckSweepLeftTight: Play = {
   name: 'Buck Sweep',
   call: [
     { word: 'Tight', label: 'formation' },
-    { word: 'Buck', label: 'play' },
+    { word: 'Buck Sweep', label: 'play' },
     { word: 'Left', label: 'direction' },
   ],
   family: 'run',
@@ -456,7 +456,7 @@ export const buckSweepRightTight: Play = mirrorTightPlay(buckSweepLeftTight, {
   id: 'buck-sweep-right-tight',
   call: [
     { word: 'Tight', label: 'formation' },
-    { word: 'Buck', label: 'play' },
+    { word: 'Buck Sweep', label: 'play' },
     { word: 'Right', label: 'direction' },
   ],
   audibleFlipId: 'buck-sweep-left-tight',
