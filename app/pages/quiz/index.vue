@@ -19,10 +19,11 @@ const modes = [
     available: true,
   },
   {
-    icon: 'lucide:monitor-play',
-    title: 'Coach Mode',
-    sub: 'Coach drives it on the big screen. Team calls it out.',
-    available: false,
+    to: '/quiz/learning',
+    icon: 'lucide:clapperboard',
+    title: 'Learning Materials',
+    sub: 'Film room. Coaching videos by position — blocking, tackling, routes, throwing.',
+    available: true,
   },
 ]
 </script>
@@ -57,6 +58,7 @@ const modes = [
         <Icon v-if="mode.available" name="lucide:chevron-right" class="mode-chev" aria-hidden="true" />
       </component>
     </div>
+
   </div>
 </template>
 
