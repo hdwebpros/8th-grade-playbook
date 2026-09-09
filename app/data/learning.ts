@@ -31,4 +31,5 @@ export const learningVideos: LearningVideo[] = [
   { id: 'b8Y-BrxoGQc', group: 'WR', title: 'Drills to improve route running', start: 163, embed: false },
   { id: 'XZ-dRS32sj4', group: 'Superback', title: 'Habits and footwork' },
   { id: 'kafczztzTRA', group: 'QB', title: 'How to throw farther' },
+  { id: 'q3SjTy5b9RQ', group: 'QB', title: 'Instantly become a better QB', note: 'First Down Training.' },
 ]
