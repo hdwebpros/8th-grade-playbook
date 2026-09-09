@@ -12,6 +12,9 @@
  *   3. "HB goes in motion, HB screen"               → splitWideScreenRight / -Left
  *   4. "HB chip blocks; receivers left→right run in, post, post, go"
  *                                                   → splitWideVictory
+ *      REWRITTEN 2026-09-09: "Routes should be LTR 7, 1, 1, 9 … a play-fake
+ *      to the Super who then blocks or picks up the blitz. QB has to release
+ *      it within 3 seconds." Victory is now play-action off the Dive.
  *
  * THE HALFBACK MAPPING (the one decision everything else hangs on).
  * `OffPosId` has no `HB`. Split Wide on varsity page 4 has exactly one back —
@@ -1159,69 +1162,83 @@ export const splitWideScreenLeft: Play = (() => {
 })()
 
 // ===========================================================================
-// PLAY 4 — SPLIT WIDE VICTORY  (in / post / post / go, HB chips)
+// PLAY 4 — SPLIT WIDE VICTORY  (post / slant / slant / fade, play-fake to Super)
 // ===========================================================================
 //
-// Your route call, left to right across the formation:
-//   Y (wide left)  — 10-YARD IN
-//   L (slot left)  — 7 POST
-//   R (slot right) — 7 POST
-//   X (wide right) — 9 GO
+// REWRITTEN 2026-09-09 per Coach Ryan: "Routes should be LTR 7, 1, 1, 9.
+// Designed for shorter passes, but also designed to run after we've ran out of
+// split wide formation before, so the new addition is a play-fake to the Super
+// who then blocks or picks up the blitz. QB has to release it within 3 seconds."
 //
-// Super never releases. He drops with the quarterback, settles on his blind-side
-// hip, scans the line, and blocks whoever gets through — no named target on any
-// front, because his man is whoever comes free. Protection slides right (RAM),
-// which is why the center's man is on the right side.
+// Your route call, left to right across the formation:
+//   Y (wide left)  — 7 POST
+//   L (slot left)  — 1 SLANT
+//   R (slot right) — 1 SLANT
+//   X (wide right) — 9 FADE
+//
+// The two slants are the play. The post and the fade run the corners and the
+// safety off so the slants have grass behind the linebackers — and the
+// linebackers are the men the fake is for. Super takes the Dive fake on the
+// Dive's exact track, then plants in the right A gap and blocks the first man
+// through. Protection still slides right (RAM), which is why the center's man
+// is on the right side and why Super's spot is there too.
+//
+// THE CLOCK: three seconds. The quarterback fakes, sets, and the ball is gone
+// on "one-thousand-three" — thrown, thrown away, or he is running with it.
 
-const CHIP_Q: Action[] = [
+/**
+ * Q: open to the right and put the ball in Super's belly on the Dive track —
+ * same mesh point as Split Wide Dive Right — then get back off it and set up
+ * shallow, about five and a half deep. No boot: the fake is the mesh, and the
+ * ball has to be out in three.
+ */
+const VIC_Q: Action[] = [
   {
     kind: 'run',
     path: [
-      { x: 0, y: -4 },
-      { x: 0, y: -6 },
+      { x: 0.4, y: -1.9 },
+      { x: 0.7, y: -2.4 },
+      { x: -0.2, y: -4.2 },
+      { x: -0.5, y: -5.6 },
     ],
   },
 ]
 
-/**
- * Y — 10-yard IN (dig). Not off the tree: varsity p14 has no in-breaking route
- * at ten, so this is drafted — ten yards straight up from (−13, 0), then snap
- * it off square and run flat across the field toward the ball.
- */
-const CHIP_Y: Action[] = [
+/** Y — 7 post from wide left. Tree geometry off (−13, 0), breaking inside. */
+const VIC_Y: Action[] = [
   {
     kind: 'route',
     path: [
-      { x: -13, y: 10 },
-      { x: -5.5, y: 10.5 },
+      { x: -13, y: 15 },
+      { x: -6.5, y: 21 },
     ],
   },
 ]
 
-/** L — 7 post from the left slot. */
-const CHIP_L: Action[] = [
+/** L — 1 slant from the left slot. Tree geometry off (−8.5, −1), breaking inside. */
+const VIC_L: Action[] = [
   {
     kind: 'route',
     path: [
-      { x: -8.5, y: 14 },
-      { x: -2, y: 20 },
+      { x: -8.5, y: 3 },
+      { x: -4, y: 6.5 },
     ],
   },
 ]
 
-/** R — 7 post from the right slot. */
-const CHIP_R: Action[] = [
+/** R — 1 slant from the right slot. Tree geometry off (+8.5, −1), breaking inside. */
+const VIC_R: Action[] = [
   {
     kind: 'route',
     path: [
-      { x: 8.5, y: 14 },
-      { x: 2, y: 20 },
+      { x: 8.5, y: 3 },
+      { x: 4, y: 6.5 },
     ],
   },
 ]
 
-/** X — 9 go/fade from wide right. */
-const CHIP_X: Action[] = [
+/** X — 9 fade from wide right. Tree geometry off (+13, 0), leaning to the sideline. */
+const VIC_X: Action[] = [
   {
     kind: 'route',
     path: [
@@ -1232,28 +1249,33 @@ const CHIP_X: Action[] = [
   },
 ]
 
-const CHIP_ROUTES = { Y: CHIP_Y, L: CHIP_L, R: CHIP_R, X: CHIP_X } satisfies Partial<
+const VIC_ROUTES = { Y: VIC_Y, L: VIC_L, R: VIC_R, X: VIC_X } satisfies Partial<
   Record<OffPosId, Action[]>
 >
 
 /**
- * Super: no chip, no release. He drops with the quarterback, settles on his
- * blind-side hip at the depth of the drop, and scans the line for anyone who
- * gets through. The arrow is a short block-capped path to that spot and it ends
- * there on purpose — where he goes next is whoever comes free, which is a
- * different man on every snap and cannot be drawn.
+ * Super: the Dive fake, then the block. The first leg is the Dive's own track
+ * (see DIVE_S) drawn as a fake — downhill at the playside hip of the center,
+ * hands out, sold all the way to the line. It ends in a block bar just behind
+ * the right A gap on purpose: that is where he plants, squares up, and takes the
+ * first man who comes through. Who that is changes every snap, so no defender is
+ * named — the picture says "fake to here, then block right here."
  */
-const CHIP_S_SCAN: Action[] = [
+const VIC_S_FAKE_BLOCK: Action[] = [
+  {
+    kind: 'fake',
+    path: [
+      { x: 0.25, y: -3 },
+      { x: 0.55, y: -1.9 },
+    ],
+  },
   {
     kind: 'block',
-    path: [
-      { x: -0.8, y: -5.1 },
-      { x: -1.3, y: -5.9 },
-    ],
+    path: [{ x: 0.9, y: -1 }],
   },
 ]
 
-const CHIP_EVEN_LINE = {
+const VIC_EVEN_LINE = {
   LT: block('E-L'),
   LG: block('T-L'),
   RG: block('T-R'),
@@ -1262,52 +1284,62 @@ const CHIP_EVEN_LINE = {
 
 const victoryVs44: FrontPlan = {
   actions: {
-    ...CHIP_ROUTES,
-    Q: CHIP_Q,
-    ...CHIP_EVEN_LINE,
+    ...VIC_ROUTES,
+    Q: VIC_Q,
+    ...VIC_EVEN_LINE,
     // The double team, not the backer: two hats converging on T-R is the combo
     // picture, and it keeps the center's line from running upfield. Per Ryan.
     C: block('T-R'),
-    S: CHIP_S_SCAN,
+    S: VIC_S_FAKE_BLOCK,
   },
   assignments: {
     C: {
       rule: 'Ram — slide right. Stay home. Double with RG until the A-gap backer comes.',
       detail:
-        'Nobody is on your nose, so do not chase anybody upfield — sit back and stay square. Get your hands on RG\'s man and help him double it, and keep your eyes on the 4-4 backer stacked in the right A gap, because he is the one who blitzes it. If he comes, come off the double and take him by yourself. If he never comes, you finish the snap on the double.',
+        'Nobody is on your nose, so do not chase anybody upfield — sit back and stay square. Get your hands on RG\'s man and help him double it, and keep your eyes on the 4-4 backer stacked in the right A gap, because he is the one who blitzes it. If he comes, come off the double and take him — Super is coming off the fake into that same gap, so the two of you have him. If he never comes, you finish the snap on the double.',
+    },
+    S: {
+      rule: 'Fake the Dive, then plant in the A gap. The stacked backer is the man to expect.',
+      detail:
+        'The 4-4 has a backer stacked right over the A gap you are faking into, and the fake is exactly what pulls him downhill. Sell it hard, plant, and if he is coming, meet him in the hole — square, low, hands inside. If he drops instead, stay right there and take the next man through. The ball is out in three, so you only have to win for three.',
     },
   },
 }
 
 const victoryVs43: FrontPlan = {
   actions: {
-    ...CHIP_ROUTES,
-    Q: CHIP_Q,
-    ...CHIP_EVEN_LINE,
+    ...VIC_ROUTES,
+    Q: VIC_Q,
+    ...VIC_EVEN_LINE,
     // Same combo picture as the 4-4. The Mike is 4½ yards deep and the center
     // does not go get him — he doubles until the Mike declares. Per Ryan.
     C: block('T-R'),
-    S: CHIP_S_SCAN,
+    S: VIC_S_FAKE_BLOCK,
   },
   assignments: {
     C: {
       rule: 'Ram — slide right. Stay home. The Mike is yours if he comes, RG\'s man if he does not.',
       detail:
-        'The Mike is straight over you and he is the only man who can get into the A gap — but he is four yards deep, so do not go get him. Sit back off the ball, put your hands on RG\'s man and double it, and watch the Mike the whole time. He blitzes, you leave the double and take him. He drops, you never leave the double.',
+        'The Mike is straight over you and he is the only man who can get into the A gap — but he is four yards deep, so do not go get him. Sit back off the ball, put your hands on RG\'s man and double it, and watch the Mike the whole time. He blitzes, you leave the double and take him, and Super is in the gap with you. He drops, you never leave the double.',
+    },
+    S: {
+      rule: 'Fake the Dive, then plant in the A gap. The Mike is the man to expect.',
+      detail:
+        'The Mike is four yards deep, straight over the ball, and your fake is aimed right at him — he has to honor it. Sell it, plant in the gap, and take him if he comes. If he drops into the slant windows, that is the one man the slants have to beat, and you stay home and block whoever else shows.',
     },
   },
 }
 
 const victoryVs52: FrontPlan = {
   actions: {
-    ...CHIP_ROUTES,
-    Q: CHIP_Q,
+    ...VIC_ROUTES,
+    Q: VIC_Q,
     LT: block('E-L'),
     LG: block('T-L'),
     C: block('N'),
     RG: block('T-R'),
     RT: block('E-R'),
-    S: CHIP_S_SCAN,
+    S: VIC_S_FAKE_BLOCK,
   },
   assignments: {
     C: {
@@ -1324,23 +1356,23 @@ const victoryVs52: FrontPlan = {
       detail: 'Same rule as LG, other side. Short outside set, hands inside, ride him past the quarterback.',
     },
     S: {
-      rule: 'Same job, and vs this front somebody IS coming.',
+      rule: 'Fake the Dive, then plant. Vs this front somebody IS coming.',
       detail:
-        'Five rushers against five linemen means the extra man is yours every snap in a 5-2. Stay on the quarterback\'s hip and find him — most often it is the blindside end beating LT or a backer running through the middle. You are the sixth blocker and you do not leave, ever, on this front.',
+        'Five rushers against five linemen means the extra man is yours every snap in a 5-2. Sell the fake, plant in the A gap, get your eyes up, and find him — most often it is a backer running through inside, or the end beating a tackle. Take the first one you see. You are the sixth blocker and you do not leave on this front, ever.',
     },
   },
 }
 
 const victoryAssignments: Record<OffPosId, Assignment> = {
   Y: {
-    rule: 'IN — ten yards, then break flat across.',
+    rule: '7 — Post.',
     detail:
-      'Ten yards straight up the field, sell that you are going deep, then plant your outside foot and break FLAT inside — square, not drifting back and not drifting deeper. Keep running across the field and keep your eyes on the quarterback the whole way. Super is staying in to block, so you are the ONLY outlet on this play — you are running to open grass behind the linebackers, so do not stop until the ball is out.',
+      'Stem at the corner for fifteen, then break inside on an angle at the goal post and keep running. You are running the safety off — the fake is pulling him up and you are pulling him back, and either way he cannot sit on L\'s slant underneath you. If the safety bites the fake and never gets back, you are the shot.',
   },
   LT: {
-    rule: 'Pass set. The end is yours.',
+    rule: 'Pass set. The end is yours, alone.',
     detail:
-      'Kick-slide, hands inside, keep your feet moving. Nobody is chipping him for you — but Super is standing behind your inside shoulder scanning, so if the end crosses your face, Super is there. Force him to run the long way around.',
+      'Kick-slide, hands inside, keep your feet moving. You are the blind side and nobody is behind you — Super is faking into the RIGHT A gap on this play, not standing on the quarterback\'s hip. Force the end to run the long way around. The ball is gone in three seconds, so make him take four.',
   },
   LG: {
     rule: 'Ram — slide right. Block the man in your gap.',
@@ -1349,7 +1381,7 @@ const victoryAssignments: Record<OffPosId, Assignment> = {
   C: {
     rule: 'Ram — slide right. Never go upfield. Covered: the nose is yours. Uncovered: sit back, double, and look for the blitz.',
     detail:
-      'Ram means the whole line slides right. YOU DO NOT GO UPFIELD ON THIS PLAY — not one step, ever. This is a five-step drop and your job is behind the line, not in front of it. If there is a nose on you, forget the slide — he is yours by yourself. If nobody is on you, sit back off the ball with your feet under you and your eyes inside: put your hands on the guard\'s man and help him double it, and keep looking for a backer running the A gap. The second a blitzer shows, leave the double and take him. You are the man who cleans up whatever the slide does not cover.',
+      'Ram means the whole line slides right. YOU DO NOT GO UPFIELD ON THIS PLAY — not one step, ever. It looks like the Dive to them, but it is a pass for you, and your job is behind the line, not in front of it. If there is a nose on you, forget the slide — he is yours by yourself. If nobody is on you, sit back off the ball with your feet under you and your eyes inside: put your hands on the guard\'s man and help him double it, and keep looking for a backer running the A gap. The second a blitzer shows, leave the double and take him. Super is coming off the fake into the right A gap, so you and he have that gap together.',
   },
   RG: {
     rule: 'Ram — slide right. Block the man on you.',
@@ -1357,32 +1389,32 @@ const victoryAssignments: Record<OffPosId, Assignment> = {
   },
   RT: {
     rule: 'Pass set. Block the end.',
-    detail: 'You are the edge on the throwing side. Kick-slide and force him to run the long way around — that is all a tackle owes on a five-step drop.',
+    detail: 'You are the edge on the throwing side. Kick-slide and force him to run the long way around — three seconds is all you owe.',
   },
   X: {
-    rule: '9 — Go.',
+    rule: '9 — Fade.',
     detail:
-      'Straight up the field, leaning toward the sideline. Run past him and go get the ball over your outside shoulder. Even when it does not come, your man cannot help on the posts.',
+      'Straight up the field, leaning toward the sideline. Run past him and go get the ball over your outside shoulder. Your real job is to take the corner with you — R is slanting into the room you leave, and if the corner sits down on that slant, the ball comes to you over the top.',
   },
   L: {
-    rule: '7 — Post.',
+    rule: '1 — Slant.',
     detail:
-      'Stem at the corner for fifteen, then break inside on an angle at the goal post and keep running. You and R are running the same route from both sides — one of you will be behind the safety.',
+      'Three hard steps upfield, then plant and cut inside on an angle. Look for the ball RIGHT NOW — this is a three-second play and you are the first look. The backers are stepping up for the Dive fake; run behind them into the window Y\'s post opens. Catch it and turn upfield.',
   },
   R: {
-    rule: '7 — Post.',
+    rule: '1 — Slant.',
     detail:
-      'Same route as L, other side. Fifteen and break in. With the Go clearing outside of you, the room is over the middle — go take it.',
+      'Same route as L, other side. Three steps, plant, cut inside, eyes to the quarterback right now. X is running the corner off outside of you, so the window is inside — get there fast and show him your numbers.',
   },
   S: {
-    rule: 'Stay on the quarterback\'s hip. Scan the line. Block anyone who gets through.',
+    rule: 'Take the Dive fake. Plant in the A gap. Block the first man through.',
     detail:
-      'You do not have one man and you never leave. Drop with the quarterback, settle on his blind-side hip about a yard off him, feet under you, and look at the line — not downfield. Start your eyes inside and work out. Whoever comes free, you take: step to him, hands inside, and put him on the ground or on his back foot. If nobody comes through, you stand right there until the ball is gone. The snap you leave early is the snap the quarterback gets hit.',
+      'This is the Dive to you for two steps — same track, same downhill aim at the playside hip of the center, hands out and ready, shoulders square. The only difference is the ball is not there. Do NOT slow down when it is not: plant right behind the right A gap, get your eyes up, and the first man who comes through is yours — step to him, hands inside, put him on his back foot. If nobody comes, you stay planted and square until the ball is gone. The snap you jog the fake is the snap the linebackers sit on the slants.',
   },
   Q: {
-    rule: 'Five-step drop. Posts first, then the in.',
+    rule: 'Fake to Super, set, throw. Slants first. Ball out in THREE SECONDS.',
     detail:
-      'Big five-step drop and get your eyes to the middle of the field. Two safeties — take the post away from the deep help. One safety — hit the other post behind him. If the middle is closed, come off it fast to Y running the in underneath. He is moving, so throw him open out in front of him — never behind. There is no checkdown on this play — Super is blocking — so if the in is not there, throw it away or run. Never hold it for a fourth count.',
+      'Open to the right and put the ball in Super\'s belly exactly like the Dive — same footwork, ball on his second step — then pull it, get back off the fake and set up shallow. Count it: one-thousand-one is the fake, one-thousand-two you are set with your eyes on the slants, one-thousand-three the ball is GONE. Pick the slant on the side where the backer bit the fake and throw it out in front of him. If both backers sit and a safety bit the fake, hit Y on the post behind him. If a corner sits down on R\'s slant, X is open over the top. Nothing there on three? Throw it away or run. You NEVER hold it for a fourth count — Super is a blocker, not a checkdown, and the protection is built for three seconds, not five.',
   },
 }
 
@@ -1397,32 +1429,33 @@ export const splitWideVictory: Play = {
   formation: splitWide.id,
   direction: 'right',
   ballCarrier: 'Q',
-  summary: 'Four-receiver dropback pass. Super stays in and chips whoever comes free.',
+  summary: 'Play-action off the Dive. Two quick slants inside, post and fade outside. Ball out in three seconds.',
   coachNotes: [
+    'Quarterback: fake, set, throw. One-thousand-three and the ball is GONE.',
+    'Super: sell the Dive, then plant in the A gap and block the first man through.',
     'Center: never go upfield. Double with the guard and watch for the blitz.',
-    'Super: block whoever gets through. Nobody comes? Stay put until the ball is gone.',
   ],
   description:
-    'Four receivers, four routes, left to right: in, post, post, go. Super never leaves — he sits on the quarterback\'s hip, scans the line, and blocks whoever gets through. Two posts from both slots is the play, and Y\'s ten-yard in is the outlet when the middle is closed.',
+    'Four receivers, left to right: post, slant, slant, fade. We run this after we have run the ball out of Split Wide, because it starts as the Dive — the quarterback puts the ball in Super\'s belly on the Dive track, and Super sells it into the line, then plants in the A gap and blocks whoever comes. The two slants are the play: the linebackers step up for the fake and the slants run in behind them. The post and the fade run the corners and the safety off so nobody is sitting in those windows. It is a quick throw — the ball is out in three seconds, thrown or thrown away.',
   assignments: victoryAssignments,
   vs: { '44': victoryVs44, '43': victoryVs43, '52': victoryVs52 } satisfies Record<FrontId, FrontPlan>,
   reviewNotes: [
     GATE,
     HB_NOTE,
     FORMATION_NOTE,
-    'ROUTE ASSIGNMENT, left to right across the formation exactly as you said it: Y (wide left) 10-YARD IN, L (left slot) POST, R (right slot) POST, X (wide right) GO. Confirm "left to right" means across the formation from the offense\'s point of view and not from the sideline, because from the sideline it reverses and the Go ends up on the left.',
-    'Y\'S ROUTE IS NOW A 10-YARD IN, per your change — it was the 5 (curl). THE TREE HAS NO IN. Varsity p14 runs 0 block, 1 slant, 2 speed out, 3 hitch, 4 wheel, 5 curl, 6 comeback, 7 post, 8 corner, 9 fade — nothing that breaks flat inside at ten, so this route is drafted rather than traced and it has NO NUMBER. That means it cannot be called in the audible system, which is digits only. Two ways out: (a) give it a number and add it to app/data/routes.ts so it can be called like everything else — but every free digit is taken, so it would mean renumbering something; or (b) leave it as a route that only exists inside this play and is called by name. I drafted (b). Tell me which you want. Also confirm the DEPTH — you said ten yards, which is one yard past the tree\'s curl; against a 44 that puts him right in the linebackers\' drop, and twelve would put him behind them.',
-    'Y IS DRAWN BREAKING FLAT AND RUNNING, not squaring up and sitting. That is the difference between an in and a curl and it matters for the quarterback: an in is a moving target thrown out in front, a curl is a spot. If what you actually want is "get to ten, break in, and sit down in the hole," say so — that is a dig-and-settle and the picture and the coaching words both change.',
-    'We have no "Go" in the route tree — the tree (varsity p14) numbers 9 as FADE. Drafted as the 9, run straight up the field leaning to the sideline. If "go" to you means a pure vertical with no lean, that is a different route and it may be worth adding to the tree.',
-    'SUPER IS A SCAN BLOCKER — per your correction, "chip" here means BLOCK ANYONE WHO GETS THROUGH, not punch-and-release. He is no longer aimed at a named defender on any front, which is the one place in the whole book where a blocker has no target, and that is on purpose: his man is whoever comes free, and that is a different man every snap. His arrow is a short line to the quarterback\'s blind-side hip at the depth of the drop, capped with the block bar and ending there — the picture says "this is where you stand and block," not "this is where you run." Two things to confirm: (1) WHICH HIP — drafted on the BLIND side (left, for a right-handed quarterback) since that is the runner the drop cannot see, but if you would rather he set on the throwing side or simply "behind the quarterback, square," say which and I will move the dot; (2) he is now purely a blocker on all three fronts, so this play releases FOUR receivers and has no checkdown. Y\'s in carries the whole outlet job by itself.',
-    'THE TWO POSTS RUN INTO EACH OTHER. Drawn straight off the tree, both posts break at 15 yards and finish 2 yards either side of the goal post — that is two of our receivers and one safety in the same window, and it shows up plainly on the diagram. Real options: (a) leave it, and coach the quarterback to throw the one away from the safety; (b) make the back-side one a SKINNY post that stays outside the hash; (c) stagger the depths, 12 and 18, so they are never at the same level. I drafted (a) because it is literally what you called, but (b) or (c) is probably what you want on the field.',
-    'PER COACH RYAN — THE CENTER: "the C can\'t go upfield, he sits back and helps double team or pick up a blitz." Rewritten on all three fronts. The base rule now leads with NEVER GO UPFIELD and makes his default job the double team with RG, with the blitz pickup as the thing that pulls him off it — that is a real change of emphasis from the draft, which had him aimed at a named backer first and helping "if he does not come." Vs the 5-2 he is untouched: there is a nose on him and he has no one to help, which is the one front where your rule cannot apply. THE DIAGRAM IS FIXED TOO: his arrow used to run UPFIELD — 4 yards to the stacked backer vs the 4-4, 4½ yards to the Mike vs the 4-3 — which is exactly the picture you said is wrong. On both even fronts it now points at T-R, the same man RG is blocking, so the center and the guard converge on one defender. Two hats on one man is the standard combo picture and it reads as "double team" without any new symbol on the field. It also stays behind the line, which is the whole point. What the diagram now does NOT show is the conditional — "leave the double when the backer comes" lives only in the words, which is normal (no playbook draws an if/then), but say the word if you want a second, lighter line out to the blitzer and I will add one.',
-    'Vs the 5-2 the scan rule solves itself — five rushers against five linemen means the extra man is Super\'s every single snap, so his assignment text on that front tells him to expect somebody rather than to look for somebody. Same picture, same arrow, all three fronts; only the coaching words change.',
+    'REWRITTEN 2026-09-09 FROM YOUR NOTE: "Routes should be LTR 7, 1, 1, 9. Designed for shorter passes, but also designed to run after we\'ve ran out of split wide formation before, so the new addition is a play-fake to the Super who then blocks or picks up the blitz. QB has to release it within 3 seconds." The old in/post/post/go picture, the five-step drop, and Super\'s scan-block on the quarterback\'s hip are all gone. What follows is what changed and the calls made along the way.',
+    'ROUTE ASSIGNMENT, left to right across the formation exactly as you said it: Y (wide left) 7 POST, L (left slot) 1 SLANT, R (right slot) 1 SLANT, X (wide right) 9 FADE. All four are straight off the tree in app/data/routes.ts at tree width — the slants break at three yards and finish at six and a half, four yards either side of the ball; the post breaks at fifteen; the fade leans out from eight. Every route now has a number, so the old "Y\'s in has no digit" problem is gone with the in. Same standing confirmation as before: "left to right" is read across the formation from the offense\'s side, not from the sideline.',
+    'THE SLANTS ARE THE PLAY and they are drawn to the tree, which means both finish at six and a half yards, four yards off the ball on their own sides — eight yards apart, so they do not run into each other the way the two posts used to. Between them is the middle of the field the fake is supposed to empty. Against a 4-3 the Mike is sitting exactly there at 4½ yards, and if he does not bite the fake he is the one man in both windows; that is written into Super\'s 4-3 note and into the quarterback\'s read. If you would rather one slant clear deeper (a 7 for L, say, making it post/post/slant/fade), say so — it is one digit.',
+    'THE PLAY-FAKE IS THE DIVE\'S OWN FOOTBALL. The quarterback opens to the right and meshes at the same spot Split Wide Dive Right meshes (drawn off DIVE_Q), and Super\'s fake leg is DIVE_S\'s first two points — downhill at the playside hip of the center. That is deliberate: the whole reason to run this after the Dive is that the first two steps look identical from a linebacker\'s depth. It is faked to the RIGHT A gap because the Dive ships right by default and the protection already slides right; a left-handed fake would also mean a left-handed Super spot and a different center rule. There is NO boot after the mesh — the quarterback pulls it and sets up straight back, about five and a half deep, because a boot fake costs a second you do not have in a three-count.',
+    'SUPER AFTER THE FAKE: he PLANTS in the right A gap, a yard behind the line, and blocks the first man through. His arrow is the fake leg capped with a block bar right there — the picture says "fake to here, block here," not "run through the hole." He is still not aimed at a named defender on any front, because his man is whoever comes; but each front now tells him who to EXPECT: the stacked A-gap backer in the 4-4, the Mike in the 4-3, and "somebody, every snap" in the 5-2. The center\'s A-gap rule is unchanged, so on the two even fronts the center and Super share that gap — the center doubles until the backer comes, Super is already there when he does. Two men on one blitzer is the safe error. If you would rather Super come off the fake and set on the quarterback\'s hip like the old version, say so, but a back who fakes into the line and then backs out to the hip is neither a good fake nor a good blocker.',
+    'THREE SECONDS is written as a count — one-thousand-one fake, one-thousand-two set, one-thousand-three gone — in the quarterback\'s assignment, and every lineman\'s detail now says the ball is out in three, so nobody is coached to hold a block for a five-step drop that is not coming. The description and the first coach note say it too. There is no field on the Play type for a clock, so it lives in the words; if you want it on the diagram or as a drill stat, that is new UI.',
+    'THE LINE STILL PASS-SETS. You did not say to change the protection, so the tackles kick-slide and the interior still runs RAM (slide right) exactly as before, with the center\'s never-go-upfield rule intact. That is the honest weak spot of this play-fake: a pass-setting line is the first thing a coached linebacker keys, and the varsity Waggle sells its fake by having the line fire out like the run for one count. Options if you want a better fake: (a) leave it — the fake is Super\'s and the quarterback\'s, and 8th-grade backers key the back, not the guards; (b) have the interior take one Dive step and then set, which is a different technique to teach and a new arrow on three fronts. Drafted as (a). Say the word for (b).',
+    'PROGRESSION: slants first, to the side where the backer bit; post if a safety bit the fake; fade if a corner squats on R\'s slant; away or run on three. No readKey is set — the quarterback is reading two linebackers, not one defender, and that is a progression, not a formal read. Say so if you want a formal key drawn.',
+    'No ball flight is drawn — the throw depends on which backer bites. The diagram shows the four routes, the fake, and Super\'s block spot; the progression lives in the quarterback\'s assignment. Tell me if you want an arrow to the primary slant on the picture.',
+    'THE 5-2 vs the fake: five down linemen means no A-gap backer to fool — the two backers are at depth over the guards and the fake pulls them straight down into the slant windows if they bite. Super\'s 5-2 note tells him to expect a man regardless, because five rushers against five linemen always leaves one over. Unchanged from the old version except for where he stands.',
     'Protection is drawn as RAM (slide right) so the language matches varsity p15 and the pass-pro page. That is why the center\'s arrow points to the right A-gap man rather than straight ahead. If you would rather this be straight man protection, say so and the center\'s picture changes on all three fronts.',
-    'No ball flight is drawn on this one because the throw depends on what the safeties do — the diagram shows four routes and a progression written in the quarterback\'s assignment instead. Tell me if you want an arrow to a primary receiver on the picture.',
-    'No readKey is set on any of these four plays — none of them is an option and nobody is reading a defender. Say so if you want Victory to carry a formal safety read.',
     MIRROR_NOTE_PREFIX +
-      'This one is the least worth mirroring: flipping it puts the Go on the left and the in on the right, which is a different concept, not the same play the other way. If you want a left-handed version, tell me the route order you want and I will author it fresh.',
+      'This one is now the MOST worth mirroring, because the fake goes to a side: a left-handed Victory would fake to the left A gap, plant Super there, and slide the line left (BULL), with the fade on the left and the post on the right. That is the same concept the other way, unlike the old in/post/post/go, so a Victory Left is one mirrorSplitWidePlay() call plus the prose. Not shipped until you say so, same ruling as the Keep.',
   ],
 }
 
