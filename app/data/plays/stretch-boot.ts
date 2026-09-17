@@ -29,8 +29,9 @@
  * outside shoulder and drive him toward the fake side. Against the even
  * fronts the center is the one uncovered lineman — he steps BACK (short
  * stunted line), helps a guard, and picks up any blitz. Against the 5-2
- * every lineman has a man immediately: tackles take the ends, guards take
- * the men over them, center takes the nose — nobody is left free.
+ * every lineman has a man immediately: tackles take the ends on their outside
+ * shoulders, guards take the tackles on THEIR outside shoulders, center takes
+ * the nose — nobody is left free.
  *
  * Differences from Waggle, same boot: pass protection instead of run-action
  * blocks (no guard pull), no motion (R stays put and runs the out), Super
@@ -96,7 +97,11 @@ const Q_BOOT: Action[] = [
 
 /**
  * S: take the fake, sell it off the left tackle's outside hip — then, once
- * he's sold it, bend back to the shallow middle as a late option.
+ * he's sold it, bend back to the shallow middle as a late option. Since
+ * 2026-09-17 every front puts the end on LT's outside shoulder (x −3.55), so
+ * the fake presses to LT's hip and then climbs INSIDE the end, up the C-gap
+ * lane over the tackle at x ≈ −2.7 — the same crease the Stretch carry takes,
+ * which is the whole point of the fake.
  */
 const S_FAKE: Action[] = [
   {
@@ -104,26 +109,33 @@ const S_FAKE: Action[] = [
     path: [
       { x: -0.9, y: -3.4 },
       { x: -2.2, y: -2.2 },
-      { x: -3.3, y: -0.8 },
-      { x: -3.8, y: 0.8 },
+      { x: -3.4, y: -0.8 },
+      { x: -2.7, y: 0.6 },
     ],
   },
   {
     kind: 'route',
     path: [
-      { x: -3.2, y: 2.4 },
+      { x: -3.0, y: 2.4 },
       { x: -1.2, y: 3.9 },
       { x: 0.8, y: 4.8 },
     ],
   },
 ]
 
-/** Y: the post — six yards up, then cut to the deep middle. */
+// NOTE (2026-09-17): the 5-2 used to need its own fake stroke, because its
+// tackle stood head-up on LT and its end a step wider — the fake threaded the
+// gap between them. Now every front aligns the end at ±3.55 and the tackle at
+// ±1.8, so the odd front's crease is the even front's crease and S_FAKE is
+// used against all three. The old S_FAKE_ODD constant is gone.
+
+/** Y: the post — release outside the end on his inside shoulder, six yards up, then cut to the deep middle. */
 const Y_POST: Action[] = [
   {
     kind: 'route',
     path: [
-      { x: -4.3, y: 2.0 },
+      { x: -5.1, y: 1.2 },
+      { x: -4.5, y: 3.0 },
       { x: -4.1, y: 6.0 },
       { x: -2.0, y: 9.0 },
       { x: 0.8, y: 12.5 },
@@ -153,7 +165,7 @@ const R_OUT: Action[] = [
   {
     kind: 'route',
     path: [
-      { x: 4.8, y: 1.5 },
+      { x: 5.2, y: 1.3 },
       { x: 5.2, y: 5.0 },
       { x: 5.4, y: 8.0 },
       { x: 9.0, y: 8.1 },
@@ -195,8 +207,9 @@ const SKILL = {
 //     outside shoulder, then the push (left on Red, right on Black).
 //   - Vs the even fronts the center has nobody in front — he STEPS BACK
 //     (short stunted line), helps the guard next to him, picks up any blitz.
-//   - Vs the 5-2 every lineman has a guy immediately: tackles on the ends,
-//     guards on the men outside them, center on the nose. Nobody free.
+//   - Vs the 5-2 every lineman has a guy immediately: tackles on the ends
+//     (±3.55, their outside shoulder), guards on the tackles (±1.8, their
+//     outside shoulder), center on the nose. Nobody free.
 // The fronts draw their down men a yard deep; contact is AT the line.
 // ---------------------------------------------------------------------------
 
@@ -207,11 +220,11 @@ const SKILL = {
 const vs44: FrontPlan = {
   actions: {
     ...SKILL,
-    LT: driveBlock(-4.8, 'E-L'),
-    LG: driveBlock(-1.6, 'T-L'),
+    LT: driveBlock(-3.55, 'E-L'),
+    LG: driveBlock(-1.8, 'T-L'),
     C: setBlock([{ x: -0.5, y: -0.9 }]),
-    RG: driveBlock(1.6, 'T-R'),
-    RT: driveBlock(4.8, 'E-R'),
+    RG: driveBlock(1.8, 'T-R'),
+    RT: driveBlock(3.55, 'E-R'),
   },
   assignments: {
     C: {
@@ -226,11 +239,11 @@ const vs44: FrontPlan = {
 const vs43: FrontPlan = {
   actions: {
     ...SKILL,
-    LT: driveBlock(-4.8, 'E-L'),
-    LG: driveBlock(-1.6, 'T-L'),
+    LT: driveBlock(-3.55, 'E-L'),
+    LG: driveBlock(-1.8, 'T-L'),
     C: setBlock([{ x: -0.5, y: -0.9 }]),
-    RG: driveBlock(1.6, 'T-R'),
-    RT: driveBlock(4.8, 'E-R'),
+    RG: driveBlock(1.8, 'T-R'),
+    RT: driveBlock(3.55, 'E-R'),
   },
   assignments: {
     C: {
@@ -243,18 +256,20 @@ const vs43: FrontPlan = {
 
 /**
  * 5-2 (odd): five big men on the line, so every lineman has a guy to block
- * immediately — tackles take the ends (get his outside shoulder, drive him
- * to the fake side), guards take the men over them, center takes the nose.
- * Nobody is left free.
+ * immediately — tackles take the ends on their outside shoulders (get his
+ * outside shoulder, drive him to the fake side), guards take the tackles on
+ * THEIR outside shoulders, center takes the nose. Nobody is left free. Since
+ * 2026-09-17 the ends and tackles stand exactly where the even fronts put them
+ * (±3.55 and ±1.8); the only difference here is the nose on the center.
  */
 const vs52: FrontPlan = {
   actions: {
     ...SKILL,
-    LT: driveBlock(-5.2, 'E-L'),
-    LG: driveBlock(-3, 'T-L'),
+    LT: driveBlock(-3.55, 'E-L'),
+    LG: driveBlock(-1.8, 'T-L'),
     C: driveBlock(0, 'N'),
-    RG: driveBlock(3, 'T-R'),
-    RT: driveBlock(5.2, 'E-R'),
+    RG: driveBlock(1.8, 'T-R'),
+    RT: driveBlock(3.55, 'E-R'),
   },
   assignments: {
     C: {
@@ -263,24 +278,24 @@ const vs52: FrontPlan = {
         'Snap the ball and get into the man in front of you the same instant. Get to his outside shoulder and push him toward the fake with everybody else. He is trying to walk you backward into the quarterback — do not let him. Hold your spot.',
     },
     LG: {
-      rule: 'The big man just outside you is yours — block him, angled to the fake side, and HOLD.',
+      rule: 'The big man on your outside shoulder is yours — block him, angled to the fake side, and HOLD.',
       detail:
-        'In this front their big man lines up between you and your tackle, and your tackle is going past him to the outside man — so he is YOURS. Get into him fast, steer him toward the fake with everybody else, and hold your ground. Never chase downfield — that is a penalty on a pass play.',
+        'In this front their big man is lined up right on your OUTSIDE shoulder, and your tackle has the end beyond him — so he is YOURS, nobody else\'s. Get into him fast, steer him toward the fake with everybody else, and hold your ground. Never chase downfield — that is a penalty on a pass play.',
     },
     RG: {
-      rule: 'The big man just outside you is yours — block him, angled to the fake side, and HOLD.',
+      rule: 'The big man on your outside shoulder is yours — block him, angled to the fake side, and HOLD.',
       detail:
-        'Same job as the other guard: your tackle steps out to their outside man, so the big man between you two is YOURS. Get into him, push him toward the fake, and give no ground — your side is the side the quarterback is booting to, so nobody gets through you.',
+        'Same job as the other guard: he is on your outside shoulder and your tackle is busy with the end outside him, so this man is YOURS. Get into him, push him toward the fake, and give no ground — your side is the side the quarterback is booting to, so nobody gets through you.',
     },
     LT: {
-      rule: 'Their outside man is yours — outside shoulder, drive him to the fake side.',
+      rule: 'Their end is on your outside shoulder — take him, and drive him to the fake side.',
       detail:
-        'Step out to the man on the end of their line. Get your helmet to his outside shoulder and drive him down toward the fake with everybody else. Hold — no ground given, no going downfield.',
+        'He is lined up right on your outside shoulder, so this is a short step, not a long reach. Get your helmet to his outside shoulder and drive him down toward the fake with everybody else. Hold — no ground given, no going downfield. Nobody is inside you; the guard has the man on his own shoulder.',
     },
     RT: {
-      rule: 'Their outside man is yours — outside shoulder, drive him to the fake side.',
+      rule: 'Their end is on your outside shoulder — take him, and drive him to the fake side.',
       detail:
-        'You are on the boot side, so this is the block the play needs most. Step out to the man on the end of their line, get your helmet to his outside shoulder, and drive him down toward the fake. The quarterback boots around your block — HOLD it.',
+        'You are on the boot side, so this is the block the play needs most. He is right on your outside shoulder: get your helmet there first and drive him down toward the fake. The quarterback boots around your block — HOLD it.',
     },
   },
 }
@@ -300,7 +315,7 @@ const assignments: Record<OffPosId, Assignment> = {
   S: {
     rule: 'Sell the fake off the left tackle’s hip, then leak to the shallow middle.',
     detail:
-      'Take the fake like it is Stretch and the ball is yours — pocket open, pads down. Then SELL it: cut upfield right off the left tackle’s outside hip and run like you have it. Every linebacker you take with you is one the quarterback does not have to beat. Once you have sold it, bend back into the shallow middle and find a window — you are the quarterback’s late option when he is on the move.',
+      'Take the fake like it is Stretch and the ball is yours — pocket open, pads down. Then SELL it: cut upfield right off the left tackle’s hip, inside their end, and run like you have it. Every linebacker you take with you is one the quarterback does not have to beat. Once you have sold it, bend back into the shallow middle and find a window — you are the quarterback’s late option when he is on the move.',
   },
   Y: {
     rule: 'Post to the middle — six yards, then cut.',
@@ -356,13 +371,14 @@ const coachNotes = [
 
 const reviewNotes = [
   'Source is YOUR red-ink sketch and your description (2026-08-11), not the varsity book — the varsity page-19 "Stretch Left Boot Rt" panel was only used to fill in what you did not mention. The routes, the fake to Super, the protection rules, and the read progression are your words as given.',
-  'PROTECTION, PER YOUR NOTES: every lineman blocks the man in front of him, angled away from the boot (boot right = block left — written as "toward the fake side" so it mirrors to Black correctly), holds the line without collapsing, and never goes downfield (the penalty is called out in every lineman’s coaching text). Vs the 4-4 and 4-3 the center is the one uncovered lineman — he steps BACK with a short stunted line and helps/eats any blitz. Vs the 5-2, per your note, everyone has a guy immediately: tackles take the outside men (outside shoulder, drive to the fake side), guards take the big men between them and the tackles, center takes the man on his nose — nobody is left free, no dashed rings. Note this differs from Waggle, which sells Stretch with run-action blocks and a pulling guard — on this play the line pass-sets.',
+  'PROTECTION, PER YOUR NOTES: every lineman blocks the man in front of him, angled away from the boot (boot right = block left — written as "toward the fake side" so it mirrors to Black correctly), holds the line without collapsing, and never goes downfield (the penalty is called out in every lineman’s coaching text). Vs the 4-4 and 4-3 the center is the one uncovered lineman — he steps BACK with a short stunted line and helps/eats any blitz. Vs the 5-2, per your note, everyone has a guy immediately: tackles take the ends (outside shoulder, drive to the fake side), guards take the tackles — who since the 2026-09-17 alignment line up on the GUARDS’ outside shoulders rather than head-up on our tackles — and the center takes the man on his nose; nobody is left free, no dashed rings. Note this differs from Waggle, which sells Stretch with run-action blocks and a pulling guard — on this play the line pass-sets.',
   'DIAGRAM CONVENTION ON BLOCKS: every block is drawn as a slanted line, per your note — out to the defender’s outside shoulder, then the push toward the fake side (left on Red, right on Black). The defenders’ circles sit a yard past the line of scrimmage so the picture stays readable; the contact is AT the line, and "never go downfield" lives in the coaching text.',
   'Super’s path is sell-then-middle per your note: he carries the fake up off the left tackle’s outside hip, then bends back into the shallow middle (drawn settling around five yards over the ball) as the quarterback’s late option. He is written into the end of Q’s read as the scramble friend, not into the main progression (X → Y → R → L) — tell us if he should slot in earlier.',
   'Depths are estimates where your description gave none: Y’s post is drawn cutting at six and finishing near 12-13 deep middle; X’s post-corner stems to ten, cuts in about four, and finishes near 19-20 at the sideline; L crosses a yard or two BEHIND the line per your note and only crosses it once he reaches the boot-side flat. Say the word if any of those should compress.',
   'You called X the "hot receiver, but needs time to develop." We wrote the quarterback’s read as: X is the primary and you give his route time — doubled means work Y across the middle, then R on the out; defense dropped back means L in the flat or scramble. If "hot" meant something more specific (a blitz answer, a pre-snap alert), tell us and we will re-word the read.',
   'The release rule is coded as coaching language on both Q and X: ball out BEFORE X’s sideline cut, thrown to the corner, no deep lobs unless coverage is blown. There is no mechanism in the data to enforce it — it lives in the assignment text, so it will show up on the play page, the flashcards, and the printed book.',
   'R’s out at eight and X’s stem occupy the same sideline area — the drawn routes cross near the numbers, which matches your sketch. Football-wise they hold different levels (8 vs 19); flagging only so the picture does not surprise you.',
+  'ALIGNMENT RETUNE (2026-09-17). Ryan: "N is directly over C. DT should be directly over the last letter on the guard (either the L or the G in RG). DE should be directly over the edge of the circle on the OT." Every front now aligns the ends at ±3.55 and the tackles at ±1.8, the 5-2 included, so the protection picture changed even though nobody swapped men: in the 5-2 the guards now have the tackles ON THEIR OUTSIDE SHOULDERS (they used to be out between guard and tackle, with our tackles covered head-up) and our tackles have the ends right on their outside shoulders — a short punch, not a reach. Every drive-block line was re-aimed to the new spots, and the 5-2 no longer needs its own fake stroke: the odd front\'s crease is now the same C-gap lane over the tackle the even fronts give, so Super runs one path against all three (inside the end at about x −2.7, the same crease the Stretch carry takes).',
   'Stretch Boot Black is generated by mirroring Red with no hand corrections — fake Stretch right to Super, boot left, same protection flipped (the line leans toward the fake side either way, so the words mirror cleanly), L runs the out, R runs the flat behind the line, X (split left in Black) runs the post-corner on the boot side. Nobody has drawn that direction; it is symmetric football but check it like you checked Waggle Black.',
 ]
 

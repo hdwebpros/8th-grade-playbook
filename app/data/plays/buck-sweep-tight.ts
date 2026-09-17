@@ -18,8 +18,10 @@
  *     takes the backside tight end's job THIS FAMILY already teaches — the
  *     page-8 table's "Y — Backside: Rip - Climb", resolved per front exactly
  *     the way buckSweepRightRed resolves it for its own backside tight end,
- *     mirrored: wall off the end vs the even fronts, rip inside him and climb
- *     to the backside backer vs the 5-2.
+ *     mirrored: wall off the end. Since the 2026-09-17 alignment the end sits
+ *     on his inside shoulder on ALL THREE fronts, so that answer no longer
+ *     splits — the 5-2 used to have him rip inside the end and climb to the
+ *     backside backer, back when the end was drawn a yard outside him.
  *   - The orbiting ball carrier starts a step wider. Red's backside wing R
  *     sits at +4.2; Tight's sits at +5.7, so the first point of his orbit
  *     squiggle is widened (4.6 instead of 4.0). Nothing else about the orbit,
@@ -27,7 +29,9 @@
  * The backside LINE work needs no change at all: buckSweepLeftRed already has
  * RT ripping to B-R vs the even fronts and taking T-R vs the 5-2, which is the
  * exact mirror of what buckSweepRightRed asks of its backside tackle behind a
- * backside tight end. The two backsides agree, so nothing was invented.
+ * backside tight end. The two backsides agree, so nothing was invented. (In
+ * the 5-2 that T-R is now a 3-technique on the pulling guard's outside
+ * shoulder, not a man head up on our tackle — same id, different job.)
  *
  * Roles, Tight left:
  *   PST = LT · PSG = LG (the KICK puller) · C = C · BSG = RG (the WRAP puller)
@@ -90,22 +94,29 @@ const R_SWEEP: Action[] = [
     path: [
       { x: -1.8, y: -5.1 },
       { x: -3.2, y: -4.9 },
-      { x: -4.1, y: -3.8 },
-      { x: -4.5, y: -2 },
-      { x: -4.4, y: 1 },
-      { x: -4.2, y: 4.8 },
+      { x: -4.2, y: -3.8 },
+      { x: -4.7, y: -2 },
+      { x: -4.7, y: -0.6 },
+      { x: -4.5, y: 0.7 },
+      { x: -4.45, y: 2 },
+      { x: -4.3, y: 4.8 },
     ],
   },
 ]
 
-/** S: run the midline. Straight up the middle, selling the mesh with his hands. */
+/**
+ * S: run the midline. Straight up the middle, selling the mesh with his hands.
+ * In the 5-2 the nose is head up on the center at (0, 1), so the point where
+ * the fake crosses the line is shaded a few inches off his helmet — it still
+ * reads as one straight line up the middle, which is what "midline" means.
+ */
 const S_MIDLINE: Action[] = [
   {
     kind: 'fake',
     path: [
       { x: 0, y: -3.2 },
       { x: 0, y: -1.6 },
-      { x: 0, y: 0.4 },
+      { x: -0.15, y: 0.3 },
       { x: 0, y: 3.4 },
     ],
   },
@@ -132,26 +143,35 @@ const Q_MESH: Action[] = [
   },
 ]
 
-/** LG: pull flat, get outside the tight end, kick the first color out. */
+/**
+ * LG: pull flat, get outside the tight end, kick the first color out. He runs
+ * OUTSIDE the ball carrier's turn-up (−5.2 against the runner's −4.5) — he has
+ * to, or he cannot kick anybody out.
+ */
 const LG_KICK: Action = {
   kind: 'run',
   path: [
     { x: -2.2, y: -1.1 },
-    { x: -3.6, y: -1.3 },
-    { x: -4.6, y: -1.2 },
-    { x: -5.4, y: -0.9 },
+    { x: -3.8, y: -1.5 },
+    { x: -5.2, y: -1.7 },
   ],
 }
 
-/** RG: pull flat, aim at the kick puller's butt, turn up in the alley. */
+/**
+ * RG: pull flat, aim at the kick puller's butt, turn up in the alley. He turns
+ * up at about −4.25 — outside the end the wing pinned in, a quarter-yard
+ * inside the runner, who is following him.
+ */
 const RG_WRAP: Action = {
   kind: 'run',
   path: [
     { x: 1, y: -1.3 },
     { x: -0.6, y: -1.8 },
     { x: -2.4, y: -1.7 },
-    { x: -3.6, y: -0.5 },
-    { x: -4.1, y: 1.6 },
+    { x: -3.6, y: -1.3 },
+    { x: -4.2, y: -0.3 },
+    { x: -4.25, y: 1 },
+    { x: -4.15, y: 2 },
   ],
 }
 
@@ -281,11 +301,13 @@ const vs43: FrontPlan = {
 }
 
 /**
- * 5-2 (odd). The nose is on the center, their tackles are head up on our
- * tackles, and there is nothing on the playside edge, so the kick puller turns
- * up on the corner. On the backside their end sits a yard outside X, so — as
- * on the family's split-end-side picture — X rips INSIDE him and climbs to the
- * backside backer while RT bases the man head up on him.
+ * 5-2 (odd). The nose is on the center and — since the 2026-09-17 alignment —
+ * their tackles are on the outside shoulder of our GUARDS, not head up on our
+ * tackles. Both guards pull out from under those tackles, so our tackles have
+ * them: the playside tackle downs his, the backside tackle cuts his off.
+ * Nothing is on the playside edge, so the kick puller turns up on the corner.
+ * On the backside the end now lines up on X's INSIDE shoulder, so X walls him
+ * off exactly as he does vs the even fronts.
  */
 const vs52: FrontPlan = {
   actions: {
@@ -297,7 +319,7 @@ const vs52: FrontPlan = {
     LG: [LG_KICK, ...block('C-L')],
     RG: [RG_WRAP, ...block('F-L')],
     RT: block('T-R'),
-    X: block('B-R'),
+    X: block('E-R'),
   },
   assignments: {
     L: {
@@ -308,12 +330,12 @@ const vs52: FrontPlan = {
     Y: {
       rule: 'Down first — nobody there, climb to the backer.',
       detail:
-        'Their tackle is head up on our tackle, so he is not yours. Get off the ball and climb to the backer inside.',
+        'The end inside you belongs to the wing, and their tackle is lined up out on our guard\'s outside shoulder — our tackle has him. Nothing left for you down here, so get off the ball and climb to the backer inside.',
     },
     LT: {
-      rule: 'Base the man on you.',
+      rule: 'Down — take the tackle over the guard.',
       detail:
-        'Odd front: their tackle is head up on you. Step playside, get your hat across him and wall him off. Nothing crosses your face.',
+        'Nobody is head up on you in this front. Their tackle is sitting on our guard\'s outside shoulder and our guard is pulling out from under him, so he is yours: step down inside, hat across his playside number and pin him. Miss this and the play never gets started.',
     },
     C: {
       rule: 'Covered — block the nose.',
@@ -330,13 +352,14 @@ const vs52: FrontPlan = {
       detail: 'Butt of the kick puller, turn up inside him, and take the safety filling the alley.',
     },
     RT: {
-      rule: 'Rip — take the man on you.',
-      detail: 'Their tackle is head up on you. Rip playside across his face and wall him off from the chase.',
+      rule: 'Rip — cut off the tackle over the guard.',
+      detail:
+        'You are uncovered — the end is out on your outside shoulder and their tackle is inside you on our guard\'s shoulder. That tackle is the one who chases this down when our guard pulls, so rip playside across his face and wall him off.',
     },
     X: {
-      rule: 'Backside — rip, climb to the backer.',
+      rule: 'Backside — rip, wall off the end.',
       detail:
-        'Step playside, rip inside the end and climb to the backside backer — our tackle has the man head up on him, so the backer is yours. The end a yard outside you is chasing from behind and runs himself out of the play.',
+        'The end lines up on your inside shoulder, and our tackle has his hands full with the tackle over the pulling guard. So the end is yours: step playside, rip across his face and wall him off — he is the first man who chases this down from behind.',
     },
   },
 }
@@ -414,10 +437,11 @@ const coachNotes = [
 const reviewNotes = [
   "NEW PLAY (2026-08-15) — NEEDS COACH RYAN'S CHECK. Buck Sweep Left out of Tight was authored by starting from the hand-authored buck-sweep-left-red (page 8's main diagram, the TE-side sweep). Tight's left surface — Y at −4.5, wing L at −5.7, the five linemen, Super and the quarterback — is geometrically IDENTICAL to Red's, so every down block, both pull paths, the midline fake and the mesh-and-boot carry over verbatim, including every judgment call already flagged on that play's own review list (the wing blocks DOWN not out; the kick puller's target per front; the wrap puller's target per front; the center's block-back; the quarterback opening away). What changed is the backside, and only the backside.",
   'WHICH PICTURE — a ruling worth confirming. Buck Sweep has two hand-authored pictures: page 8 (at the tight end) and page 9 (away from the tight end, to the split end). Tight has a tight end AND a wing on both edges, so we treated BOTH Tight directions as the page-8, TE-side picture. That is the whole reason to be in Tight, but it does mean Tight never gets the page-9 edge answers (wing pinning the end, X stalking a corner) — confirm that is what you want.',
-  'THE ONE REAL CHANGE — X is a tight end here, not a split end. In Red he is split at +12 running a free route that takes the corner away. In Tight he sits at +4.5, so he takes the backside tight end job the page-8 table already writes down ("Y — Backside: Rip - Climb"), resolved per front exactly the way the family\'s own split-end-side picture (buck-sweep-right-red) resolves it for ITS backside tight end, mirrored: vs the 4-4 and 4-3 the end is right on his face, so he spends the rip ON him and walls off the chase while our tackle climbs to the backer; vs the 5-2 the tackles are head up (our tackle bases his man), so X rips INSIDE the end and climbs to the backside backer, leaving the end to chase from a yard outside. That is the same backside answer the family already ships — nothing new was invented — but it is the piece to eyeball.',
+  'THE ONE REAL CHANGE — X is a tight end here, not a split end. In Red he is split at +12 running a free route that takes the corner away. In Tight he sits at +4.5, so he takes the backside tight end job the page-8 table already writes down ("Y — Backside: Rip - Climb"), resolved per front exactly the way the family\'s own split-end-side picture (buck-sweep-right-red) resolves it for ITS backside tight end, mirrored: the end lines up on his inside shoulder on every front, so he spends the rip ON him and walls off the chase — our tackle climbs to the backer vs the even fronts and cuts off the tackle over the pulling guard vs the 5-2, and either way he cannot also have the end. (Before 2026-09-17 the 5-2 end was drawn a yard outside X and X climbed to the backside backer instead.) That is the same backside answer the family already ships — nothing new was invented — but it is the piece to eyeball.',
   'THE BACKSIDE LINE NEEDED NO CHANGE, and that is a small piece of evidence the reading above is right: buck-sweep-left-red already has RT ripping to B-R vs the even fronts and taking T-R vs the 5-2, which is exactly the mirror of what buck-sweep-right-red asks of its backside tackle standing next to a backside tight end. The two hand-authored pictures agree on the backside; Tight just inherits it.',
   'CONSEQUENCE — nobody runs the corner off anymore. Red-left sent X on a backside free route to carry the corner away from the play. Tight has no detached receiver, so the backside corner and safety are simply unblocked (they are a long way from a sweep going the other direction). Flag if you would rather X release deep on the back side instead of ripping.',
-  'ORBIT GEOMETRY — the ball carrier starts a step wider. Tight\'s backside wing is at ±5.7 where Red\'s is at 4.2, so the first point of the orbit squiggle was widened (4.6 instead of 4.0) and nothing else moved: he still runs flat at five yards to about two and a half yards outside the ball and turns up INSIDE the tight end, tight behind the wrapping guard, at about 4.4 yards wide. Same relationship page 8 draws.',
+  'ORBIT GEOMETRY — the ball carrier starts a step wider. Tight\'s backside wing is at ±5.7 where Red\'s is at 4.2, so the first point of the orbit squiggle was widened (4.6 instead of 4.0) and nothing else moved: he still runs flat at five yards to about two and a half yards outside the ball, then turns up tight behind the wrapping guard at about 4.5 yards wide. Retuned 2026-09-17 with the rest of the family: the end is now a 5-technique at 3.55, the wing pins him IN and the guard kicks the next man OUT, so the runner splits those two blocks — he turns up OUTSIDE the end, where before he turned up inside him at 3.5. Same relationship page 8 draws, other side of the end\'s helmet.',
+  'DEFENSIVE ALIGNMENT, 2026-09-17. Ryan: "N is directly over C. DT should be directly over the last letter on the guard (either the L or the G in RG). DE should be directly over the edge of the circle on the OT." Two things changed in this play because of it. (1) In the 5-2 our tackles are no longer covered — the tackle is out on the GUARD\'s outside shoulder — so instead of "base the man head up on you" the playside tackle blocks DOWN on the tackle over the pulling playside guard and the backside tackle RIPS and cuts off the tackle over the pulling backside guard, which is the same job the even fronts already ask for. The center is still alone on the nose. (2) X\'s backside answer stopped splitting by front: the end is on his inside shoulder in all three, so he walls the end off in all three and the backside backer B-R is the man we now leave alone in the 5-2. Same target ids everywhere except X vs the 5-2 (B-R to E-R) — but the words the kids hear changed, so re-teach it.',
   'BALANCED SET — no formationTwinId, matching the Split Wide and Tight-veer rulings: Tight mirrors onto itself, so there is no Red/Black-style formation twin, just the left/right pair linked by audibleFlipId (Indy = left, Hoosier = right at the line, per DIRECTION_AUDIBLES).',
   'THE RIGHT-HAND PLAY IS GENERATED, not hand-authored: buck-sweep-right-tight = mirrorTightPlay(buck-sweep-left-tight) — mirrorPlay() plus the X↔Y entry exchange this balanced one-formation set requires (X and Y are mirror-image POSITIONS that keep their spots, so their entries must trade places when everything else flips — the bug the Split Wide dive hit). Tight is drawn exactly symmetric and all three fronts are left/right symmetric, so no hand corrections were needed. Reviewing the left play reviews both, and if any answer above changes, the right play changes with it automatically.',
   'FOOTBALL NOTE FOR REVIEW — Tight makes the kick puller\'s long runs shorter in spirit but not on paper. Vs the 4-3 he still turns up on the playside safety and vs the 5-2 still on the corner, exactly as in Red, because the extra tight end is on the BACK side, not the play side. If having a second tight end on the field should change either of those targets, say so and we retarget them here without touching the Red plays.',

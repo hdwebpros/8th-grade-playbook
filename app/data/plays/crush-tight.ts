@@ -166,12 +166,19 @@ const L_NEAR_COLOR_43: Action = {
   ],
 }
 
-/** Y: inside release, over the top of the tackle's block, then climb. */
+/**
+ * Y: inside release, under the end's inside hip and up over the top of the
+ * tackle's block, then climb. Since the 2026-09-17 alignment the end is a
+ * 5-technique at −3.55 — tight to our tackle, not out over the tight end — so
+ * the release starts flat behind the line to get past his hip before it turns
+ * up through the lane over our tackle.
+ */
 const Y_INSIDE: Action = {
   kind: 'run',
   path: [
-    { x: -3.9, y: 0.7 },
-    { x: -3.2, y: 2.2 },
+    { x: -4, y: -0.3 },
+    { x: -3, y: 0.4 },
+    { x: -2.9, y: 2.2 },
   ],
 }
 
@@ -222,7 +229,7 @@ const vs44: FrontPlan = {
     },
     LG: {
       rule: 'Covered — base him.',
-      detail: 'The tackle is head up on you. Take his playside number and wall him inside.',
+      detail: 'The tackle is on your outside shoulder. Take his playside number and wall him inside.',
     },
     C: {
       rule: 'Step playside. Uncovered — get vertical.',
@@ -241,7 +248,7 @@ const vs44: FrontPlan = {
     X: {
       rule: 'Backside — base the end on you.',
       detail:
-        'You are a tight end in this set, and the play runs away from you. Take the end head up on you and stay on him until the whistle. In Red you would be split out chasing a corner; here you shut the back door.',
+        'You are a tight end in this set, and the play runs away from you. Take the end on your inside shoulder and stay on him until the whistle. In Red you would be split out chasing a corner; here you shut the back door.',
     },
   },
 }
@@ -305,10 +312,16 @@ const vs43: FrontPlan = {
 }
 
 /**
- * 5-2 — the arrow-for-arrow copy of the page-7 panel on the playside. The end
- * aligns OUTSIDE our tight end, so Y works inside and the end himself is the
- * read. On the back side X bases the end outside him and everything else is
- * the panel unchanged.
+ * 5-2. Was an arrow-for-arrow copy of the page-7 panel on the playside, back
+ * when our 5-2 sat the end outside our tight end and the tackle head up on our
+ * tackle. Ryan's 2026-09-17 alignment moved both: the end is a 5-technique
+ * tight to our tackle and the tackle is a 3-technique on our GUARD's outside
+ * shoulder. So the guards are covered and our tackles are not — the
+ * guard-and-center double on the nose is gone (the center is alone), the
+ * playside guard and tackle work the 3-technique together, and the backside
+ * tackle is the free climber. Y still releases inside the end, going under his
+ * inside hip now, and the end is still the read. X still bases the backside
+ * end, who now sits on his inside shoulder.
  */
 const vs52: FrontPlan = {
   readKey: 'E-L',
@@ -317,16 +330,16 @@ const vs52: FrontPlan = {
     Y: [Y_INSIDE, ...block('B-L')],
     L: [L_PIN_52, ...block('B-L')],
     LT: block('T-L'),
-    LG: block('N'),
+    LG: block('T-L'),
     C: block('N'),
-    RG: block('B-R'),
-    RT: block('T-R'),
+    RG: block('T-R'),
+    RT: block('B-R'),
   },
   assignments: {
     Y: {
       rule: 'Inside release — climb to the playside backer.',
       detail:
-        'The end outside you is the read key: do not touch him. Step inside, run over the top of the tackle\'s block and put your hat on the backer. That block is what springs the keep.',
+        'The end is the read key — he lines up tight on our tackle\'s outside shoulder now, so you are going UNDER his inside hip, not around him. Do not touch him. Duck inside, come up through the lane over our tackle and put your hat on the backer. That block is what springs the keep.',
     },
     L: {
       rule: 'Tight off the read — pin the backer.',
@@ -334,31 +347,32 @@ const vs52: FrontPlan = {
         'Release outside and run straight past the end we are reading — never touch him. As soon as you clear him, turn back inside and pin the playside backer. The tight end is climbing to that same man from the inside: whoever gets him, the other one takes the next jersey that shows.',
     },
     LT: {
-      rule: 'Base the man on you.',
+      rule: 'Take the tackle with the guard.',
       detail:
-        'Odd front: their tackle is head up on you. Step playside, get your hat across him and wall him off from the ball.',
+        'Nobody is head up on you in this front — their tackle sits out on our guard\'s outside shoulder, in the gap between you two. You and the guard have him together: your inside hand on his outside number, and stay on him until the dive clears.',
     },
     LG: {
-      rule: 'Down — take the nose with the center.',
+      rule: 'Covered — base him.',
       detail:
-        'Step inside and get your shoulder on the nose\'s playside number. The center is on him too — you two are one block until the nose is moved, then whoever is free climbs.',
+        'Their tackle is on your outside shoulder, not head up, so step with your outside foot and get your hat across his playside number. The tackle is coming down on him with you — do not let him cross either of your faces.',
     },
     C: {
-      rule: 'Covered — block the nose.',
-      detail: 'He is head up on you. Take him, and let the guard take his playside half.',
+      rule: 'Covered — block the nose. You are alone on him.',
+      detail:
+        'The nose is head up on you and the guard has a man of his own now, so there is no help coming. Playside foot first, hat on his playside number, and do not lose him.',
     },
     RG: {
-      rule: 'Uncovered — climb to the backside backer.',
-      detail: 'Nobody on you in a 5-2. Step playside, then climb and cut off the backer chasing from behind.',
+      rule: 'Covered — base him.',
+      detail: 'Their tackle is on your outside shoulder on the back side. Take him and never let him chase down the line.',
     },
     RT: {
-      rule: 'Base the man on you.',
-      detail: 'Their tackle is head up on you on the back side. Take him and stay on him.',
+      rule: 'Uncovered — step playside, climb to the backside backer.',
+      detail: 'Nobody on you: the end is the tight end\'s and the tackle inside you is the guard\'s. Step playside and cut off the backer chasing from behind.',
     },
     X: {
-      rule: 'Backside — base the end outside you.',
+      rule: 'Backside — base the end on your inside shoulder.',
       detail:
-        'The end sits just outside your shoulder and the play is going the other way. Take him and hold him — he is the man with the best angle to chase us down.',
+        'The end lines up on our tackle\'s outside shoulder, just inside you, and the play is going the other way. Take him and hold him — he is the man with the best angle to chase us down.',
     },
   },
 }
@@ -390,7 +404,7 @@ const assignments: Record<OffPosId, Assignment> = {
   RT: {
     rule: 'Backside — covered: base. Uncovered: climb to the backside backer.',
     detail:
-      'The tight end outside you has the end on this play, so if nobody is on your nose you climb and cut off the chase. If a man is head up on you, take him and stay on him.',
+      'The tight end outside you has the end on this play, so if nobody is on your nose you climb and cut off the chase. If a man is on your shoulder, take him and stay on him.',
   },
   Y: {
     rule: 'Block the man on you. Nobody on you — inside release and climb.',
@@ -436,7 +450,8 @@ const reviewNotes = [
   "JUDGMENT CALL — vs the 4-3 the whole backside is REPLUMBED, and this is the part most worth your eyes. In Red-left the backside is: RT on the end, RG climbing to the backside backer, C blocking back on the down man. Here X takes the end, which frees RT — so RT climbs to the backside backer (B-R), RG bases the down man head up on him (T-R), and the CENTER, with nothing to block back on, steps playside and runs to the deep safety on our side (F-L). Every backside defender is now blocked once and the center is chasing a safety at eleven yards. If that is too far to send a center, the fallback is C on the Mike and LT on the playside safety, or simply leaving the safety alone and having C step playside and help on the nose.",
   "vs the 4-4 and the 5-2 NOTHING moved but X. In both fronts crushLeftRed already had the backside guard and tackle busy (44: RG bases T-R, RT climbs to B-R; 52: RG climbs to B-R, RT bases T-R), so X basing the end is a straight ADD — vs the 4-4 the backside end E-R was completely unblocked in Red and now he is covered. That is the clean gain of the set.",
   "WHAT IT COSTS — the backside CORNER (C-R). In Red, X's whole job was that corner; in Tight nobody touches him in any front. On an outside veer going the other way that is a cheap trade (he is the farthest defender from the ball), but it is a real change from the Red picture and it is worth saying out loud. Also still unblocked, exactly as in Red: the read key itself, and vs the 4-4 the backside walked-up backer (O-R).",
-  "READ KEYS are crushLeftRed's unchanged: 4-4 → the walked-up outside backer (O-L), because the end is head up on Y and Y blocks him; 4-3 → the outside backer (B-L) at four and a half; 5-2 → the END (E-L) outside Y, the literal scan picture. Nothing about the second tight end changes who the quarterback is reading.",
+  "READ KEYS are crushLeftRed's unchanged: 4-4 → the walked-up outside backer (O-L), because the end is head up on Y and Y blocks him; 4-3 → the outside backer (B-L) at four and a half; 5-2 → still the END (E-L), though since the 2026-09-17 alignment he lines up tight on our tackle's outside shoulder rather than outside Y, so Y releases UNDER his inside hip instead of around him. Nothing about the second tight end changes who the quarterback is reading.",
+  "THE 5-2 LINE BLOCKS WERE RE-RESOLVED (2026-09-17). Ryan: \"N is directly over C. DT should be directly over the last letter on the guard (either the L or the G in RG). DE should be directly over the edge of the circle on the OT.\" That makes the guards covered and our tackles uncovered in the odd front, the opposite of the page-7 50 look this plan was transcribed from. So: the guard-and-center double team on the nose is GONE and the center is alone on him; the playside guard and tackle work the 3-technique together; the backside guard bases his 3-technique and the backside tackle, who used to base a man head up on him, is now the free climber to the backside backer. Y's release and the read key are unchanged. Confirm.",
   "BALANCED SET — no formationTwinId, matching the Split Wide and Veer-out-of-Tight rulings: Tight mirrors onto itself, so there is no Red/Black-style formation twin, just this left/right pair linked by audibleFlipId (Indy = left, Hoosier = right at the line, per DIRECTION_AUDIBLES in app/utils/playbook.ts).",
   "PITCH MAN GEOMETRY — Tight's R wing starts at (+5.7, −1) instead of Red's (+4.2, −1), so the first point of the orbit squiggle was widened to (4.6, −2.7) — the same one-point fix veer-left-tight made. The rest of the motion, the 5-by-1 pitch phase ending at (−10, −2.2), Super's dive and the quarterback's flat arrow are carried over from crushLeftRed unchanged.",
 ]

@@ -107,12 +107,13 @@ const S_FLAT: Action[] = [
   },
 ]
 
-/** Y: the over — inside release, climb, then across the field at nine. */
+/** Y: the over — release outside the end (he sits on Y's inside shoulder at ∓3.55), climb, then across the field at nine. */
 const Y_OVER: Action[] = [
   {
     kind: 'route',
     path: [
-      { x: -4.0, y: 1.8 },
+      { x: -5.1, y: 1.2 },
+      { x: -4.2, y: 3.2 },
       { x: -3.0, y: 5.8 },
       { x: -0.6, y: 8.4 },
       { x: 2.8, y: 9.0 },
@@ -168,8 +169,8 @@ const rgPull = (targetId: string): Action[] => [
     kind: 'run',
     path: [
       { x: 2.4, y: -0.9 },
-      { x: 3.6, y: -1.3 },
-      { x: 4.8, y: -1.5 },
+      { x: 3.6, y: -1.4 },
+      { x: 4, y: -1.2 },
     ],
   },
   { kind: 'block', targetId },
@@ -203,10 +204,18 @@ const vs43: FrontPlan = {
   },
 }
 
+/**
+ * 5-2. Since the 2026-09-17 alignment the only thing this front adds over the
+ * even fronts is the nose on the center: their tackles sit on our GUARDS'
+ * outside shoulders exactly as they do in the 4-4 and 4-3, and our tackles are
+ * uncovered inside with the end on their outside shoulder. So the left rule
+ * resolves the same way it does vs the even fronts — LT takes the end to his
+ * left, LG takes the tackle to his left — and only the center's man changes.
+ */
 const vs52: FrontPlan = {
   actions: {
     ...SKILL,
-    LT: block('T-L'),
+    LT: block('E-L'),
     LG: block('T-L'),
     C: block('N'),
     RG: rgPull('E-R'),
@@ -219,9 +228,9 @@ const vs52: FrontPlan = {
         'Odd front, so there is a man head up on you. Step toward the fake, get your hat across him and hold him. The pulling guard is gone, so nobody is coming to help — hold your ground and do not chase.',
     },
     LT: {
-      rule: 'Block Stretch to the fake side — reach the man on you.',
+      rule: 'Block Stretch to the fake side — take the end on your shoulder.',
       detail:
-        'The tackle is head up on you in a 5-2. Step toward the fake, hat across his near number, sell the run. The end outside you releases with the tight end and chases nothing.',
+        'Nobody is head up on you in this front any more — their tackle is out on the guard\'s outside shoulder and the end is on yours. The end is the first man to your left, so he is yours: step toward the fake, hat across his near number, sell the run and do not let him come underneath you.',
     },
   },
 }

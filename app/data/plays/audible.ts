@@ -193,7 +193,7 @@ const AT_L: Pt = { x: -5.7, y: -1 }
 // line map serves both, per front.
 // ---------------------------------------------------------------------------
 
-/** 4-4: tackles head up on our guards, ends outside our tackles, two inside backers. */
+/** 4-4: tackles on our guards' outside shoulders, ends on our tackles', two inside backers. */
 const LINE_44 = {
   Y: block('E-L'),
   LT: block('T-L'),
@@ -215,8 +215,16 @@ const LINE_43 = {
 
 /**
  * 5-2 (odd): five down men means there is no empty gap to slide into. The
- * protection stops being a slide and becomes man-on — everybody blocks the
- * man over him, and the two uncovered guards climb to the two backers.
+ * protection stops being a slide and becomes gap-on — every lineman takes the
+ * down man in the gap he owns: Y the end away, our tackles the tackles inside
+ * them, the center the nose, and the two guards — whose A gaps the head-up
+ * nose leaves empty — climb to the two backers.
+ *
+ * NOTE (2026-09-17): since the alignment retune their tackles sit on the
+ * GUARDS' outside shoulders (x ±1.8), not head-up on our tackles, so this map
+ * has our tackles reaching one gap inside for them. It draws honestly, but the
+ * simpler man-on picture — guards on the tackles, tackles on the ends — is
+ * worth Coach Ryan's eyes. See the review note.
  */
 const LINE_52 = {
   Y: block('E-L'),
@@ -428,24 +436,24 @@ const OVERRIDES_43: Partial<Record<OffPosId, Assignment>> = {
 
 const OVERRIDES_52: Partial<Record<OffPosId, Assignment>> = {
   LT: a(
-    'Odd front — no slide. Take the man on your nose.',
-    'Five down linemen means every gap already has somebody in it, so there is nothing to slide into. The tackle is head up on you: he is yours, all by yourself, all day.',
+    'Odd front — no slide. Take their tackle in the gap inside you.',
+    'Five down linemen means every gap already has somebody in it, so there is nothing to slide into. Their tackle is sitting on the guard\'s outside shoulder, in the gap between you and him, and that gap is yours on this front: he is yours, all by yourself, all day. Y has the end outside you.',
   ),
   LG: a(
-    'Odd front — uncovered. Climb to the backer on your side.',
-    'Nobody is on you in a 5-2. Set, get your eyes on the backer behind the nose, and go get him. If he drops into coverage, stay square and help the center.',
+    'Odd front — your inside gap is empty. Climb to the backer on your side.',
+    'The nose is head-up on the center and their tackle is outside you in the gap your tackle owns, so the gap between you and the center has nobody in it. Set, get your eyes on the backer behind the nose, and go get him. If he drops into coverage, stay square and help the center.',
   ),
   C: a(
     'Odd front — the nose is on you. He is yours.',
     "A man on your nose is what makes this an ODD front. Snap and get into him immediately — you cannot let a nose guard walk you back into the quarterback's lap.",
   ),
   RG: a(
-    'Odd front — uncovered. Climb to the backer on your side.',
-    'Same as the other guard, other side. Nobody on you, so the backer behind the nose on your side is yours.',
+    'Odd front — your inside gap is empty. Climb to the backer on your side.',
+    'Same as the other guard, other side. Nothing in the gap between you and the center, so the backer behind the nose on your side is yours.',
   ),
   RT: a(
-    'Odd front — take the man on your nose.',
-    'The tackle is head up on you instead of an end being outside you. Block him and stay square; Super has the end outside.',
+    'Odd front — take their tackle in the gap inside you.',
+    'Their tackle lines up on the guard\'s outside shoulder, in the gap between you and him, and on this front that man is yours. Block him and stay square; Super has the end outside you.',
   ),
 }
 
@@ -514,7 +522,8 @@ const sharedReviewNotes = [
   'RAM vs BULL DIRECTION — p15 is one picture titled "RAM / BULL". The drawn arrows all cap about half a man to the LEFT of each lineman and Super\'s arrow runs up-and-RIGHT to a bar on the inside hip of the right tackle, so the picture as drawn is BULL (slide left, Super off the hip of the tackle away). We slide TOWARD the split-end side so the free edge is always on the tight end\'s side where Y is standing — that makes Red = Ram and Black = Bull, and it makes p15\'s drawn picture literally our Black dropback. If you would rather always slide away from the throw, say so and both dropback plays flip.',
   "SUPER'S DROPBACK BAR — on p15 Super's block bar sits BETWEEN the away guard and the away tackle and behind the line, not outside the tackle. That is transcribed as drawn: he sets at the away tackle's inside hip at depth. It is written as a set-step block rather than a block on a named defender, because in an even front nobody is standing there pre-snap.",
   'SLIDE vs REACH TARGETS — Ram (slide right) and Sprint Right (reach right) give the linemen the SAME gaps; the difference on p15 vs p17 is technique and Super\'s job. So one line map serves both protections in this file. Flag it if you teach different gap ownership for the two.',
-  'VS THE 5-2 THE PROTECTION IS A DIFFERENT PICTURE — five down men means there is no empty gap to slide into, so the protection becomes man-on: Y has the end, both tackles have the man on their nose, the center has the nose guard, and the two uncovered guards climb to the two backers. On DROPBACK that leaves Super with the end on the split-end side instead of a hip (the p15 rule cannot be run against this front). On SPRINT he still has the playside edge, which against a 5-2 is that same end. This is the biggest front-driven change in the file — please eyeball the 5-2 diagrams first.',
+  'VS THE 5-2 THE PROTECTION IS A DIFFERENT PICTURE — five down men means there is no empty gap to slide into, so the protection becomes gap-on: Y has the end away, each of our tackles takes their tackle in the gap inside him, the center has the nose guard, and the two guards — whose A gaps the head-up nose leaves empty — climb to the two backers. On DROPBACK that leaves Super with the end on the split-end side instead of a hip (the p15 rule cannot be run against this front). On SPRINT he still has the playside edge, which against a 5-2 is that same end. This is the biggest front-driven change in the file — please eyeball the 5-2 diagrams first.',
+  'OPEN, 2026-09-17 — THE 5-2 LINE MAP AFTER THE ALIGNMENT CHANGE. Your rule ("N is directly over C. DT should be directly over the last letter on the guard. DE should be directly over the edge of the circle on the OT") moved the 5-2 tackles off our tackles and onto the guards\' outside shoulders. The words above now match what is drawn, but the drawing itself is the OLD assignment: our tackles reach one gap inside to take those tackles while the guards climb. The simpler picture on this front is straight man-on — each guard takes the tackle on his own outside shoulder, each of our tackles takes the end on his, Y releases or doubles, and nobody climbs. That is a football change, not a wording change, so it is left for you: say the word and the 5-2 map flips to man-on.',
   'THE PLAYSIDE EDGE, BY FRONT — p17 says "SUPER: PLAYSIDE EDGE" without naming anybody. Resolved here as the outermost rusher on the call side: the walked-up backer in the 4-4, the Sam in the 4-3, the end in the 5-2. Confirm.',
   "THE QUARTERBACK'S PATH IS NOT DRAWN ON p15 OR p16 — the dropback panels show him as a circle with no line. The five-step drop here is authored, not transcribed. The SPRINT path IS drawn (p18, the long black arrow that dips behind Super and then runs flat toward the sideline) and follows p17's words, \"Gain Depth — Sprint Downhill Toward Sideline.\"",
   "WING ROUTE WIDTH — the wing lines up eight yards inside the split end, so his out and his wheel have to cover more ground sideways to finish at the same spot on the field. The route paths here stretch that lateral distance (and only the lateral distance — every depth and every break point comes straight out of app/data/routes.ts). That is what the scans draw: on p16 \"12\" the wing's out finishes outside the split end's alignment, and on p18 \"54\" the wheel turns up outside the curl.",

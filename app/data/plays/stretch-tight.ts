@@ -69,9 +69,12 @@ const block = (targetId: string): Action[] => [{ kind: 'block', targetId }]
 /**
  * S: the page-12 measured path, verbatim. Slow bucket step back and away,
  * through the mesh at (−2.5, −2.9), to an aiming point OUTSIDE the playside
- * tackle — x = −3.8, between LT (−3.0) and Y (−4.5). Then the dead-vertical
- * BEND-UP the scan draws. The scan's second arrow (bounce outside the end man)
- * lives in his assignment text, same convention as the rest of the family.
+ * tackle — x = −3.8, between LT (−3.0) and Y (−4.5). Then the BEND-UP the scan
+ * draws. Since 2026-09-17 the end aligns at −3.55, right on LT's outside
+ * shoulder, so "bend up INSIDE him" is the C-gap lane over the tackle: squeeze
+ * through at x ≈ −2.7 a yard past the line, then widen back to −3.2 once past
+ * him. The scan's second arrow (bounce outside the end man) lives in his
+ * assignment text, same convention as the rest of the family.
  */
 const S_STRETCH: Action[] = [
   {
@@ -81,8 +84,9 @@ const S_STRETCH: Action[] = [
       { x: -1.2, y: -3.9 },
       { x: -2.5, y: -2.9 },
       { x: -3.8, y: -1.9 },
-      { x: -3.8, y: 0.6 },
-      { x: -3.8, y: 3.2 },
+      { x: -2.6, y: 0.5 },
+      { x: -2.75, y: 1.6 },
+      { x: -3.2, y: 3.2 },
     ],
   },
 ]
@@ -101,17 +105,20 @@ const Q_MESH: Action[] = [
 /**
  * X on the backside cutoff — the second tight end is what Tight buys us back
  * here. Up and INSIDE, bar around 2.3 yards, walling off the inside chase
- * behind RT's step-down. This is stretch-right-red's hand-authored Y cutoff
- * stroke (the page-13 panel's red scramble arrow) mirrored onto +x, at the
- * identical alignment.
+ * behind RT's step-down. He is climbing PAST the backside end, not blocking
+ * him (the R wing bars that man), so since the 2026-09-17 alignment put the end
+ * at +3.55 — on top of the old stroke — the climb is routed through the lane
+ * inside him, over RT at x ≈ +2.7. This is stretch-right-red's hand-authored Y
+ * cutoff stroke (the page-13 panel's red scramble arrow) mirrored onto +x, at
+ * the identical alignment.
  */
 const X_CUTOFF: Action[] = [
   {
     kind: 'block',
     path: [
-      { x: 4.1, y: 0.6 },
-      { x: 3.5, y: 1.5 },
-      { x: 3.1, y: 2.3 },
+      { x: 3.4, y: 0.2 },
+      { x: 2.7, y: 1.2 },
+      { x: 2.5, y: 2.3 },
     ],
   },
 ]
@@ -128,8 +135,9 @@ const SKILL = {
 
 /**
  * 5-2 (ODD) — the front the varsity scan itself draws, so the playside here is
- * a one-for-one copy of page-12's arrows: LT reaches the head-up tackle, LG
- * combos and climbs to the playside backer, C reaches the nose, the wing goes
+ * a one-for-one copy of page-12's arrows: Y and LT combo the END on LT's
+ * outside shoulder with LT climbing off it to the playside backer, LG reaches
+ * the tackle on his own outside shoulder, C reaches the nose, the wing goes
  * all the way to the corner. The backside follows page-13's panel mirrored:
  * RG scoops the nose with C and then climbs off it to the backside backer (the
  * panel's second dotted climb, which page-12 left hanging), RT cuts off, the R
@@ -140,23 +148,31 @@ const vs52: FrontPlan = {
     ...SKILL,
     Y: block('E-L'),
     L: block('C-L'),
-    LT: block('T-L'),
-    LG: [...block('T-L'), ...block('B-L')],
+    // The man over LT is the END (E-L at −3.55, on his outside shoulder) and Y
+    // is reaching him too, so page-12's playside double-team is LT+Y and LT —
+    // the inside man — is the one who comes off it to the backer.
+    LT: [...block('E-L'), ...block('B-L')],
+    LG: block('T-L'),
     C: block('N'),
     RG: [...block('N'), ...block('B-R')],
     RT: block('T-R'),
     R: block('E-R'),
   },
   assignments: {
-    LT: {
-      rule: '45 outside step — reach the man on you.',
+    Y: {
+      rule: '45 outside step — reach the end and turn him in.',
       detail:
-        'The tackle is head up on you in a 5-2. Playside foot first at 45 degrees, get your hat across his playside number and run your feet. The guard is coming to help.',
+        'In a 5-2 their end is on your inside shoulder, tight to our tackle. Playside step at 45, hat across his outside number, and turn him in — the tackle is punching him with you for a beat before he climbs. You own this man: Super bends up inside your block or bounces around it.',
+    },
+    LT: {
+      rule: '45 outside step — combo the end with Y, then climb to the backer.',
+      detail:
+        'Nobody is inside you in a 5-2 — their end sits on your OUTSIDE shoulder and Y is reaching him too. Step playside at 45, get your hat and hands on that end with Y, and the second Y has him turned, come off flat for the inside backer. He is the one who fills this play.',
     },
     LG: {
-      rule: '45 outside step — combo the down man, then climb to the backer.',
+      rule: '45 outside step — reach the man on you.',
       detail:
-        'Nobody on you. Step playside at 45 and put your inside hand on the down man the tackle is reaching. Stay on him until the tackle owns him, then come off flat for the inside backer — he is the one who fills this play.',
+        'Their tackle lines up on YOUR outside shoulder in a 5-2, so he is yours alone. Playside foot first at 45 degrees, get your hat across his playside number and run your feet toward the sideline. No help is coming — the center has the nose and your tackle is outside on the end.',
     },
     C: {
       rule: '45 outside step — reach the nose.',
@@ -169,9 +185,9 @@ const vs52: FrontPlan = {
         'Step inside at 45 and get your shoulder into the nose. Once the center owns him, come off flat to the backside backer — he is the man who chases this down from behind.',
     },
     RT: {
-      rule: '45 inside step — cut off the man on you.',
+      rule: '45 inside step — cut off the tackle inside you.',
       detail:
-        'Step DOWN inside, not out. Get your head across his playside shoulder and wall him off. You never fan out on him — nothing chases us from behind.',
+        'Step DOWN inside, not out. Their tackle is on the back-side guard\'s outside shoulder and he is the one who chases this play — get your head across his playside shoulder and wall him off. You never fan out on the end behind you; nothing chases us from behind.',
     },
     L: {
       rule: 'Gap to climb — go get the corner.',
@@ -223,7 +239,7 @@ const vs44: FrontPlan = {
     LG: {
       rule: '45 outside step — reach the man on you.',
       detail:
-        'The tackle is head up. Playside foot first, get your helmet to his playside number and run him toward the sideline. The center is stepping over to help.',
+        'The tackle is on your outside shoulder. Playside foot first, get your helmet to his playside number and run him toward the sideline. The center is stepping over to help.',
     },
     C: {
       rule: '45 outside step — help the playside guard.',
@@ -394,11 +410,12 @@ const reviewNotes = [
   'CONSEQUENCE OF THAT TRADE — NOBODY PLAYS MDM. With no split end, no safety gets blocked on any front. On the Red version the split end was the only man who ever ran at one. What Tight buys instead is a second body sealing the back side, which is why the cutback is cleaner and the chase is slower. Confirm you are happy trading the MDM block for the extra seal, or tell us who should climb to the safety (the backside wing is the only candidate who is not already busy).',
   "JUDGMENT CALL — backside wing on the EDGE MAN, not the backer. Stretch Left out of Red sends the backside wing climbing to the backside inside backer (B-R), and its review list flags the alternative: bar the tight edge man instead, which is what page-13's panel actually draws when the backside has a tight end and a wing on it. Tight's backside IS that surface, so this file follows page 13: R bars E-R in all three fronts, X seals inside him. That is the same answer stretch-right-red shipped.",
   'JUDGMENT CALL — the backside inside backer (B-R) is UNBLOCKED in the 4-4 and 4-3. With R on the edge man and X sealing inside, nobody climbs to him; he has to chase the stretch from behind through two cutoffs. Only the 5-2 covers him, because there RG comes off the nose scoop onto him — page-13\'s second dotted climb. Identical to the hole stretch-right-red left, and the fixes are the same: X climbs instead of sealing, or the wing goes back to the backer.',
-  "JUDGMENT CALL — second-level climbs in the 5-2 are chained blocks, both of them: LG combos the down man with LT and climbs to B-L (page-12's clear dotted climb), RG scoops the nose with C and climbs to B-R (the climb page-12 draws short and leaves hanging, which page-13 lands). Confirm you want both, especially RG's — page-12 alone would leave him plain on the nose.",
+  "JUDGMENT CALL — second-level climbs in the 5-2 are chained blocks, both of them: LT combos the END with Y and climbs to B-L (page-12's clear dotted climb, which since the 2026-09-17 alignment comes off the tackle/tight-end combo rather than off LG), RG scoops the nose with C and climbs to B-R (the climb page-12 draws short and leaves hanging, which page-13 lands). Confirm you want both, especially RG's — page-12 alone would leave him plain on the nose.",
   "Playside wing (L) per front, inherited unchanged from Stretch Left out of Red: the corner (C-L) vs the 5-2, the walked-up force man (O-L) vs the 4-4, the outside backer (B-L) vs the 4-3. Same rule, different answer per front — and against the even fronts the playside corner goes unblocked. That was already on the Red review list; it rides along here.",
-  "S's path and Q's mesh are page-12's MEASURED geometry, unchanged: bucket → mesh at (−2.5, −2.9), aiming point (−3.8, −1.9) between LT and Y, then dead vertical. The diagram can only carry one carry path, so it shows the BEND-UP and the 'or bounce it around him' lives in S's assignment text — same convention as the rest of the family. Q's line stops at the mesh; no boot fake is drawn on any Stretch page.",
+  "S's path and Q's mesh are page-12's MEASURED geometry: bucket → mesh at (−2.5, −2.9), aiming point (−3.8, −1.9) between LT and Y, then up. (Amended 2026-09-17: the ends now align at −3.55, standing on the seam the scan's bend-up arrow ran up, so the carry is drawn a foot further in — the C-gap lane over the tackle at about −2.7 — and widens back to −3.2 once past him. Same read, same football, new spot for the end.) The diagram can only carry one carry path, so it shows the BEND-UP and the 'or bounce it around him' lives in S's assignment text — same convention as the rest of the family. Q's line stops at the mesh; no boot fake is drawn on any Stretch page.",
   'GENERATED SIBLING: Stretch Right out of Tight is mirrorTightPlay(stretchLeftTight) — mirrorPlay plus the X↔Y exchange this balanced set requires (Split Wide hit the same bug: plain mirrorPlay leaves X and Y keyed where they are, which strands the playside tight end\'s reach on the man standing backside). The mirror was checked stroke by stroke: Tight is exactly symmetric and all three fronts are left/right symmetric, so no hand corrections were needed. Review the left play and you have reviewed the right one.',
   'Unblocked defenders, by front — 4-4: B-R, O-R, both corners; 4-3: B-R, C-L, C-R and both safeties; 5-2: C-L, C-R and both safeties. None are listed in `ignored` because Stretch has no option to "handle" them — they are men the zone outruns. Say the word if you want dashed rings on any of them.',
+  'ALIGNMENT RETUNE (2026-09-17). Ryan: "N is directly over C. DT should be directly over the last letter on the guard (either the L or the G in RG). DE should be directly over the edge of the circle on the OT." Every front now puts the ends at ±3.55 (our tackle\'s outside shoulder) and the tackles at ±1.8 (our guard\'s outside shoulder), the 5-2 included — their tackle is NO LONGER head up on our tackle. Two 5-2 jobs changed here, exactly as they did on Stretch Left out of Red: LG is the covered guard and reaches that tackle by himself, and the playside double-team is LT + Y on the END with LT coming off it to the backer. Nobody came unblocked in the swap. Geometry: Super\'s bend-up threads the C-gap lane over LT (x ≈ −2.7) instead of the old stroke at −3.6, and X\'s backside cutoff scramble was routed inside the backside end (over RT, x ≈ +2.7) — he climbs past that man, the R wing is the one who blocks him.',
 ]
 
 export const stretchLeftTight: Play = {

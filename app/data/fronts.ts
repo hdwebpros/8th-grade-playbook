@@ -21,6 +21,20 @@
  *
  * Yards, per docs/SEAM.md §1. Down linemen are drawn a yard into the defensive
  * backfield so they don't sit on top of the offensive line.
+ *
+ * ALIGNMENT (our line splits are 1.5 yards: G ±1.5, T ±3, Y −4.5; a player
+ * icon is 0.55 yd in radius). Coach's rule, 2026-09-17, same on every front:
+ *   - the nose (5-2) is head-up on the center — x 0;
+ *   - the tackles sit directly over the OUTSIDE letter of the guard's label
+ *     (the L in LG, the G in RG) — x ±1.8, a 3-technique on the guard's outside
+ *     shoulder, on the even fronts AND the 5-2 (they are NOT head-up on our
+ *     tackles in the 5-2);
+ *   - the ends sit directly over the OUTSIDE EDGE of our tackle's circle —
+ *     x ±3.55, a 5-technique on the tackle's outside shoulder.
+ * Earlier drafts had the ends a full man wide (±4.8 / ±5.2) and the 5-2
+ * tackles head-up on our tackles (±3). Tune here, once; blocks aim at ids,
+ * not yards — but hand-drawn paths that thread the B and C gaps were retuned
+ * to these spots, so move them together.
  */
 
 import type { Defender, Front, FrontId } from '../types/football'
@@ -44,12 +58,12 @@ export const four4: Front = {
   name: '4-4',
   scheme: 'even',
   description:
-    "Four down linemen and four linebackers. Nobody is head-up on the center — that's how you know it's an even front. The two tackles sit on our guards, the ends outside our tackles, and the two outside backers — Sam (S) to our strength, Will (W) away from it — walk up on the edges. Two inside backers (B) behind them and one free safety (F) over the top. Lots of bodies close to the ball.",
+    "Four down linemen and four linebackers. Nobody is head-up on the center — that's how you know it's an even front. The two tackles shade the outside shoulder of our guards, the ends shade the outside shoulder of our tackles, and the two outside backers — Sam (S) to our strength, Will (W) away from it — walk up on the edges. Two inside backers (B) behind them and one free safety (F) over the top. Lots of bodies close to the ball.",
   defenders: [
-    { id: 'E-L', label: 'E', at: { x: -4.8, y: 1 } },
-    { id: 'T-L', label: 'T', at: { x: -1.6, y: 1 } },
-    { id: 'T-R', label: 'T', at: { x: 1.6, y: 1 } },
-    { id: 'E-R', label: 'E', at: { x: 4.8, y: 1 } },
+    { id: 'E-L', label: 'E', at: { x: -3.55, y: 1 } },
+    { id: 'T-L', label: 'T', at: { x: -1.8, y: 1 } },
+    { id: 'T-R', label: 'T', at: { x: 1.8, y: 1 } },
+    { id: 'E-R', label: 'E', at: { x: 3.55, y: 1 } },
     { id: 'B-L', label: 'B', at: { x: -1.6, y: 4 } },
     { id: 'B-R', label: 'B', at: { x: 1.6, y: 4 } },
     { id: 'O-L', label: 'W', at: { x: -6.5, y: 3.5 } },
@@ -66,10 +80,10 @@ export const four3: Front = {
   description:
     "Same four down linemen, but only three linebackers and two safeties over the top. Still nobody on the center's nose, so it's even — the difference is the Mike (M), stacked right over the ball, with Sam (S) to our strength and Will (W) away from it. Behind them a strong safety ($) and a free safety (F). The edges are softer than the 4-4.",
   defenders: [
-    { id: 'E-L', label: 'E', at: { x: -4.8, y: 1 } },
-    { id: 'T-L', label: 'T', at: { x: -1.6, y: 1 } },
-    { id: 'T-R', label: 'T', at: { x: 1.6, y: 1 } },
-    { id: 'E-R', label: 'E', at: { x: 4.8, y: 1 } },
+    { id: 'E-L', label: 'E', at: { x: -3.55, y: 1 } },
+    { id: 'T-L', label: 'T', at: { x: -1.8, y: 1 } },
+    { id: 'T-R', label: 'T', at: { x: 1.8, y: 1 } },
+    { id: 'E-R', label: 'E', at: { x: 3.55, y: 1 } },
     { id: 'B-L', label: 'W', at: { x: -4, y: 4.5 } },
     { id: 'M', label: 'M', at: { x: 0, y: 4.5 } },
     { id: 'B-R', label: 'S', at: { x: 4, y: 4.5 } },
@@ -83,13 +97,13 @@ export const five2: Front = {
   name: '5-2',
   scheme: 'odd',
   description:
-    "Five down linemen with a nose guard right on the center — a man on the center's nose means it's an ODD front, and odd means we Scoop instead of Rip. Their tackles are head-up on our tackles and there are only two inside linebackers (B) behind them, with a strong safety ($) and a free safety (F) over the top.",
+    "Five down linemen with a nose guard right on the center — a man on the center's nose means it's an ODD front, and odd means we Scoop instead of Rip. Their tackles shade the outside shoulder of our guards and the ends shade the outside shoulder of our tackles, and there are only two inside linebackers (B) behind them, with a strong safety ($) and a free safety (F) over the top.",
   defenders: [
-    { id: 'E-L', label: 'E', at: { x: -5.2, y: 1 } },
-    { id: 'T-L', label: 'T', at: { x: -3, y: 1 } },
+    { id: 'E-L', label: 'E', at: { x: -3.55, y: 1 } },
+    { id: 'T-L', label: 'T', at: { x: -1.8, y: 1 } },
     { id: 'N', label: 'N', at: { x: 0, y: 1 } },
-    { id: 'T-R', label: 'T', at: { x: 3, y: 1 } },
-    { id: 'E-R', label: 'E', at: { x: 5.2, y: 1 } },
+    { id: 'T-R', label: 'T', at: { x: 1.8, y: 1 } },
+    { id: 'E-R', label: 'E', at: { x: 3.55, y: 1 } },
     { id: 'B-L', label: 'B', at: { x: -2, y: 4 } },
     { id: 'B-R', label: 'B', at: { x: 2, y: 4 } },
     ...CORNERS,

@@ -53,8 +53,14 @@
  * ARROWS AS DRAWN on page-12 (this is the literal transcription; the drawn
  * defense is an ODD front — three down linemen E/N/E with the nose head-up on
  * the center, edge backers B and S, inside backers W and M — which maps onto
- * our 5-2 as: drawn E(left)→T-L, N→N, E(right)→T-R, B→E-L, S→E-R, W→B-L,
- * M→B-R, $→F-L, F→F-R):
+ * our 5-2 as: drawn E(left)→E-L, N→N, E(right)→E-R, W→B-L, M→B-R,
+ * $→F-L, F→F-R — since 2026-09-17 our ends sit on the OUTSIDE SHOULDER OF OUR
+ * TACKLES (x ±3.55), exactly where the scan draws its ends, so drawn end = our
+ * end. The drawn walked-out edge backers B and S have no counterpart in our
+ * 5-2, and our extra men are the tackles at ±1.8, 3-techniques on our GUARDS.
+ * One consequence: LT's "man over him" and Y's "playside edge defender" are the
+ * SAME player now, our E-L — a tackle/tight-end combo with the dotted climb
+ * coming off it):
  *   LT   stem straight up, block bar ON the down lineman over him
  *   LG   arcs playside-outward and helps on that same down lineman
  *   C    reaches playside, hook/bar ON the nose
@@ -74,7 +80,10 @@
  *   S at (0, −4.0); his line dips back/away, runs through the mesh, and reaches
  *   the aiming point at (−3.8, −1.9). The bend-up arrow is then DEAD VERTICAL
  *   at x = −3.8 up to y = +3.2 — that is between Y (−4.5) and LT (−3.0), i.e.
- *   literally OUTSIDE THE PLAYSIDE TACKLE, not out at the wing.
+ *   literally OUTSIDE THE PLAYSIDE TACKLE, not out at the wing. (Our fronts
+ *   now park the end ON that seam at −3.55, so the drawn path is coded a foot
+ *   further in — the C-gap lane over the tackle, x ≈ −2.7 — which is the same
+ *   football: bend up INSIDE the end man.)
  *   The second (bounce) arrow leaves the same aiming point and finishes at
  *   about (−7.0, +0.8), outside the wing.
  *   L's block bar is drawn at (−7.9, +2.0), heading up and OUT — short of the
@@ -85,8 +94,9 @@
  * climbing off the double-teams to the second level — one from the E over the
  * playside tackle up to W (the playside inside backer), one from the nose
  * climbing straight up. These are the "climb" half of "gap to CLIMB": the
- * LT/LG combo comes off onto W. Coded as a chained second block on LG in the
- * 5-2 plan. On page-12 the nose climb is drawn short and lands on no letter —
+ * combo on the playside down man comes off onto W. In our 5-2 that down man is
+ * the END on LT's outside shoulder and the combo is LT+Y, so it is coded as a
+ * chained second block on LT. On page-12 the nose climb is drawn short and lands on no letter —
  * but page-13's "Stretch Right" panel draws BOTH climbs landing (on W and M),
  * which is how the right-hand play below resolves them.
  */
@@ -113,8 +123,11 @@ const block = (targetId: string): Action[] => [{ kind: 'block', targetId }]
  * S: slow bucket step back and away, through the mesh, to an aiming point
  * OUTSIDE the playside tackle — x = −3.8, between LT (−3.0) and Y (−4.5),
  * which is where page-12 puts it. Then he keys the end man on the line and
- * this path shows the BEND-UP: the scan's dead-vertical arrow off that aiming
- * point. The scan's second arrow (bounce outside) lives in the assignment text.
+ * this path shows the BEND-UP. Since 2026-09-17 the end stands at −3.55, right
+ * on LT's outside shoulder, so "bend up INSIDE him" is the C-gap lane over the
+ * tackle: squeeze through at x ≈ −2.7 a yard past the line, then widen back out
+ * to −3.2 once you are past him. The scan's second arrow (bounce outside the
+ * end) lives in the assignment text.
  */
 const S_STRETCH: Action[] = [
   {
@@ -124,8 +137,9 @@ const S_STRETCH: Action[] = [
       { x: -1.2, y: -3.9 },
       { x: -2.5, y: -2.9 },
       { x: -3.8, y: -1.9 },
-      { x: -3.8, y: 0.6 },
-      { x: -3.8, y: 3.2 },
+      { x: -2.6, y: 0.5 },
+      { x: -2.75, y: 1.6 },
+      { x: -3.2, y: 3.2 },
     ],
   },
 ]
@@ -159,11 +173,13 @@ const vs52: FrontPlan = {
     ...BACKS,
     Y: block('E-L'),
     L: block('C-L'),
-    LT: block('T-L'),
     // Combo, then climb: page-12 draws a dotted arrow with a block bar coming
-    // off this double-team up to W (our B-L). Chained blocks render exactly
-    // that — LG to the down man, then off him to the backer.
-    LG: [...block('T-L'), ...block('B-L')],
+    // off the playside double-team up to W (our B-L). The man over LT is the
+    // END (E-L at −3.55, on his outside shoulder), which is Y's man too — so
+    // the double-team is LT+Y, and LT, the inside man, is the one who comes
+    // off. Chained blocks render exactly that.
+    LT: [...block('E-L'), ...block('B-L')],
+    LG: block('T-L'),
     C: block('N'),
     RG: block('N'),
     RT: block('T-R'),
@@ -171,15 +187,20 @@ const vs52: FrontPlan = {
     X: block('F-R'),
   },
   assignments: {
-    LT: {
-      rule: '45 outside step — reach the man on you.',
+    Y: {
+      rule: '45 outside step — reach the end and turn him in.',
       detail:
-        'The tackle is head up on you in a 5-2. Playside foot first at 45 degrees, get your hat across his playside number and run your feet. The guard is coming to help.',
+        'In a 5-2 their end is on your inside shoulder, tight to our tackle. Playside step at 45, hat across his outside number, and turn him in — the tackle is punching him with you for a beat before he climbs. You own this man: Super bends up inside your block or bounces around it.',
+    },
+    LT: {
+      rule: '45 outside step — combo the end with Y, then climb to the backer.',
+      detail:
+        'Nobody is inside you in a 5-2 — their end sits on your OUTSIDE shoulder and Y is reaching him too. Step playside at 45, get your hat and hands on that end with Y, and the second Y has him turned, come off flat for the inside backer. He is the one who fills this play.',
     },
     LG: {
-      rule: '45 outside step — combo the down man, then climb to the backer.',
+      rule: '45 outside step — reach the man on you.',
       detail:
-        'Nobody on you. Step playside at 45 and put your inside hand on the down man the tackle is reaching. Stay on him until the tackle owns him, then come off flat for the inside backer — he is the one who fills this play.',
+        'Their tackle lines up on YOUR outside shoulder in a 5-2, so he is yours alone. Playside foot first at 45 degrees, get your hat across his playside number and run your feet toward the sideline. No help is coming — the center has the nose and your tackle is outside on the end.',
     },
     C: {
       rule: '45 outside step — reach the nose.',
@@ -192,9 +213,9 @@ const vs52: FrontPlan = {
         'Step inside at 45 and get your shoulder into the nose. If the nose fights across the center, he is yours alone. This is the block that keeps the play from getting hit in the back.',
     },
     RT: {
-      rule: '45 inside step — cut off the man on you.',
+      rule: '45 inside step — cut off the tackle inside you.',
       detail:
-        'Step DOWN inside, not out. Get your head across his playside shoulder and wall him off. You never fan out on him — nothing chases us from behind.',
+        'Step DOWN inside, not out. Their tackle is on the back-side guard\'s outside shoulder and he is the one who chases this play — get your head across his playside shoulder and wall him off. You never fan out on the end behind you; nothing chases us from behind.',
     },
     L: {
       rule: 'Gap to climb — go get the corner.',
@@ -237,7 +258,7 @@ const vs44: FrontPlan = {
     LG: {
       rule: '45 outside step — reach the man on you.',
       detail:
-        'The tackle is head up. Playside foot first, get your helmet to his playside number and run him toward the sideline. The center is stepping over to help.',
+        'The tackle is on your outside shoulder. Playside foot first, get your helmet to his playside number and run him toward the sideline. The center is stepping over to help.',
     },
     C: {
       rule: '45 outside step — help the playside guard.',
@@ -386,15 +407,16 @@ const reviewNotes = [
   "Direction is play identity (RESOLVED, Ryan 2026-08-14): the scan draws Stretch out of our RED alignment running LEFT — to the tight end and wing — so this picture is Stretch LEFT out of Red ('Red, Stretch, Left'). Indy/Hoosier are direction AUDIBLES (Indy = left, Hoosier = right), wired via audibleFlipId; page 13's right-going weak-side picture is now its own play, stretch-right-red. This supersedes the old 'names follow the formation' framing.",
   "Page-13 is NOT a vs-front page. It is six FORMATION variants (Stretch Left/Right, I Stretch Left/Right, Gun Stretch Left/Right) against the same defense. Our package has no I or Gun, so the varsity book gives us the arrows against exactly ONE front.",
   "Correction to an earlier read of page 13: its 'Stretch Right' panel is NOT the mirrored formation. Re-measured, that panel keeps the SAME alignment as 'Stretch Left' (Y and the L wing to the left, R wing right, X split right) and simply runs the ball to the RIGHT — a weak-side stretch out of Red. Under the direction model that panel is a play we DO carry: it is authored in this file as stretch-right-red. Black therefore stays a pure mirror of the corresponding Red play, which is football-correct because all three of our fronts are left/right symmetric, but it is a mirror we derived, not one the book confirms.",
-  "Fixed after a literal re-measure of page-12: Super's bend-up arrow is DEAD VERTICAL at about 3.8 yards outside the ball — between the tight end (−4.5) and the playside tackle (−3.0), i.e. right off the tackle's outside shoulder. Our old path pressed all the way out to −5.5 (the wing) and then drifted, which drew a sweep, not a stretch. Path retuned to bucket → mesh at (−2.5, −2.9) → aiming point (−3.8, −1.9) → straight up. Q's mesh was also 0.6 yd too deep and now lands where the scan draws the mesh circle, behind the tackle's inside leg.",
+  "Fixed after a literal re-measure of page-12: Super's bend-up arrow is DEAD VERTICAL at about 3.8 yards outside the ball — between the tight end (−4.5) and the playside tackle (−3.0), i.e. right off the tackle's outside shoulder. Our old path pressed all the way out to −5.5 (the wing) and then drifted, which drew a sweep, not a stretch. Path retuned to bucket → mesh at (−2.5, −2.9) → aiming point (−3.8, −1.9) → up. (Amended 2026-09-17: the ends now align at ±3.55, standing on the very seam the scan's arrow ran up, so the bend-up is drawn a foot further in — through the C-gap lane over the tackle at about −2.7, then back out to −3.2 once past him. Still 'bend up inside the end man', just around his new spot.) Q's mesh was also 0.6 yd too deep and now lands where the scan draws the mesh circle, behind the tackle's inside leg.",
   "Added after the re-measure: page-12 draws two black DOTTED arrows capped with block bars, climbing off the double-teams to the second level. The clear one comes off the playside double-team up to W (our B-L), so LG in the 5-2 plan is now a chained block — down man first, then off to B-L. The second dotted arrow climbs off the nose but is drawn short and lands on no letter (M is already the backside wing's man), so nothing was coded for it here. Page 13's 'Stretch Right' panel draws both climbs landing on backers, and stretch-right-red codes them that way.",
-  "The one front the scan draws is an ODD look — three down linemen with a nose head-up on the center, two edge backers, two inside backers. We mapped it onto our 5-2 (drawn E→T-L/T-R, N→N, B→E-L, S→E-R, W→B-L, M→B-R) and the 5-2 plan in this file is a one-for-one copy of the drawn arrows. The 4-4 and 4-3 plans apply the same written rules to those fronts — they are football, not transcription. Please eyeball those two.",
-  "Backside wing (R) 'Cutoff': the scan draws his arrow climbing up and over to the backside INSIDE backer (M), and that is what we coded for all three fronts. But the drawn defense's backside edge man (S) is walked out to about +6.3 and 2 yards deep — nobody is tight on R — whereas all three of OUR fronts put a defender right on that edge (E-R at +4.8 / +5.2, only a yard outside the wing). Page 13's weak-side 'Stretch Right' panel is the case that matches ours: there the backside wing has a tight edge defender (B) next to him and he blocks HIM rather than climbing — and stretch-right-red codes its backside wing that way. So on THIS play: R on the backside backer (as coded, literal to the main drawing) or on E-R (matching page 13 and the tighter fronts we actually see)? One-line change per front.",
+  "The one front the scan draws is an ODD look — three down linemen with a nose head-up on the center, two edge backers, two inside backers. We mapped it onto our 5-2 (drawn E→E-L/E-R, N→N, W→B-L, M→B-R — since the 2026-09-17 alignment our ends sit at ±3.55, on our tackles' outside shoulders, exactly where the scan draws its ends; the drawn walked-out edge backers B and S have no counterpart in our 5-2, and our tackles at ±1.8 on the guards are extra men the drawn front does not have) and the 5-2 plan in this file is a one-for-one copy of the drawn arrows. The 4-4 and 4-3 plans apply the same written rules to those fronts — they are football, not transcription. Please eyeball those two.",
+  "Backside wing (R) 'Cutoff': the scan draws his arrow climbing up and over to the backside INSIDE backer (M), and that is what we coded for all three fronts. But the drawn defense's backside edge man (S) is walked out to about +6.3 and 2 yards deep — nobody is tight on R — whereas all three of OUR fronts put a defender right on that edge (E-R at +3.55 on every front since 2026-09-17 — on our tackle's outside shoulder, a step inside the wing). Page 13's weak-side 'Stretch Right' panel is the case that matches ours: there the backside wing has a tight edge defender (B) next to him and he blocks HIM rather than climbing — and stretch-right-red codes its backside wing that way. So on THIS play: R on the backside backer (as coded, literal to the main drawing) or on E-R (matching page 13 and the tighter fronts we actually see)? One-line change per front.",
   "Playside wing (L), measured: his block bar is drawn at about (−7.9, +2.0) — up and OUT, past everybody, but stopping well short of the corner letter at (−9.4, +3.9) and bowing away from the $ safety at (−6.1, +7.6). No defender sits under that bar, so we read it as 'the corner / the man in the alley' and target C-L. Our 5-2 puts C-L a good bit deeper than the drawn bar, so our line to him is longer than the scan's. Flagging rather than guessing at a different target.",
   "Playside wing (L): the scan sends him past everybody to the CORNER, because the drawn front had only one edge defender and the tight end took him. Against our 4-4 he instead takes the walked-up S backer and against our 4-3 the outside backer — the first man in the alley — and the corner goes unblocked. Same rule, different answer per front. Confirm.",
   "S's path: the scan draws TWO arrows off the aiming point — one bending up inside the end man and one bouncing outside him. The data can only carry one carry path, so the diagram shows the BEND-UP and the 'or bounce it' lives in his assignment text. Say the word if you'd rather see the bounce drawn.",
   "Q: the scan's quarterback line stops at the mesh — no boot fake is drawn on the Stretch page (Jet and Rocket both say 'carry out boot fake', Stretch's table does not). We drew it literally, stopping at the mesh, and put 'carry out your fake' in the coaching detail. Waggle is the play that punishes a defense for chasing that fake, so you may want it drawn.",
-  "RG vs the 4-4 and 4-3: 'gap to climb, 45 INSIDE step' with a tackle head-up on him resolves to cutting that man off, which is what we coded. The RT then also steps down onto that same man rather than fanning out to the end behind him — that is the backside rule you called out on Veer, applied here. Confirm the double is what you want, or tell us where the tackle should end up instead.",
+  "RG vs the 4-4 and 4-3: 'gap to climb, 45 INSIDE step' with a tackle on his outside shoulder resolves to cutting that man off, which is what we coded. The RT then also steps down onto that same man rather than fanning out to the end behind him — that is the backside rule you called out on Veer, applied here. Confirm the double is what you want, or tell us where the tackle should end up instead.",
+  'ALIGNMENT RETUNE (2026-09-17). Ryan: "N is directly over C. DT should be directly over the last letter on the guard (either the L or the G in RG). DE should be directly over the edge of the circle on the OT." Every front now aligns the ends at ±3.55 (our tackle\'s outside shoulder) and the tackles at ±1.8 (our guard\'s outside shoulder) — the 5-2 included, where their tackle is NO LONGER head up on our tackle. Two 5-2 jobs changed on this play. LG is now the covered guard and reaches that tackle BY HIMSELF (he used to be the free man who comboed and climbed). LT is now covered by the END, the same man Y is reaching, so the playside double-team is LT + Y on the end and LT — the inside man — is the one who comes off it to the backer. That is still page-12\'s dotted climb, just off a different combo. Nobody was left unblocked by the swap. Confirm you want the tackle, not the tight end, coming off that combo.',
 ]
 
 export const stretchLeftRed: Play = {
@@ -455,8 +477,9 @@ const S_STRETCH_RIGHT: Action[] = [
       { x: 1.2, y: -3.9 },
       { x: 2.5, y: -2.9 },
       { x: 3.8, y: -1.9 },
-      { x: 3.8, y: 0.6 },
-      { x: 3.8, y: 3.2 },
+      { x: 2.6, y: 0.5 },
+      { x: 2.75, y: 1.6 },
+      { x: 3.2, y: 3.2 },
     ],
   },
 ]
@@ -474,16 +497,19 @@ const Q_MESH_RIGHT: Action[] = [
 
 /**
  * Y backside cutoff: page-13 draws him scrambling up and INSIDE with an open
- * arrowhead on no particular man. Coded as a path-capped block (bar ~2.3 yd)
+ * arrowhead on no particular man — he is not blocking the backside end (the L
+ * wing bars him), he is climbing PAST him. Since 2026-09-17 the end stands at
+ * −3.55, right where the old stroke ran, so the climb is routed through the
+ * lane INSIDE him — over LT, x ≈ −2.7 — and capped with the bar at ~2.3 yd,
  * walling off the inside chase behind LT's cutoff.
  */
 const Y_CUTOFF: Action[] = [
   {
     kind: 'block',
     path: [
-      { x: -4.1, y: 0.6 },
-      { x: -3.5, y: 1.5 },
-      { x: -3.1, y: 2.3 },
+      { x: -3.4, y: 0.2 },
+      { x: -2.7, y: 1.2 },
+      { x: -2.5, y: 2.3 },
     ],
   },
 ]
@@ -500,10 +526,11 @@ const BACKS_RIGHT = {
 
 /**
  * 5-2 (ODD) — the closest of our fronts to the defense page-13 draws, so this
- * plan follows the panel's arrows most directly: C reaches the nose, RT/RG
- * combo the tackle with RG climbing to the playside backer (the drawn climb
- * onto M), LG scoops the nose and climbs to the backside backer (the drawn
- * climb onto W), LT cuts off, and the R wing bars the playside edge man.
+ * plan follows the panel's arrows most directly: C reaches the nose, the R wing
+ * and RT combo the END on the edge with RT climbing to the playside backer (the
+ * drawn climb onto M), RG reaches the tackle on his own outside shoulder, LG
+ * scoops the nose and climbs to the backside backer (the drawn climb onto W),
+ * and LT cuts off the backside tackle.
  */
 const vs52Right: FrontPlan = {
   actions: {
@@ -512,21 +539,24 @@ const vs52Right: FrontPlan = {
     LT: block('T-L'),
     LG: [...block('N'), ...block('B-L')],
     C: block('N'),
-    RG: [...block('T-R'), ...block('B-R')],
-    RT: block('T-R'),
+    RG: block('T-R'),
+    // The man over RT is the END (E-R at 3.55, on his outside shoulder), and
+    // the wing is reaching him too — so the panel's playside combo-and-climb
+    // is RT's: hands on the end with R, then off to the backer.
+    RT: [...block('E-R'), ...block('B-R')],
     R: block('E-R'),
     X: block('F-R'),
   },
   assignments: {
     RT: {
-      rule: '45 outside step — reach the man on you.',
+      rule: '45 outside step — combo the end with the wing, then climb to the backer.',
       detail:
-        'The tackle is head up on you in a 5-2. Playside foot first at 45 degrees, get your hat across his playside number and run your feet. The guard is coming to help.',
+        'Nobody is inside you in a 5-2 — their end sits on your OUTSIDE shoulder and the wing is coming to reach him too. Step playside at 45, get your hat and hands on that end with him, and the second he has him turned, come off flat for the inside backer. He is the one who fills this play.',
     },
     RG: {
-      rule: '45 outside step — combo the down man, then climb to the backer.',
+      rule: '45 outside step — reach the man on you.',
       detail:
-        'Nobody on you. Step playside at 45 and put your inside hand on the down man the tackle is reaching. Stay on him until the tackle owns him, then come off flat for the inside backer — he is the one who fills this play.',
+        'Their tackle lines up on YOUR outside shoulder in a 5-2, so he is yours alone. Playside foot first at 45 degrees, get your hat across his playside number and run your feet toward the sideline. No help is coming — the center has the nose and your tackle is outside on the end.',
     },
     C: {
       rule: '45 outside step — reach the nose.',
@@ -539,14 +569,14 @@ const vs52Right: FrontPlan = {
         'Step inside at 45 and get your shoulder into the nose. Once the center owns him, come off flat to the backside backer — cut off the man who chases this down from behind.',
     },
     LT: {
-      rule: '45 inside step — cut off the man on you.',
+      rule: '45 inside step — cut off the tackle inside you.',
       detail:
-        'Step DOWN inside, not out. Get your head across his playside shoulder and wall him off. You never fan out on him — nothing chases us from behind.',
+        'Step DOWN inside, not out. Their tackle is on the back-side guard\'s outside shoulder and he is the one who chases this play — get your head across his playside shoulder and wall him off. You never fan out on the end behind you; nothing chases us from behind.',
     },
     R: {
       rule: 'Gap to climb — reach the end on the edge.',
       detail:
-        'With no tight end on your side, the end on the line is the edge. Step outside at 45, hat across his outside number, and turn him in — Super bends up inside your block or bounces off it.',
+        'With no tight end on your side, the end on the line is the edge — and in a 5-2 he is tight, right on our tackle\'s outside shoulder. Step outside at 45, hat across his outside number, and turn him in; your tackle punches him with you for a beat before he climbs. Super bends up inside your block or bounces off it.',
     },
     L: {
       rule: 'Backside wing: cutoff — bar the end next to you.',
@@ -593,7 +623,7 @@ const vs44Right: FrontPlan = {
     RG: {
       rule: '45 outside step — reach the man on you.',
       detail:
-        'The tackle is head up. Playside foot first, get your helmet to his playside number and run him toward the sideline. The center is stepping over to help.',
+        'The tackle is on your outside shoulder. Playside foot first, get your helmet to his playside number and run him toward the sideline. The center is stepping over to help.',
     },
     C: {
       rule: '45 outside step — help the playside guard, then climb.',
@@ -761,12 +791,13 @@ const reviewNotesRight = [
   "Indy/Hoosier are direction AUDIBLES (Ryan, 2026-08-14): Indy = left, Hoosier = right, yelled at the line. 'Red, Stretch, Left' + 'HOOSIER HOOSIER' becomes THIS play. Wired via audibleFlipId; the words live in DIRECTION_AUDIBLES (app/utils/playbook.ts).",
   "JUDGMENT CALL — backside edge: the panel bars the backside WING on the tight edge man next to him (their B) and scrambles Y up-and-inside with an open arrowhead on nobody. Coded exactly that way in all three fronts: L blocks E-L, Y is a path-only cutoff bar (~2.3 yd) sealing the inside chase. That settles for this play the question flagged on Stretch Left (wing on the backer vs wing on the tight edge man) in favor of the edge man.",
   "JUDGMENT CALL — the backside inside backer (B-L / Will) is UNBLOCKED in the 4-4 and 4-3: with L on the edge man and Y sealing inside, nobody climbs to him; he has to chase the stretch from behind through the cutoffs. Only the 5-2 covers him, because there LG comes off the nose scoop — the panel's dotted climb onto W. If you want an even-front body on him, the candidates are Y (climb instead of seal) or the L wing (the old Stretch Left coding).",
-  "JUDGMENT CALL — second-level climbs: page-13 lands BOTH dotted climbs on backers (off the nose combo onto W, off the E combo onto M), where page-12 left the nose climb hanging. Coded as chained blocks: the playside combo climber is C in the even fronts (RT is busy with the end in his gap) but RG in the 5-2 (matching the drawn RG-to-M climb); the nose-scoop climber is LG, 5-2 only. Confirm who you want coming off each combo.",
-  "JUDGMENT CALL — playside surface with no tight end: RT's 'gap to climb' reach lands on the C-gap end E-R in the even fronts and on the head-up T-R in the 5-2. The R wing's man per front: the walked-up force man O-R (4-4), the Sam B-R (4-3), and in the 5-2 the END E-R — the panel bars the wing on the walked-up playside edge man, so R reaches the end instead of climbing to the corner the way the L wing does on Stretch Left. That leaves the playside CORNER unblocked in every front here. Confirm, especially the 5-2 (wing on the end vs wing to the corner with the end as Super's unblocked read).",
+  "JUDGMENT CALL — second-level climbs: page-13 lands BOTH dotted climbs on backers (off the nose combo onto W, off the E combo onto M), where page-12 left the nose climb hanging. Coded as chained blocks: the playside combo climber is C in the even fronts (RT is busy with the end in his gap) and RT in the 5-2 — he is the inside man on the combo with the wing on the end, so he is the one who comes off (through 2026-09-16 it was RG, back when their tackle stood head up on RT); the nose-scoop climber is LG, 5-2 only. Confirm who you want coming off each combo.",
+  "JUDGMENT CALL — playside surface with no tight end: RT's 'gap to climb' reach lands on the end E-R in every front now — since 2026-09-17 the 5-2's tackle aligns on the GUARD, so the end on RT's outside shoulder is his man there too (he combos him with the wing and climbs). The R wing's man per front: the walked-up force man O-R (4-4), the Sam B-R (4-3), and in the 5-2 the END E-R — the panel bars the wing on the walked-up playside edge man, so R reaches the end instead of climbing to the corner the way the L wing does on Stretch Left. That leaves the playside CORNER unblocked in every front here. Confirm, especially the 5-2 (wing on the end vs wing to the corner with the end as Super's unblocked read).",
   "JUDGMENT CALL — X plays MDM even though he is playside: the panel's stroke works back INSIDE to a bar on the deep safety, not out to the corner. Coded F (4-4) / F-R (4-3, 5-2). If you'd rather have X stalk the corner and let the wing's man be the alley, that's a one-line change per front.",
   "S's key: 'end man on LOS' — in these plans that man is blocked (RT's reach in the even fronts, R's reach in the 5-2), so the read is off the BLOCK: bend up inside it if the end runs wide, bounce outside if he squeezes. The drawn panel shows only the bend-up (dead vertical just outside RT); the bounce lives in the assignment text, same convention as Stretch Left.",
   "Geometry: S's bucket/mesh/bend-up and Q's mesh path are the exact x-negations of the page-12 measured paths — page-13's panel draws the same picture on the right (mesh behind RT's inside leg, vertical bend-up at about +3.8, between RT and the wing). Y's cutoff stroke is newly drawn; L, and all line blocks are targeted blocks like the rest of this file.",
   "Unblocked defenders, by front — 4-4: B-L, O-L, both corners; 4-3: B-L, C-L, C-R, F-L; 5-2: E-R is covered but C-L, C-R, F-L are not. None are listed in `ignored` because Stretch has no option to 'handle' them — they are simply men the zone outruns. Say the word if you want dashed rings on any of them.",
+  'ALIGNMENT RETUNE (2026-09-17). Ryan: "N is directly over C. DT should be directly over the last letter on the guard (either the L or the G in RG). DE should be directly over the edge of the circle on the OT." In the 5-2 their tackle now sits on the GUARD\'s outside shoulder (±1.8) instead of head up on our tackle, and the end on our tackle\'s outside shoulder (±3.55). Two 5-2 jobs swapped: RG reaches the tackle alone (he is the covered guard) and RT combos the END with the R wing, then climbs to M — the panel\'s playside climb, now coming off the tackle instead of the guard. Geometry moved with it: Super\'s bend-up threads the C-gap lane over RT (x ≈ +2.7) instead of the old dead-vertical at +3.6, which the end now stands on, and Y\'s backside cutoff scramble was re-routed INSIDE the backside end (over LT, x ≈ −2.7). Y is climbing PAST that end, not blocking him — the L wing bars him — so the stroke had to give him room.',
 ]
 
 export const stretchRightRed: Play = {

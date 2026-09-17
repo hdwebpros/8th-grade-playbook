@@ -156,17 +156,21 @@ const MIRROR_NOTE_PREFIX =
 // the quarterback audibles (see reviewNotes — the call is not built yet).
 //
 // Line reasoning (why these targets and not others):
-//  - The B gap is the RG/RT seam, so RG blocks the man on him and works him
-//    IN, RT blocks the man on him and works him OUT. The hole is the daylight
-//    between those two blocks. Nobody pulls: in our even fronts the backside
-//    guard has a tackle head-up on him and can't leave.
+//  - The B gap is the RG/RT seam, and on EVERY front their tackle is a
+//    3-technique on RG's outside shoulder — standing at the inside edge of it
+//    — with their end on RT's outside shoulder. So RG blocks the man on him
+//    and works him IN, RT blocks the man on him and works him OUT, and the
+//    hole is the daylight between those two blocks. Nobody pulls: the backside
+//    guard has their tackle on his own outside shoulder on every front and
+//    can't leave.
 //  - C is the uncovered man in both even fronts, so he does what he does on
 //    Veer — steps playside and climbs. He goes to the backer who fits the B
 //    gap: B-R in the 4-4, the Mike in the 4-3 (the 4-3's B-R is aligned too
 //    wide to be the B-gap fitter, so the slot gets him instead).
-//  - Vs the 5-2 the B gap is already open — nobody is aligned in it — so RG is
-//    the uncovered man and HE climbs to B-R, RT walls the tackle head-up on
-//    him, and C/LG double the nose.
+//  - Vs the 5-2 the front side does not change at all — same two blocks, same
+//    hole. What changes is the middle: the nose is head-up on C and both
+//    guards are covered, so the center has him ALONE and nobody climbs to a
+//    backer off the line. The two slots take the two backers instead.
 
 const KEEP_S: Action[] = [SETTLE_MOTION, { kind: 'fake', path: SETTLE_SHOW }]
 
@@ -182,10 +186,10 @@ const KEEP_Q: Action[] = [
     kind: 'carry',
     path: [
       { x: 1.8, y: -1.4 },
-      { x: 2.2, y: -0.2 },
-      { x: 2.4, y: 1.5 },
-      { x: 2.8, y: 4 },
-      { x: 3.2, y: 7 },
+      { x: 2.3, y: -0.2 },
+      { x: 2.7, y: 1.5 },
+      { x: 3, y: 4 },
+      { x: 3.3, y: 7 },
     ],
   },
 ]
@@ -254,40 +258,41 @@ const keepVs43: FrontPlan = {
 const keepVs52: FrontPlan = {
   actions: {
     ...KEEP_SKILL,
-    LT: block('T-L'),
-    LG: block('N'),
+    LT: block('E-L'),
+    LG: block('T-L'),
     C: block('N'),
-    RG: block('B-R'),
-    RT: block('T-R'),
-    L: block('E-L'),
-    R: block('E-R'),
+    RG: block('T-R'),
+    RT: block('E-R'),
+    L: block('B-L'),
+    R: block('B-R'),
     Y: block('C-L'),
     X: block('C-R'),
   },
   assignments: {
     C: {
-      rule: 'Covered — Scoop the nose with LG.',
+      rule: 'Covered — the nose is yours, ALONE.',
       detail:
-        'Odd front, so the nose is right on you. Step playside and take his playside number; the guard is coming behind you to finish him. Same Scoop you run on Veer.',
-    },
-    LG: {
-      rule: 'Odd — Scoop with C.',
-      detail: 'Step playside and get your shoulder into the nose. If he slants away from us he is yours alone.',
+        'Odd front, so the nose is head-up on you — and in this front both guards have their own man on their outside shoulder, so nobody is coming to help you. Playside foot first, hat on his playside number, and move him off the spot. He cannot cross your face into the hole.',
     },
     RG: {
-      rule: 'Uncovered — climb through the B gap to the backer.',
+      rule: 'Their tackle is on your outside shoulder, in the hole — work him IN.',
       detail:
-        'A 5-2 leaves your gap wide open, and that is the gap the quarterback is running through. Step playside, run through the hole in front of him, and take the backer at 4 yards. You are leading him.',
+        'Five down men and every one of them is blocked, and yours is the one standing at the inside edge of the gap the quarterback is running through. Drive him toward the center and never let him get back outside your shoulder. The hole is the daylight between you and RT.',
     },
     RT: {
-      rule: 'Base the man head up on you — work him OUT.',
+      rule: 'Their end is on your outside shoulder — work him OUT.',
       detail:
-        'Their tackle is nose to nose with you. Get your hat outside his and drive him toward the sideline. The hole is the daylight between you and RG.',
+        'Nobody is head-up on you in this front: their tackle is inside on RG and their end is half a man outside you. Short flat step, hat outside his, and drive him toward the sideline.',
     },
     R: {
-      rule: 'Crack the end.',
+      rule: 'Block the backer at 4 yards.',
       detail:
-        'A 5-2 leaves their end free on the edge — he is the man who chases the quarterback down from outside. Come down flat and wall him off. Hat in front, never in the back.',
+        'A 5-2 has nobody walked up on the edge, and our line has every big man blocked — so the man who fills this hole is the backer at 4 yards on your side. Flat angle, get inside-out on him, and do not let him cross your face to the ball.',
+    },
+    L: {
+      rule: 'Backside — cut off the backer on your side.',
+      detail:
+        'You are away from the play. Take a flat angle at the backside backer and make him run around you; he is the one who catches this from behind.',
     },
   },
 }
@@ -304,24 +309,24 @@ const keepAssignments: Record<OffPosId, Assignment> = {
       'Backside tackle. Step to him, hat across his outside number, and wall him off. Everything on your side is about nobody catching the quarterback from behind.',
   },
   LG: {
-    rule: 'Even: base the man on you. Odd: Scoop the nose with C.',
+    rule: 'Base the man on your outside shoulder. Do not chase.',
     detail:
-      'Look at the center\'s nose. Nobody there — take the man head up on you and hold him. A nose guard there — Scoop it with the center.',
+      'Their tackle sits on your outside shoulder on every front we see — even or odd, he is right there. Step to him, hat across, and wall him off from the ball. You are the back side of this play.',
   },
   C: {
-    rule: 'Covered: Scoop with LG. Uncovered: climb to the B-gap backer.',
+    rule: 'Uncovered: climb to the B-gap backer. Covered: the nose is yours, alone.',
     detail:
-      'Playside foot first, every time. Covered means the nose is yours with the guard. Uncovered means you climb through the B gap and block the backer who fills it.',
+      'Playside foot first, every time. Look at your nose: in an even front nobody is there, so you climb through the B gap and block the backer who fills it. In the 5-2 the nose guard is head-up on you and both guards have their own man — so he is yours by yourself, and he does not get to cross your face into the hole.',
   },
   RG: {
-    rule: 'Covered: base the man on you, work him IN. Uncovered: climb to the backer.',
+    rule: 'Base the man on your outside shoulder, work him IN.',
     detail:
-      'You are the inside wall of the hole. If a man is on you, drive him toward the center — never let him get outside your shoulder. If nobody is on you, run through the hole and lead the quarterback onto the backer.',
+      'You are the inside wall of the hole. Their tackle lines up on your outside shoulder on every front, right at the inside edge of the gap the quarterback is running through — drive him toward the center and never let him get back outside your shoulder.',
   },
   RT: {
-    rule: 'Base the man on you, work him OUT.',
+    rule: 'Base the end on your outside shoulder, work him OUT.',
     detail:
-      'You are the outside wall of the hole. Hat outside, drive him toward the sideline. If he is aligned wide of you, take a short flat step and get to him — he cannot be allowed to squeeze back in.',
+      'You are the outside wall of the hole. He is half a man outside you on every front, so take a short flat step to get to him, hat outside his, and drive him toward the sideline. He cannot be allowed to squeeze back in.',
   },
   X: {
     rule: 'Stalk the corner.',
@@ -329,14 +334,14 @@ const keepAssignments: Record<OffPosId, Assignment> = {
       'Same block you run on Veer. Sprint at him, break down under control at three yards, and stay on his outside number. If the quarterback breaks the first tackle, your man is the last one out there.',
   },
   L: {
-    rule: 'Back side — cut off the first man outside our tackle.',
+    rule: 'Back side — cut off the first man on your side our line has not blocked.',
     detail:
-      'Play is going away from you. Take a flat angle at the first defender outside LT and get in his path. You are not knocking anyone down; you are making him run around you.',
+      'Play is going away from you. Take a flat angle at the first defender who can run this down from the back side — the backer walked up on the edge if they have one, the backer at 4 yards if they do not — and get in his path. You are not knocking anyone down; you are making him run around you.',
   },
   R: {
-    rule: 'Play side — block the first defender outside our tackle.',
+    rule: 'Play side — block the first man outside our tackle our line has not blocked.',
     detail:
-      'You are the edge. Come off flat, get your hat outside his, and turn him away from the middle of the field. The keeper is coming inside of your block, not outside it.',
+      'You are the edge. In a 4-4 that is the backer walked up out there; in a 4-3 and a 5-2 our line has every big man, so it is the backer at 4 yards. Come off flat, get your hat outside his, and turn him away from the middle of the field. The keeper is coming inside of your block, not outside it.',
   },
   S: {
     rule: 'Motion out between R and X. STOP. Get set. Hands up, eyes on the quarterback.',
@@ -382,8 +387,9 @@ export const splitWideKeeperRight: Play = {
     'PER COACH RYAN — WHAT THIS PLAY IS FOR: "used to get just a few yards, D-line relaxes thinking it\'s a screen again, QB rams a few." That is now written into the description and into the quarterback\'s detail as "cash it, do not try to break it." Two consequences worth naming: (1) this play is a SEQUENCE play — it is worth much less on the first snap of a game than it is after they have seen the screen, so it belongs on the call sheet as a follow-up, not an opener; (2) it means the "nobody blocks the deep safety" note below is not a problem at all, because we are not asking this play to go the distance. Tell me if you want the call sheet / practice script to carry that ordering explicitly.',
     'Is it a keeper or a read? Drafted as a pure keeper — the ball is the quarterback\'s before the snap, no readKey, nobody left unblocked on purpose. If you want it to be a give-or-keep off the end man, that is a different play and it needs a read key.',
     'B gap = between RG and RT, and the quarterback\'s aiming point is the outside hip of RG. Confirm that is the gap you mean by "over the right guard" — the other reading is the A gap right on top of him, which is the dive, and you already have a dive.',
-    'Why nobody pulls: in both even fronts LG has a tackle head-up on him and cannot leave without giving up a free runner behind the play, so the uncovered center climbs to the B-gap backer instead. Vs the 5-2 that flips — RG is the uncovered man, so HE leads through the hole onto the backer while RT walls the man on his nose. If you would rather teach one pulling guard on every front, say so and I will change the front rules instead of the pictures.',
-    'Vs the 4-3 the slot (R) blocks the backer at 4 yards instead of an edge man, because a 4-3 has no walked-up edge — so the center takes the Mike and R takes the outside backer. Vs the 5-2 R cracks the free end. Confirm you want the slot cracking IN on all three fronts rather than stalking the corner and letting the safety come free.',
+    'Why nobody pulls: on every front LG has their tackle on his own outside shoulder and cannot leave without giving up a free runner behind the play, so on the two even fronts the uncovered center climbs to the B-gap backer instead. Vs the 5-2 nobody climbs off the line at all — the nose is head-up on the center and both guards are covered, so the five blocks are man-for-man and the two slots take the two backers. If you would rather teach one pulling guard on every front, say so and I will change the front rules instead of the pictures.',
+    'CHANGED 2026-09-17 WITH THE NEW ALIGNMENT — your words: "N is directly over C. DT should be directly over the last letter on the guard (either the L or the G in RG). DE should be directly over the edge of the circle on the OT." The 5-2 tackle is no longer head-up on our tackle, he is a 3-technique on the guard\'s outside shoulder, so the 5-2 blocking on this play changed: RG now blocks that tackle (he is standing in the B gap we are running) and works him IN instead of climbing to a backer; RT now blocks the END on his outside shoulder and works him OUT instead of the tackle; the center has the nose ALONE (no Scoop — LG is covered too, so he cannot come help); and the two slots block the two backers instead of cracking the ends, because our tackles now have the ends. The hole itself did not move: it is still the daylight between RG and RT.',
+    'Vs the 4-3 and the 5-2 the slot (R) blocks the backer at 4 yards instead of an edge man, because neither front walks a man up on the edge and neither leaves an end free any more — our tackle has him. In the 4-3 the center takes the Mike and R takes the outside backer; in the 5-2 the center has the nose and R has the playside backer. Confirm you want the slot blocking IN on all three fronts rather than stalking the corner and letting the safety come free.',
     'Nobody blocks the deep safety on any front. That is on purpose — this play is meant to gain 4 to 6 downhill, and the safety is the guy who ends it. If you want it to be able to go the distance, someone has to leave a defender free to get to him.',
     'DIRECTION — RESOLVED (Coach Ryan, 2026-08-18): the Keep is called with a direction, and the word does two jobs at once — it tells Super which way to MOTION OUT to and it tells the quarterback which way to SNEAK. Right = motion right, settle between R and X, run the RG/RT B gap; Left = motion left, settle between L and Y, run the LG/LT B gap. Indy = left, Hoosier = right at the line, wired through audibleFlipId. One balanced formation, so no formationTwinId.',
     'MIRROR — SHIPPED for the keep: Split Wide Keep Left is one mirrorSplitWidePlay() call (the mirror plus the X↔Y exchange this balanced set needs) with zero hand corrections to the football. What IS hand-authored over there is the prose — every rule that says "right", "R and X", "RG and RT" is rewritten, because mirrorPlay re-keys assignments but cannot rewrite a sentence. Review the right-handed play and you have reviewed the football of both; read the left one only for its words. Note that the keep and the screen must be called to the SAME side to stay one picture — Keep Right pairs with Screen Right, Keep Left with Screen Left.',
@@ -422,9 +428,9 @@ export const splitWideKeeperLeft: Play = (() => {
     assignments: {
       ...m.assignments,
       C: {
-        rule: 'Covered: Scoop with RG. Uncovered: climb to the B-gap backer.',
+        rule: 'Uncovered: climb to the B-gap backer. Covered: the nose is yours, alone.',
         detail:
-          'Playside foot first, every time — and playside is LEFT on this call. Covered means the nose is yours with the guard. Uncovered means you climb through the B gap and block the backer who fills it.',
+          'Playside foot first, every time — and playside is LEFT on this call. Look at your nose: in an even front nobody is there, so you climb through the B gap and block the backer who fills it. In the 5-2 the nose guard is head-up on you and both guards have their own man, so he is yours by yourself.',
       },
       R: {
         rule: 'Back side — cut off the first man outside our tackle.',
@@ -449,16 +455,16 @@ export const splitWideKeeperLeft: Play = (() => {
         assignments: {
           ...m.vs['52']!.assignments,
           C: {
-            rule: 'Covered — Scoop the nose with RG.',
+            rule: 'Covered — the nose is yours, ALONE.',
             detail:
-              'Odd front, so the nose is right on you. Step playside — LEFT — and take his playside number; the guard is coming behind you to finish him. Same Scoop you run on Veer.',
+              'Odd front, so the nose is head-up on you, and both guards have their own man on their outside shoulder — nobody is coming to help. Step playside — LEFT — take his playside number, and move him off the spot.',
           },
         },
       },
     } satisfies Record<FrontId, FrontPlan>,
     reviewNotes: [
       ...(splitWideKeeperRight.reviewNotes ?? []),
-      'GENERATED: this play is mirrorSplitWidePlay(splitWideKeeperRight) — the straight mirror plus the X↔Y exchange this balanced set needs, so Y (wide left) now runs the playside stalk and X (wide right) carries the whole back side. The football took zero hand corrections. What was hand-authored is only the language: the center now scoops with RG instead of LG, R is the backside cut-off outside RT, Super motions out between L and Y, and the quarterback steps left and runs the LG/LT B gap. Review the right-handed play for the football; read this one only for its words.',
+      'GENERATED: this play is mirrorSplitWidePlay(splitWideKeeperRight) — the straight mirror plus the X↔Y exchange this balanced set needs, so Y (wide left) now runs the playside stalk and X (wide right) carries the whole back side. The football took zero hand corrections. What was hand-authored is only the language: the center\'s odd-front note is written playside-LEFT, R is the backside cut-off behind RT, Super motions out between L and Y, and the quarterback steps left and runs the LG/LT B gap. Review the right-handed play for the football; read this one only for its words.',
     ],
   }
 })()
@@ -574,41 +580,37 @@ const diveVs52: FrontPlan = {
   actions: {
     ...DIVE_SKILL,
     ...DIVE_WR,
-    LT: block('T-L'),
-    LG: block('N'),
+    LT: block('E-L'),
+    LG: block('T-L'),
     C: block('N'),
-    RG: block('B-R'),
-    RT: block('T-R'),
-    L: block('E-L'),
-    R: block('E-R'),
+    RG: block('T-R'),
+    RT: block('E-R'),
+    L: block('B-L'),
+    R: block('B-R'),
   },
   assignments: {
     C: {
-      rule: 'Covered — Scoop the nose with LG.',
+      rule: 'Covered — the nose is yours, ALONE.',
       detail:
-        'Odd front. The nose is on you and he is standing in the hole. Step playside, take his playside number, and let the guard finish him.',
-    },
-    LG: {
-      rule: 'Odd — Scoop with C.',
-      detail: 'Step playside, shoulder into the nose. If he slants away, he is yours by yourself and the center climbs.',
+        'Odd front. The nose is head-up on you and he is standing in the hole, and both guards have their own man on their outside shoulder — nobody can come help. Playside foot first, hat on his playside number, and move him off the spot. Super is running right off your playside hip.',
     },
     RG: {
-      rule: 'Uncovered — climb to the backer.',
+      rule: 'Base their tackle — he is on your outside shoulder.',
       detail:
-        'Nobody on you in a 5-2. Step playside off the double team and take the backer at 4 yards. He is the man in the hole once the nose is handled.',
+        'Five down men, five of us, and yours is the one on your outside shoulder. Step, drive, and keep him going away from the hole — he cannot fall back inside into the A gap where the dive is.',
     },
     RT: {
-      rule: 'Base the man head up on you.',
-      detail: 'Their tackle is nose to nose with you. Take him where he wants to go and seal him away from the A gap.',
+      rule: 'Base the end on your outside shoulder.',
+      detail: 'Their tackle is inside on RG, so all you have is the end half a man outside you. Take him where he wants to go and seal him outside. The dive is inside of you and it is not coming back out.',
     },
     R: {
-      rule: 'Crack the end.',
+      rule: 'Crack the backer on your side.',
       detail:
-        'A 5-2 leaves their end unblocked on the edge, and on an inside run he crashes flat down the line. That is the crash. Get your hat in front of him and wall him out.',
+        'A 5-2 leaves no big man unblocked — our tackles have both ends now — so the man who crashes into the middle is the backer at 4 yards. Take a flat inside angle, beat him to the spot, and turn him away from the middle. Hat in front, never in the back.',
     },
     L: {
-      rule: 'Crack the end.',
-      detail: 'Same job on the back side — the backside end chasing down the line is what turns a 5-yard dive into a 1-yard dive.',
+      rule: 'Crack the backer on your side.',
+      detail: 'Same job on the back side — the backside backer chasing down the line is what turns a 5-yard dive into a 1-yard dive.',
     },
   },
 }
@@ -624,21 +626,21 @@ const diveAssignments: Record<OffPosId, Assignment> = {
     detail: 'Backside. Step, punch, wall him off from the ball. All you owe is that nobody catches Super from behind.',
   },
   LG: {
-    rule: 'Even: base the man on you. Odd: Scoop the nose with C.',
-    detail: 'Check the center\'s nose. Empty — take your own man. Nose guard — Scoop it with the center.',
+    rule: 'Base the man on your outside shoulder.',
+    detail: 'Their tackle is on your outside shoulder on every front. Step, punch, wall him off from the ball — he does not get back inside you into the dive.',
   },
   C: {
-    rule: 'Covered: Scoop with LG. Uncovered: climb to the backer in the hole.',
+    rule: 'Uncovered: climb to the backer in the hole. Covered: the nose is yours, alone.',
     detail:
-      'Playside foot first. Covered means the nose is yours and the guard is helping. Uncovered means you get vertical and block the backer who fills the A gap — he is the man who makes this tackle.',
+      'Playside foot first. In an even front nobody is on your nose, so you get vertical and block the backer who fills the A gap — he is the man who makes this tackle. In the 5-2 the nose is head-up on you and both guards have a man of their own, so he is yours by yourself and you move him off the hole.',
   },
   RG: {
-    rule: 'Covered: base the man on you. Uncovered: climb to the backer.',
+    rule: 'Base the man on your outside shoulder.',
     detail:
-      'You are the playside wall of the hole. If a man is on you, drive him — he cannot fall back into the A gap. If nobody is on you, get to the second level.',
+      'You are the playside wall of the hole. Their tackle lines up on your outside shoulder on every front — drive him, and he cannot fall back into the A gap.',
   },
   RT: {
-    rule: 'Base the man on you.',
+    rule: 'Base the end on your outside shoulder.',
     detail: 'Take him wherever he wants to go and seal him outside. The dive is inside of you and it is not coming back out.',
   },
   X: {
@@ -647,12 +649,12 @@ const diveAssignments: Record<OffPosId, Assignment> = {
       'Same as the other side. Sprint, break down, mirror. If he tries to fold inside for the tackle, your body is the wall.',
   },
   L: {
-    rule: 'Crack the first unblocked defender outside our tackle.',
+    rule: 'Crack the first man on your side our line has not blocked.',
     detail:
-      'That is the man who crashes down the line. Come off the ball flat and downhill, get your helmet in FRONT of him, and turn him toward the sideline. Never block him in the back and never dive at his knees.',
+      'That is the man who crashes down the line: the backer walked up on the edge in a 4-4, the outside backer in a 4-3, the backer at 4 yards in a 5-2. Come off the ball flat and downhill, get your helmet in FRONT of him, and turn him toward the sideline. Never block him in the back and never dive at his knees.',
   },
   R: {
-    rule: 'Crack the first unblocked defender outside our tackle.',
+    rule: 'Crack the first man outside our tackle our line has not blocked.',
     detail:
       'Same block, play side. You are stopping the crash before it starts — one step late and he is already in the hole.',
   },
@@ -697,7 +699,8 @@ export const splitWideDiveRight: Play = {
     FORMATION_NOTE,
     'Crack block safety: I wrote "helmet in FRONT of him, never in the back, never at his knees" into every crack assignment. At this level a crack block is the easiest way to draw a flag or hurt somebody. If you would rather these be stalk blocks in space than true cracks, that is a one-word change and it is worth making on purpose.',
     'Which gap? Drafted as the playside A gap — aiming point is the center\'s playside hip. "Standard dive" could also mean straight over the center or at the playside guard\'s outside hip (B gap). Confirm the aiming point; it changes who the center and both guards climb to.',
-    'Vs the 5-2 the crack targets change on their own: the ends are the unblocked men there, so the slots crack the ENDS. Vs the 4-4 they crack the walked-up edge backers, and vs the 4-3 they crack the outside backers. The rule the kids learn stays one sentence — "first unblocked man outside our tackle" — and the picture solves itself per front. Confirm you like teaching it as a rule rather than as three memorized names.',
+    'The crack targets change by front on their own: vs the 4-4 the slots crack the walked-up edge backers, vs the 4-3 the outside backers, and vs the 5-2 the two inside backers. The rule the kids learn stays one sentence — "the first man on your side our line has not blocked" — and the picture solves itself per front. Confirm you like teaching it as a rule rather than as three memorized names.',
+    'CHANGED 2026-09-17 WITH THE NEW ALIGNMENT — your words: "N is directly over C. DT should be directly over the last letter on the guard (either the L or the G in RG). DE should be directly over the edge of the circle on the OT." In the 5-2 their tackle is no longer head-up on our tackle, so the 5-2 line blocking on this play is now man-for-man like the even fronts: LT and RT have the two ends on their outside shoulders, both guards have the tackles on theirs, and the center has the nose ALONE (no Scoop — the guard who used to help him is covered now). That also took the free ends away from the slots, so vs the 5-2 they crack the two inside backers instead. The dive itself is untouched: same track, same aiming point at the center\'s playside hip.',
     'The quarterback\'s boot fake away is my addition, not yours. It costs nothing and it is what makes the same look sell the keeper and the screen. Cut it if you want the dive taught totally clean.',
     'DIRECTION — RESOLVED (Coach Ryan, 2026-08-14): the dive IS called with a direction, like the runs in Red and Black, and Indy/Hoosier flip it at the line — Indy = left, Hoosier = right, wired through audibleFlipId. Split Wide is one balanced formation, so unlike those runs there is no Red/Black formation twin: just this left/right pair, no formationTwinId.',
     'MIRROR — SHIPPED for the dive (superseding the file-wide "not shipped yet" stance): Split Wide is a balanced set and all three fronts are left/right symmetric, so Split Wide Dive Left is one mirrorSplitWidePlay() call — mirrorPlay plus the X↔Y exchange this balanced set needs — with zero hand corrections to the football, and it now ships as this play\'s audible flip. Keep and Victory remain one-way per the same ruling. Both dive plays still sit behind the HANDOFF §10 review gate like everything else in this file.',
@@ -735,13 +738,27 @@ export const splitWideDiveLeft: Play = mirrorSplitWidePlay(splitWideDiveRight, {
 // Super motions out and SETTLES between R and X — the exact same motion and the
 // exact same settle spot as Split Wide Keep, so the two plays are one picture
 // until the ball leaves. He stands there with his hands up; on the keep it is a
-// lie and on this one it is true. The quarterback opens away, lets the right
-// side of the rush come free, and throws it out to him behind the line with RG
-// and RT leading.
+// lie and on this one it is true. The quarterback opens away and throws it out
+// to him behind the line.
 //
-// The two deliberately UNBLOCKED rushers on the right are the screen: they run
-// upfield past the quarterback and the ball goes out behind them. That is the
-// play, and it is why the protection targets look one man short.
+// REWRITTEN 2026-09-17 per Coach Ryan. The problem: "the DE gets into the
+// backfield, disrupting the pass to the Super or rushing the QB." The first
+// version let the playside end come free on purpose, screen-style. No more:
+//
+//  - RT REACH-BLOCKS the playside end and pushes him AWAY from the play
+//    (right-side play, push him left). Big reach block, aggressive reach step.
+//  - RG still sets one count, then PULLS — hooks around the outside of the end
+//    RT is reaching, and finds the playside inside backer. "If that linebacker
+//    is out of position or unreachable, find any jersey that you can block."
+//  - X blocks the corner in front of him, every front. No more run-off.
+//  - R (the playside slot) blocks the strong-side ALLEY backer — the
+//    linebacker closest to the play.
+//  - LT (the away-side tackle) just BUMPS his end so he can't get in quick,
+//    then gets upfield to a linebacker, or a safety.
+//
+// So the only man who comes anywhere near free now is the away-side end after
+// LT's bump — and vs the 5-2, the tackle on RG's outside shoulder, whom RG lets
+// go after one count. Both are on the side the ball is leaving from, late.
 
 const SCREEN_S: Action[] = [
   SETTLE_MOTION,
@@ -775,36 +792,78 @@ const SCREEN_Q: Action[] = [
   },
 ]
 
-/** RG: one count of pass set, then out flat to lead inside-up. */
-const SCREEN_RG_RELEASE: Action = {
+/**
+ * RG: one count of pass set, then PULL — flat behind the line, around the
+ * OUTSIDE of the end RT is reaching, and turn up. The block that follows the
+ * pull aims back inside at the backer chasing the screen.
+ */
+const SCREEN_RG_PULL: Action = {
   kind: 'run',
   path: [
-    { x: 1.8, y: -0.4 },
-    { x: 4, y: -1.2 },
-    { x: 7, y: -1 },
+    { x: 2, y: -0.6 },
+    { x: 4.6, y: -1 },
+    { x: 6.6, y: -0.3 },
+    { x: 7.3, y: 1.2 },
   ],
 }
 
-/** RT: one count of pass set, then out flat and up the alley ahead of the catch. */
-const SCREEN_RT_RELEASE: Action = {
-  kind: 'run',
-  path: [
-    { x: 3.4, y: -0.5 },
-    { x: 6.5, y: -1.4 },
-    { x: 9.8, y: -1 },
-  ],
-}
-
-/** X's clear-out: run the corner off instead of blocking him. */
-const SCREEN_X_CLEAROUT: Action[] = [
-  {
-    kind: 'route',
-    path: [
-      { x: 13, y: 6 },
-      { x: 13.6, y: 12 },
-    ],
-  },
+/**
+ * RT: the REACH. Aggressive reach step to the end's OUTSIDE hip, then run him
+ * back inside, away from the play. The block bar points back at him from the
+ * outside — that is the picture of "push him left."
+ */
+const reachBlock = (step: Pt, targetId: string): Action[] => [
+  { kind: 'run', path: [step] },
+  ...block(targetId),
 ]
+/**
+ * E-R sits at 3.55 on EVERY front now — a 5-technique on RT's outside shoulder
+ * — so there is one reach step, not one per front: a short hard step to his
+ * outside hip at 4, then the bar back inside at him.
+ */
+const SCREEN_RT_REACH: Action[] = reachBlock({ x: 4, y: 0.3 }, 'E-R')
+
+/**
+ * LT: BUMP the away-side end — one short block bar at his inside shoulder —
+ * then climb and block a linebacker (a safety if the backer is gone).
+ */
+const SCREEN_LT_CHIP: Action = {
+  kind: 'block',
+  targetId: 'E-L',
+  path: [{ x: -3.5, y: 0.5 }],
+}
+
+/**
+ * LG (the away-side guard): block his man for about one second — until the
+ * quarterback starts to throw — then let him go and climb up the middle of
+ * the field to block any jersey. The climb is a line to NOBODY on purpose:
+ * it is there so the whole line knows it can get upfield once the ball is out.
+ */
+const SCREEN_LG_HOLD: Action = {
+  kind: 'block',
+  targetId: 'T-L',
+  path: [{ x: -2.05, y: 0.5 }],
+}
+const SCREEN_LG_CLIMB: Action = {
+  kind: 'run',
+  path: [
+    { x: -0.4, y: 1.7 },
+    { x: -0.2, y: 5.5 },
+  ],
+}
+
+/**
+ * RG vs the 5-2 ONLY: no pull. Their tackle is a 3-technique on RG's own
+ * outside shoulder — standing in the B gap RT is about to vacate for the end
+ * — so if RG pulled he would run straight into the backfield behind him. RG
+ * disrupts him just long enough for the pass to get off, then climbs to the
+ * playside backer.
+ */
+const SCREEN_RG_HOLD_ODD: Action = {
+  kind: 'block',
+  targetId: 'T-R',
+  path: [{ x: 2.05, y: 0.5 }],
+}
 
 /** Y and L clear out away from the screen and take their coverage with them. */
 const SCREEN_CLEAROUT = {
@@ -832,39 +891,40 @@ const SCREEN_SKILL = {
   S: SCREEN_S,
   Q: SCREEN_Q,
   ...SCREEN_CLEAROUT,
+  /** X blocks the corner in front of him on every front. */
+  X: block('C-R'),
 } satisfies Partial<Record<OffPosId, Action[]>>
 
-/** Even-front protection: three men, four rushers, and E-R goes free on purpose. */
+/** Even-front protection: LT bumps and climbs, LG holds one count and climbs, C has the tackle, RT reaches the end. */
 const SCREEN_EVEN_PRO = {
-  LT: block('E-L'),
-  LG: block('T-L'),
+  LT: [SCREEN_LT_CHIP, ...block('B-L')],
+  LG: [SCREEN_LG_HOLD, SCREEN_LG_CLIMB],
   C: block('T-R'),
+  RT: SCREEN_RT_REACH,
 } satisfies Partial<Record<OffPosId, Action[]>>
 
 const screenVs44: FrontPlan = {
   actions: {
     ...SCREEN_SKILL,
     ...SCREEN_EVEN_PRO,
-    RG: [SCREEN_RG_RELEASE, ...block('B-R')],
-    RT: [SCREEN_RT_RELEASE, ...block('O-R')],
-    R: block('C-R'),
-    X: SCREEN_X_CLEAROUT,
+    RG: [SCREEN_RG_PULL, ...block('B-R')],
+    R: block('O-R'),
   },
   assignments: {
-    RT: {
-      rule: 'Set one count, release, and take the walked-up backer.',
+    RG: {
+      rule: 'Set one count, pull around the end, and find the playside inside backer.',
       detail:
-        'He is the first man outside on the edge and he is standing right in front of where you come out. Get to him under control and turn him inside — Super is running around your outside shoulder.',
+        'Hook around the outside of the end RT is reaching and turn up. The inside backer on the screen side is yours — he is the first man to read screen and run at it. If he is gone or you cannot get to him, block any jersey you can find.',
     },
     R: {
-      rule: 'Block the corner.',
+      rule: 'Block the walked-up backer — the Sam.',
       detail:
-        'Vs a 4-4 we let X run off deep instead of blocking, so the corner is yours. Come off the ball like a route, break down, and stay on his outside number.',
+        'He is the alley backer, standing on the edge closest to the catch. Come off the ball like a route, break down, and wall him off from Super. Inside-out — never let him cross your face to the sideline.',
     },
-    X: {
-      rule: 'Run him off — vertical, all the way.',
+    LT: {
+      rule: 'Bump the end, then climb to the away-side backer.',
       detail:
-        'A 4-4 keeps one man deep in the middle, and he is not blockable on a throw this fast. Instead of blocking, take the corner deep and out of the play. Sprint up the sideline and do not look back.',
+        'A 4-4 keeps one man deep in the middle, and after the bump he is the safety you go find if the backer has already run to the screen.',
     },
   },
 }
@@ -873,23 +933,24 @@ const screenVs43: FrontPlan = {
   actions: {
     ...SCREEN_SKILL,
     ...SCREEN_EVEN_PRO,
-    RG: [SCREEN_RG_RELEASE, ...block('M')],
-    RT: [SCREEN_RT_RELEASE, ...block('F-R')],
+    RG: [SCREEN_RG_PULL, ...block('M')],
     R: block('B-R'),
-    X: block('C-R'),
   },
   assignments: {
     RG: {
-      rule: 'Set one count, release, and take the Mike.',
-      detail: 'He is the first man to read screen and run at it. He is the one who ruins this play — go find him.',
-    },
-    RT: {
-      rule: 'Set one count, release, and take the safety on your side.',
-      detail: 'A 4-3 plays two deep, so your man is the near safety coming down into the alley.',
+      rule: 'Set one count, pull around the end, and find the Mike.',
+      detail:
+        'Hook around the outside of the end RT is reaching and turn up. The Mike is the first man to read screen and run at it — he is the one who ruins this play. If he is gone or you cannot get to him, block any jersey you can find.',
     },
     R: {
-      rule: 'Block the outside backer.',
-      detail: 'He is closest to the catch. Get inside-out on him and wall him off from Super.',
+      rule: 'Block the outside backer — the Sam.',
+      detail:
+        'He is the alley backer closest to the catch. Get inside-out on him and wall him off from Super.',
+    },
+    LT: {
+      rule: 'Bump the end, then climb to the Will.',
+      detail:
+        'The Will is right there behind the end you bumped. If he is already gone to the screen, keep climbing and take the safety on your side.',
     },
   },
 }
@@ -897,28 +958,33 @@ const screenVs43: FrontPlan = {
 const screenVs52: FrontPlan = {
   actions: {
     ...SCREEN_SKILL,
-    LT: block('E-L'),
-    LG: block('T-L'),
+    LT: [SCREEN_LT_CHIP, ...block('B-L')],
+    LG: [SCREEN_LG_HOLD, SCREEN_LG_CLIMB],
     C: block('N'),
-    RG: [SCREEN_RG_RELEASE, ...block('B-R')],
-    RT: [SCREEN_RT_RELEASE, ...block('F-R')],
-    R: block('C-R'),
-    X: SCREEN_X_CLEAROUT,
+    RG: [SCREEN_RG_HOLD_ODD, ...block('B-R')],
+    RT: SCREEN_RT_REACH,
+    R: block('B-R'),
   },
   assignments: {
     C: {
       rule: 'Take the nose by yourself.',
-      detail: 'Odd front — he is right on you and there is nobody to help. Punch, sit down, and keep him off the quarterback for two counts.',
+      detail:
+        'Odd front — he is right on you and there is nobody to help. Punch, sit down, and keep him off the quarterback for two counts.',
+    },
+    RT: {
+      rule: 'Reach the end — same as always. Nobody is inside you: the tackle is RG\'s.',
+      detail:
+        'Same reach — step hard to the end\'s outside hip and run him back to the left. In this front their tackle is lined up on RG\'s outside shoulder, not on you, and RG is holding him for the first count. All you have is the end.',
+    },
+    RG: {
+      rule: 'NO pull. Disrupt the tackle on your outside shoulder, then climb to the playside backer.',
+      detail:
+        'Odd front — their tackle is right on your outside shoulder, standing in the gap between you and RT, and RT is leaving him to reach the end. Pull, and that man runs straight into the backfield. So you do not pull here. Block him inside-out just long enough for the quarterback to get the pass off. Right as the ball is coming out, let him go and climb to the playside linebacker. If R already has him, take the next jersey — the safety coming down.',
     },
     R: {
-      rule: 'Block the corner.',
+      rule: 'Block the NEAREST defender — the linebacker if he shows. The most important block on this play.',
       detail:
-        'Vs a 5-2 we let X run off instead of blocking, so the corner is yours. Come off the ball under control, break down, and stay on his outside number.',
-    },
-    X: {
-      rule: 'Run him off — vertical, all the way.',
-      detail:
-        'A 5-2 plays two deep and gives us one more blocker than we need in the alley, so your job is to take the corner OUT of the play instead of blocking him. Sprint straight up the sideline and do not look back.',
+        'A 5-2 has no alley backer walked up on you, so the man closest to the catch is whoever shows first — usually the playside linebacker scraping out, sometimes the safety filling. Come off the ball like a route, find the nearest jersey, and wall him off from Super. Inside-out. Nobody else is close enough to make this block — it is yours, and the play does not work without it.',
     },
   },
 }
@@ -930,13 +996,14 @@ const screenAssignments: Record<OffPosId, Assignment> = {
       'Nothing is coming to you and that is the point. Run hard for four seconds and take the corner and the deep help with you, away from the screen.',
   },
   LT: {
-    rule: 'Pass set. Block the end.',
+    rule: 'Bump the end, then get upfield and block a linebacker — or a safety.',
     detail:
-      'Real pass set, real punch — you are selling a dropback. Kick-slide, hands inside, and keep him off the quarterback for two full counts.',
+      'Do not stay on him. One hard punch to slow him down so he cannot get in fast, then let him go and climb. Find the first linebacker on your side and block him; if he is already gone, keep going and find the safety. The ball is out quick — the bump is all the protection we need from you.',
   },
   LG: {
-    rule: 'Pass set. Block the man on you.',
-    detail: 'Set inside-out and hold him. If he stunts inside, you go with him — the quarterback is stepping away from you.',
+    rule: 'Block your man for one second — until the quarterback starts to throw — then let him go and climb.',
+    detail:
+      'Your man is away from the play, so you only have to hold him for about one count. Set inside-out and stay on him until the quarterback starts to throw. Then let him go, get upfield through the middle, and block any jersey you can find. Your line on the picture goes to nobody on purpose — it is there so the whole line knows: once the ball is out, everybody climbs and blocks.',
   },
   C: {
     rule: 'Pass set. Block the first man to your right; if a nose is on you, he is yours alone.',
@@ -944,19 +1011,19 @@ const screenAssignments: Record<OffPosId, Assignment> = {
       'You are the last man protecting the middle. Two counts is all we need — the ball is out before the rush ever gets home.',
   },
   RG: {
-    rule: 'Set one count, then release flat and lead inside-up.',
+    rule: 'Set one count, then pull around the end and find the linebacker.',
     detail:
-      'Show him a pass set, let him beat you upfield — that is what we want — then get out into the flat and climb to the first backer chasing the screen. You are the inside blocker; get your head across him.',
+      'Show him a pass set for one count, then pull flat and hook around the OUTSIDE of the end RT is reaching — never inside him, that is where RT is pushing him. Turn up and find the linebacker chasing the screen; get your head across him. If that backer is out of position or you cannot reach him, find any jersey you can block. Never run out there with nobody to hit.',
   },
   RT: {
-    rule: 'Set one count, then release flat and lead up the alley.',
+    rule: 'REACH the end. Push him inside, away from the play.',
     detail:
-      'Same set, same release, but you go further and deeper than RG. You have the deep man who comes down to make the tackle. Run under control the last three steps so you do not run past him.',
+      'This is a big reach block and it is the block that fixes this play. Aggressive reach step — your outside foot goes hard to the end\'s outside hip — get your hat across his outside number, and run him back to the LEFT. He does not get upfield and he does not get to Super. If he tries to go outside you, you are already there. If he runs inside, that is where you wanted him — go with him.',
   },
   X: {
-    rule: '4-3: block the corner. 4-4 and 5-2: run him off deep.',
+    rule: 'Go up and block the corner in front of you.',
     detail:
-      'Count the hats outside with you. If we already have enough blockers out there, the best thing you can do is take the corner deep and out of the play — sprint up the sideline. If we are a man short, you stalk him and stay on his outside number so everything spills back inside.',
+      'Come off the ball like a route, get to him under control, and stay on his outside number so everything spills back inside to Super. You are the last block on the sideline.',
   },
   L: {
     rule: 'Clear out — post across the middle.',
@@ -964,19 +1031,19 @@ const screenAssignments: Record<OffPosId, Assignment> = {
       'Run the middle of the field empty. The safety who chases you is the safety who is not sitting in the alley waiting for Super.',
   },
   R: {
-    rule: 'Block the first defender inside the corner.',
+    rule: 'Block the alley backer — the linebacker closest to the play.',
     detail:
-      'Super is catching it just outside of you, so you are the block he runs off of. Come off the ball like a route so nobody smells screen, then break down and take him. Inside-out — never let him cross your face to the sideline.',
+      'You are the playside slot, so the strong-side alley is yours. Come off the ball like a route so nobody smells screen, then break down and take the backer closest to the catch. Inside-out — never let him cross your face to the sideline. Super is running off your block.',
   },
   S: {
     rule: 'Motion out between R and X. STOP. Get set, hands up — then catch it and get north.',
     detail:
-      'Exactly the same trip you take on the keep: out behind the line, stop between R and X, feet set, numbers to the quarterback, hands up. Set for a full count before the snap. Stand still and let it come to you — do not drift toward him and do not start upfield until you have caught it. Look the ball all the way in, THEN find your blockers: RG is your inside wall, RT is out in front of you, R is inside you and X is downfield. Get up the sideline. Never bounce back inside — that is where the rush ended up.',
+      'Exactly the same trip you take on the keep: out behind the line, stop between R and X, feet set, numbers to the quarterback, hands up. Set for a full count before the snap. Stand still and let it come to you — do not drift toward him and do not start upfield until you have caught it. Look the ball all the way in, THEN find your blockers: RT has the end sealed inside, RG is coming around the end to wall off the backer, R has the alley, X has the corner. Get up the sideline. Never bounce back inside.',
   },
   Q: {
-    rule: 'Send him out, wait for him to set, open away, let the right side come free, throw it flat.',
+    rule: 'Send him out, wait for him to set, open away, throw it flat on time.',
     detail:
-      'Same start as the keep — call Super out, WAIT for him to be stopped and set, and look at their linebackers while you wait. Then snap it, take a hard three-step drop opening AWAY from the screen, and hold your eyes to the back side for one full count. The end on the right is unblocked on purpose; let him run at you. Then turn and throw it at Super\'s numbers while he is standing still — this is a short, flat, hard throw behind the line. Never throw it late and never throw it behind him. Against a team that blitzes, the ball MUST be out on time — the second you feel extra men coming, that is the snap this play was built for, and holding it one extra beat is the only way to lose it.',
+      'Same start as the keep — call Super out, WAIT for him to be stopped and set, and look at their linebackers while you wait. Then snap it, take a hard three-step drop opening AWAY from the screen, and hold your eyes to the back side for one full count. RT is reaching the end on the screen side, so nobody should be in your throwing lane — the man who might get to you is the away-side end after LT bumps him, and he is coming from the side you opened to, so be on time. Turn and throw it at Super\'s numbers while he is standing still — a short, flat, hard throw behind the line. Never throw it late and never throw it behind him. Against a team that blitzes, the ball MUST be out on time — the second you feel extra men coming, that is the snap this play was built for, and holding it one extra beat is the only way to lose it.',
   },
 }
 
@@ -993,27 +1060,36 @@ export const splitWideScreenRight: Play = {
   direction: 'right',
   ballCarrier: 'S',
   audibleFlipId: 'split-wide-screen-left',
-  summary: 'Quick screen to Super in space, linemen out in front.',
+  summary: 'Quick screen to Super in space. Tackle reaches the end, guard pulls around him.',
   coachNotes: [
     'Our answer to a blitzing team - the ball must be out on time.',
+    'RT: reach the end and push him inside. He never gets to Super.',
+    'RG: hook around the end, find the backer. No backer? Any jersey. (5-2: hold the tackle first, then climb.)',
+    'Once the ball is out, everybody climbs and blocks.',
     'Super: stand still, hands up. Catch it first, then run.',
   ],
   description:
-    'Super motions out and settles between R and X with his hands up — the same picture as the keep. We let their right-side rush come free, the quarterback sells a drop the other way, and the ball goes out behind them to Super standing still, with both right-side linemen leading him up the sideline. This is our answer to a team that blitzes: the more men they send, the fewer are left out there with Super. The ball has to come out quick — that is the whole play — and it puts Super in space.',
+    'Super motions out and settles between R and X with his hands up — the same picture as the keep. The quarterback sells a drop the other way and the ball goes out flat to Super standing still. The screen-side end does NOT come free any more: RT reaches him and pushes him inside, away from the play, and RG pulls around the outside of that block to find the backer. R has the alley backer and X has the corner, so Super has a wall in front of him up the sideline. The away-side guard holds his man for one count, until the ball is coming out, then he climbs too — once the ball is gone, everybody blocks. This is our answer to a team that blitzes: the ball comes out quick and it puts Super in space.',
   assignments: screenAssignments,
   vs: { '44': screenVs44, '43': screenVs43, '52': screenVs52 } satisfies Record<FrontId, FrontPlan>,
   reviewNotes: [
     GATE,
     HB_NOTE,
     FORMATION_NOTE,
-    'WHICH SCREEN? "HB goes in motion, HB screen" has two honest readings and I drafted the first: (1) a TRUE SCREEN — Super motions past the tackle and out into the flat, we deliberately let the two right-side rushers come free upfield, and RG and RT release to lead him. (2) A QUICK/BUBBLE SCREEN — Super motions out to a slot and gets the ball immediately with only R and X blocking, no linemen out. Version 1 is a bigger play and teaches real screen timing; version 2 is far easier to get right in a week. Tell me which one and I will keep the other as a change-up or throw it away.',
-    'THE UNBLOCKED MEN ARE THE PLAY. Vs the 4-4 and 4-3 the right end is unblocked on purpose; vs the 5-2 both the right tackle and the right end are. That is what makes a screen work, and it will look like a mistake on the diagram until a kid is told why. Confirm you are comfortable teaching "let him come" to 13-year-olds — if not, the answer is the bubble version, where nobody is intentionally free.',
+    'REWRITTEN 2026-09-17 FROM YOUR NOTE: "the DE gets into the backfield, disrupting the pass to the Super or rushing the QB." Every change below is yours, in your order: RT reach-blocks the playside end away from the play (right-side play, push him left) with an aggressive reach step; X goes up and blocks the corner in front of him; R blocks the strong-side alley backer closest to the play; the pulling guard hooks around the end RT is blocking and finds that linebacker — "if that linebacker is out of position or unreachable, find any jersey that you can block"; and the away-side tackle just bumps his end so he cannot get in quick, then gets upfield to a linebacker or a safety.',
+    'ADJUSTED 2026-09-17 (SECOND PASS) FROM YOUR NOTES: (1) "Opposite play-side guard: initially block a defender away from the play for about one second until the quarterback starts to throw. Once that point is reached, let your guy go and climb up field and block any jersey. Draw a line blocking nothing, just in the center of the field, so the line knows it can all climb up and block." — LG now has a short block bar on the tackle (the hold) and then a plain arrow up the middle of the field to nobody, on every front. That arrow is the "everybody climbs" picture and the LG text says so. (2) "On a 5-2, the playside wing blocks the nearest defender, which could be the linebacker as well. It is the most important block. And on the 5-2 I don\'t want the right guard pulling until after he blocks the D-tackle just long enough for the quarterback to get the pass off; right as he is doing that, climb up to the playside linebacker." — vs the 5-2 only, RG no longer pulls: short block bar on the tackle over his own outside shoulder (T-R), then a bar up to the playside backer (B-R). R is drawn to that same backer (B-R) as "the nearest defender" and his 5-2 rule calls it the most important block on the play.',
+    'BOTH R AND RG ARE DRAWN TO THE PLAYSIDE BACKER IN THE 5-2. That is on purpose, not a mistake: R takes the nearest man who shows (usually that backer), and RG climbs to the same backer with "if R already has him, take the next jersey — the safety" in his text. Two bars on one man is the honest picture of "first one there takes him." If you would rather RG\'s climb be drawn to the strong safety (F-R) so nobody doubles, say so and it is a one-line change.',
+    'WHAT CHANGED ON THE DIAGRAM: RT no longer releases — his arrow is a reach step to the end\'s OUTSIDE hip with the block bar pointing back inside at him, which is the picture of "push him left." RG\'s release is now a pull that goes flat, around the outside of the end, and turns up before the block bar goes back inside to the backer. LT\'s arrow is a short block bar on the end\'s inside shoulder (the bump) followed by a second bar up to the away-side inside backer. X now has a block bar on the corner on every front instead of the run-off route.',
+    'WHO IS FREE NOW. The old play let the playside end come free on purpose; that is what you saw getting into the backfield, and it is gone. Vs the 4-4 and 4-3 nobody on the screen side is free. The one man who can get home now is the AWAY-side end after LT bumps and leaves him — and he is coming from the side the quarterback opens to, which is why the quarterback\'s detail says to be on time. Vs the 5-2 nobody on the screen side is free either now: your second-pass note has RG holding the tackle on his own outside shoulder instead of pulling, so the man standing in the gap RT vacates for the end is accounted for. The away-side tackle (T-L in the 5-2, on LG\'s outside shoulder) is LG\'s for the one count he holds, then he is loose too — same trade as the end, the ball is already out.',
+    'THE TARGETS BY FRONT, and why: R takes the alley backer closest to the play — the Sam walked up on the edge in the 4-4 (O-R), the Sam in the 4-3 (B-R), and in the 5-2, which has no alley backer, the nearest defender, drawn as the playside backer (B-R) per your second pass. RG\'s "that linebacker" on the pull is the playside inside backer — B-R in the 4-4, the Mike in the 4-3; in the 5-2 he does not pull, he holds T-R and climbs to B-R. LT climbs to the away-side inside backer in all three (B-L, the Will in the 4-3) with the safety as his fallback in the text. LG\'s climb is to nobody on every front, by your call. Nobody is on the deep middle safety in the 4-4; same trade as before, get the yards and get out of bounds.',
+    'ALIGNMENT RETUNE 2026-09-17, your words: "N is directly over C. DT should be directly over the last letter on the guard (either the L or the G in RG). DE should be directly over the edge of the circle on the OT." The hand-drawn steps in this play were tuned to the old spots, so they moved with the defense: RT\'s reach step is now one step to (4, 0.3) on every front (the end is at 3.55 on all three now, so there is no longer an even/odd version of it), LT\'s bump lands at (−3.5, 0.5), and LG\'s one-count hold is at (−2.05, 0.5) — the guard\'s own outside shoulder, where their tackle now stands on every front. The 5-2 no longer needs its own numbers for any of that; only RG\'s 5-2 hold is still its own action, because on the even fronts he pulls.',
+    'THE REACH IS THE HARD BLOCK. Asking a 13-year-old right tackle to reach a defensive end who is lined up outside him is a real ask — he needs the reach step drilled until it is automatic, and the end will beat it upfield sometimes. When he does, RG\'s pull path takes him around the OUTSIDE of that block, so RG must read it: if the end has beaten RT to the outside, RG goes inside him instead and takes him, and the backer becomes "any jersey." That read is in the RG text as "never inside him" for the normal case; confirm you want the exception taught, or keep it simple.',
+    'X BLOCKS THE CORNER ON EVERY FRONT NOW. The old play had X run the corner off deep vs the 4-4 and 5-2 and only stalk him vs the 4-3. Your call is simpler and it is the same rule on every front, which is a better rule for kids.',
     'The ball flight is drawn with the `pitch` action kind because the frozen schema has no `pass` kind (see docs/SEAM.md §2). It renders as the dotted ball-flight line, which reads correctly, but flag it if you want passes drawn differently across the whole book.',
-    'THE PAIR: this play and Split Wide Keep are now deliberately the same pre-snap picture and the same first second — Super out and set between R and X, quarterback waiting and reading. That is the point of both, and it is also the setup for checking between them at the line, which we have not built yet (see the keep\'s notes).',
-    'Lead-blocker targets, and why: RG always turns back INSIDE and walls off the first pursuit defender over the ball (the backer in the 4-4 and 5-2, the Mike in the 4-3) — he is the man who reads screen fastest and he is the one who makes this a 2-yard play. RT goes further out and takes the first man on the edge (the walked-up backer in the 4-4, the near safety in the two-high 4-3 and 5-2). Then we count hats: vs the 4-4 and the 5-2 we have one more blocker out there than they have defenders, so R takes the corner and X RUNS HIM OFF deep instead of blocking; vs the 4-3 R takes the outside backer and X stalks the corner. Deliberately NOT drawn: a block on the deep middle safety in the 4-4 — a guard cannot get to a man 10 yards deep before the ball does, so the play is coached as "get the yards and get out of bounds." Confirm that trade.',
-    'THE SETTLE, per your call: Super motions out and STOPS between R and X at (10.75, −1) — same motion path, same spot, same hands-up look as Split Wide Keep, and the code literally shares the constants so the two diagrams can never drift apart. That moved the catch point about 4 yards wider than it was drafted, so three things moved with it: RT now releases all the way out to 9.8 to be in front of the catch, RG out to 7 as the inside wall, and the throw is now a flat, standing catch instead of a lead throw to a moving man. Because he is standing still, this is an easier throw and an easier catch than the drafted version — and a slower one, so RG and RT have to be moving on their release or they will not be there in time.',
-    'HE IS SET, WHICH MEANS HE IS NOT MOVING AT THE SNAP. Same rule note as on the keep: a man who motions and stops must be set a full second before the snap. On this play that is also a timing tax — the quarterback cannot snap it the instant Super arrives, so the defense gets an extra beat to look at him standing out there. Worth confirming: if the linebackers start jumping the screen because it is telegraphed, the answer is the keep, which is exactly why the two share a picture.',
-    'PER COACH RYAN — WHAT THIS PLAY IS FOR: "works for blitzing teams, ball must get out quick, gets the Super in space." Now in the description and in the quarterback\'s detail. This also answers the timing worry two notes up from a different direction: against a blitzing team the extra beat Super spends standing there is bought back, because the men who would be looking at him are running at the quarterback instead. It also sharpens the choice between the two screen versions in the note above — if the trigger for this call is BLITZ, the quick/bubble version gets the ball out faster than the true screen does, and speed is the thing you just said matters most. Worth a decision.',
+    'THE PAIR: this play and Split Wide Keep are still the same pre-snap picture and the same first second — Super out and set between R and X, quarterback waiting and reading. That is the point of both, and it is also the setup for checking between them at the line, which we have not built yet (see the keep\'s notes).',
+    'THE SETTLE, per your call: Super motions out and STOPS between R and X at (10.75, −1) — same motion path, same spot, same hands-up look as Split Wide Keep, and the code literally shares the constants so the two diagrams can never drift apart. Because he is standing still, this is a flat, standing catch — an easy throw and an easy catch, and a slower one, so RG has to be moving on his pull or he will not be around the end in time.',
+    'HE IS SET, WHICH MEANS HE IS NOT MOVING AT THE SNAP. Same rule note as on the keep: a man who motions and stops must be set a full second before the snap. On this play that is also a timing tax — the quarterback cannot snap it the instant Super arrives, so the defense gets an extra beat to look at him standing out there. If the linebackers start jumping the screen because it is telegraphed, the answer is the keep, which is exactly why the two share a picture.',
+    'PER COACH RYAN — WHAT THIS PLAY IS FOR: "works for blitzing teams, ball must get out quick, gets the Super in space." In the description and in the quarterback\'s detail.',
     'Y and L clear out on every front. Confirm — the alternative is having L block the backside pursuit, but he is 8½ yards away from anything worth blocking and his route is what empties the middle.',
     'DIRECTION — RESOLVED (Coach Ryan, 2026-08-14): the Screen is now called with a direction like the Dive — Indy = left, Hoosier = right at the line, wired through audibleFlipId; one balanced formation, so no formationTwinId.',
     'MIRROR — SHIPPED for the screen: Split Wide Screen Left now ships as this play\'s audible flip, built with mirrorSplitWidePlay (the mirror plus the X↔Y exchange the balanced set needs). The old caution stands even with it shipped: a mirrored screen mirrors the PICTURE, not the quarterback\'s technique — throwing left off an away-opening drop is a different rep for a right-handed kid, and it needs its own practice time before the left call is live on game day.',
@@ -1023,10 +1099,12 @@ export const splitWideScreenRight: Play = {
 // ---------------------------------------------------------------------------
 // PLAY 3b — SPLIT WIDE SCREEN LEFT: the mirror of the play above. The GEOMETRY
 // is one mirrorSplitWidePlay() call — Super settles between L and Y at
-// (−10.75, −1), the LEFT rush comes free, LG and LT release and lead. The
-// PROSE is all hand-translated: mirrorPlay re-keys assignments correctly but
-// cannot rewrite "right" into "left" inside a sentence, so every rule and
-// detail below is authored fresh at the already-correct mirrored keys.
+// (−10.75, −1), LT reaches the left end and pushes him RIGHT, LG pulls around
+// him, L has the alley, Y has the corner, RT bumps and climbs, RG holds one
+// count and climbs to nobody. The PROSE is all
+// hand-translated: mirrorPlay re-keys assignments correctly but cannot rewrite
+// "right" into "left" inside a sentence, so every rule and detail below is
+// authored fresh at the already-correct mirrored keys.
 // ---------------------------------------------------------------------------
 
 export const splitWideScreenLeft: Play = (() => {
@@ -1041,22 +1119,22 @@ export const splitWideScreenLeft: Play = (() => {
     ],
     audibleFlipId: 'split-wide-screen-right',
     description:
-      'Super motions out and settles between L and Y with his hands up — the same screen picture, flipped to the left. We let their left-side rush come free, the quarterback sells a drop the other way, and the ball goes out behind them to Super standing still, with both left-side linemen leading him up the sideline. This is our answer to a team that blitzes: the more men they send, the fewer are left out there with Super. The ball has to come out quick — that is the whole play — and it puts Super in space.',
+      'Super motions out and settles between L and Y with his hands up — the same screen picture, flipped to the left. The quarterback sells a drop the other way and the ball goes out flat to Super standing still. The screen-side end does NOT come free: LT reaches him and pushes him inside, away from the play, and LG pulls around the outside of that block to find the backer. L has the alley backer and Y has the corner, so Super has a wall in front of him up the left sideline. The away-side guard holds his man for one count, until the ball is coming out, then he climbs too — once the ball is gone, everybody blocks. This is our answer to a team that blitzes: the ball comes out quick and it puts Super in space.',
     assignments: {
       Y: {
-        rule: '4-3: block the corner. 4-4 and 5-2: run him off deep.',
+        rule: 'Go up and block the corner in front of you.',
         detail:
-          'You are the wide man on the screen side now. Count the hats outside with you. If we already have enough blockers out there, the best thing you can do is take the corner deep and out of the play — sprint up the sideline. If we are a man short, you stalk him and stay on his outside number so everything spills back inside.',
+          'You are the wide man on the screen side now. Come off the ball like a route, get to him under control, and stay on his outside number so everything spills back inside to Super. You are the last block on the sideline.',
       },
       LT: {
-        rule: 'Set one count, then release flat and lead up the alley.',
+        rule: 'REACH the end. Push him inside, away from the play.',
         detail:
-          'Same set, same release, but you go further and deeper than LG. You have the deep man who comes down to make the tackle. Run under control the last three steps so you do not run past him.',
+          'This is a big reach block and it is the block that fixes this play. Aggressive reach step — your outside foot goes hard to the end\'s outside hip — get your hat across his outside number, and run him back to the RIGHT. He does not get upfield and he does not get to Super. If he tries to go outside you, you are already there. If he runs inside, that is where you wanted him — go with him.',
       },
       LG: {
-        rule: 'Set one count, then release flat and lead inside-up.',
+        rule: 'Set one count, then pull around the end and find the linebacker.',
         detail:
-          'Show him a pass set, let him beat you upfield — that is what we want — then get out into the flat and climb to the first backer chasing the screen. You are the inside blocker; get your head across him.',
+          'Show him a pass set for one count, then pull flat and hook around the OUTSIDE of the end LT is reaching — never inside him, that is where LT is pushing him. Turn up and find the linebacker chasing the screen; get your head across him. If that backer is out of position or you cannot reach him, find any jersey you can block. Never run out there with nobody to hit.',
       },
       C: {
         rule: 'Pass set. Block the first man to your left; if a nose is on you, he is yours alone.',
@@ -1064,13 +1142,14 @@ export const splitWideScreenLeft: Play = (() => {
           'You are the last man protecting the middle. Two counts is all we need — the ball is out before the rush ever gets home.',
       },
       RG: {
-        rule: 'Pass set. Block the man on you.',
-        detail: 'Set inside-out and hold him. If he stunts inside, you go with him — the quarterback is stepping away from you.',
+        rule: 'Block your man for one second — until the quarterback starts to throw — then let him go and climb.',
+        detail:
+          'Your man is away from the play, so you only have to hold him for about one count. Set inside-out and stay on him until the quarterback starts to throw. Then let him go, get upfield through the middle, and block any jersey you can find. Your line on the picture goes to nobody on purpose — it is there so the whole line knows: once the ball is out, everybody climbs and blocks.',
       },
       RT: {
-        rule: 'Pass set. Block the end.',
+        rule: 'Bump the end, then get upfield and block a linebacker — or a safety.',
         detail:
-          'Real pass set, real punch — you are selling a dropback. Kick-slide, hands inside, and keep him off the quarterback for two full counts.',
+          'Do not stay on him. One hard punch to slow him down so he cannot get in fast, then let him go and climb. Find the first linebacker on your side and block him; if he is already gone, keep going and find the safety. The ball is out quick — the bump is all the protection we need from you.',
       },
       X: {
         rule: 'Clear out — run straight up the field.',
@@ -1078,9 +1157,9 @@ export const splitWideScreenLeft: Play = (() => {
           'Nothing is coming to you and that is the point. Run hard for four seconds and take the corner and the deep help with you, away from the screen.',
       },
       L: {
-        rule: 'Block the first defender inside the corner.',
+        rule: 'Block the alley backer — the linebacker closest to the play.',
         detail:
-          'Super is catching it just outside of you, so you are the block he runs off of. Come off the ball like a route so nobody smells screen, then break down and take him. Inside-out — never let him cross your face to the sideline.',
+          'You are the playside slot, so the alley on the left is yours. Come off the ball like a route so nobody smells screen, then break down and take the backer closest to the catch. Inside-out — never let him cross your face to the sideline. Super is running off your block.',
       },
       R: {
         rule: 'Clear out — post across the middle.',
@@ -1090,32 +1169,32 @@ export const splitWideScreenLeft: Play = (() => {
       S: {
         rule: 'Motion out between L and Y. STOP. Get set, hands up — then catch it and get north.',
         detail:
-          'Same settle, other side: out behind the line to your LEFT, stop between L and Y — not past Y, not next to L, right in the middle of them. Feet set, numbers to the quarterback, hands up. Set for a full count before the snap. Stand still and let it come to you — do not drift toward him and do not start upfield until you have caught it. Look the ball all the way in, THEN find your blockers: LG is your inside wall, LT is out in front of you, L is inside you and Y is downfield. Get up the LEFT sideline. Never bounce back inside — that is where the rush ended up.',
+          'Same settle, other side: out behind the line to your LEFT, stop between L and Y — not past Y, not next to L, right in the middle of them. Feet set, numbers to the quarterback, hands up. Set for a full count before the snap. Stand still and let it come to you — do not drift toward him and do not start upfield until you have caught it. Look the ball all the way in, THEN find your blockers: LT has the end sealed inside, LG is coming around the end to wall off the backer, L has the alley, Y has the corner. Get up the LEFT sideline. Never bounce back inside.',
       },
       Q: {
-        rule: 'Send him out, wait for him to set, open away, let the left side come free, throw it flat.',
+        rule: 'Send him out, wait for him to set, open away, throw it flat on time.',
         detail:
-          'Same play as Screen Right, sent the other way. Call Super out to your LEFT, WAIT for him to be stopped and set, and look at their linebackers while you wait. Then snap it, take a hard three-step drop opening AWAY to the RIGHT, and hold your eyes to the back side for one full count. The end on the left is unblocked on purpose; let him run at you. Then turn and throw it at Super\'s numbers while he is standing still — this is a short, flat, hard throw behind the line, and throwing it to your left is the harder half of this pair, so it gets its own reps in practice. Never throw it late and never throw it behind him. Against a team that blitzes, the ball MUST be out on time — the second you feel extra men coming, that is the snap this play was built for, and holding it one extra beat is the only way to lose it.',
+          'Same play as Screen Right, sent the other way. Call Super out to your LEFT, WAIT for him to be stopped and set, and look at their linebackers while you wait. Then snap it, take a hard three-step drop opening AWAY to the RIGHT, and hold your eyes to the back side for one full count. LT is reaching the end on the screen side, so nobody should be in your throwing lane — the man who might get to you is the right end after RT bumps him, and he is coming from the side you opened to, so be on time. Turn and throw it at Super\'s numbers while he is standing still — a short, flat, hard throw behind the line, and throwing it to your left is the harder half of this pair, so it gets its own reps in practice. Never throw it late and never throw it behind him. Against a team that blitzes, the ball MUST be out on time — the second you feel extra men coming, that is the snap this play was built for, and holding it one extra beat is the only way to lose it.',
       },
     } satisfies Record<OffPosId, Assignment>,
     vs: {
       '44': {
         ...m.vs['44'],
         assignments: {
-          LT: {
-            rule: 'Set one count, release, and take the walked-up backer.',
+          LG: {
+            rule: 'Set one count, pull around the end, and find the playside inside backer.',
             detail:
-              'He is the first man outside on the edge and he is standing right in front of where you come out. Get to him under control and turn him inside — Super is running around your outside shoulder.',
+              'Hook around the outside of the end LT is reaching and turn up. The inside backer on the screen side is yours — he is the first man to read screen and run at it. If he is gone or you cannot get to him, block any jersey you can find.',
           },
           L: {
-            rule: 'Block the corner.',
+            rule: 'Block the walked-up backer on your side.',
             detail:
-              'Vs a 4-4 we let Y run off deep instead of blocking, so the corner is yours. Come off the ball like a route, break down, and stay on his outside number.',
+              'He is the alley backer, standing on the edge closest to the catch. Come off the ball like a route, break down, and wall him off from Super. Inside-out — never let him cross your face to the sideline.',
           },
-          Y: {
-            rule: 'Run him off — vertical, all the way.',
+          RT: {
+            rule: 'Bump the end, then climb to the away-side backer.',
             detail:
-              'A 4-4 keeps one man deep in the middle, and he is not blockable on a throw this fast. Instead of blocking, take the corner deep and out of the play. Sprint up the sideline and do not look back.',
+              'A 4-4 keeps one man deep in the middle, and after the bump he is the safety you go find if the backer has already run to the screen.',
           },
         },
       },
@@ -1123,16 +1202,19 @@ export const splitWideScreenLeft: Play = (() => {
         ...m.vs['43'],
         assignments: {
           LG: {
-            rule: 'Set one count, release, and take the Mike.',
-            detail: 'He is the first man to read screen and run at it. He is the one who ruins this play — go find him.',
-          },
-          LT: {
-            rule: 'Set one count, release, and take the safety on your side.',
-            detail: 'A 4-3 plays two deep, so your man is the near safety coming down into the alley.',
+            rule: 'Set one count, pull around the end, and find the Mike.',
+            detail:
+              'Hook around the outside of the end LT is reaching and turn up. The Mike is the first man to read screen and run at it — he is the one who ruins this play. If he is gone or you cannot get to him, block any jersey you can find.',
           },
           L: {
-            rule: 'Block the outside backer.',
-            detail: 'He is closest to the catch. Get inside-out on him and wall him off from Super.',
+            rule: 'Block the outside backer on your side.',
+            detail:
+              'He is the alley backer closest to the catch. Get inside-out on him and wall him off from Super.',
+          },
+          RT: {
+            rule: 'Bump the end, then climb to the outside backer on your side.',
+            detail:
+              'He is right there behind the end you bumped. If he is already gone to the screen, keep climbing and take the safety on your side.',
           },
         },
       },
@@ -1141,24 +1223,30 @@ export const splitWideScreenLeft: Play = (() => {
         assignments: {
           C: {
             rule: 'Take the nose by yourself.',
-            detail: 'Odd front — he is right on you and there is nobody to help. Punch, sit down, and keep him off the quarterback for two counts.',
+            detail:
+              'Odd front — he is right on you and there is nobody to help. Punch, sit down, and keep him off the quarterback for two counts.',
+          },
+          LT: {
+            rule: 'Reach the end — same as always. Nobody is inside you: the tackle is LG\'s.',
+            detail:
+              'Same reach — step hard to the end\'s outside hip and run him back to the right. In this front their tackle is lined up on LG\'s outside shoulder, not on you, and LG is holding him for the first count. All you have is the end.',
+          },
+          LG: {
+            rule: 'NO pull. Disrupt the tackle on your outside shoulder, then climb to the playside backer.',
+            detail:
+              'Odd front — their tackle is right on your outside shoulder, standing in the gap between you and LT, and LT is leaving him to reach the end. Pull, and that man runs straight into the backfield. So you do not pull here. Block him inside-out just long enough for the quarterback to get the pass off. Right as the ball is coming out, let him go and climb to the playside linebacker. If L already has him, take the next jersey — the safety coming down.',
           },
           L: {
-            rule: 'Block the corner.',
+            rule: 'Block the NEAREST defender — the linebacker if he shows. The most important block on this play.',
             detail:
-              'Vs a 5-2 we let Y run off instead of blocking, so the corner is yours. Come off the ball under control, break down, and stay on his outside number.',
-          },
-          Y: {
-            rule: 'Run him off — vertical, all the way.',
-            detail:
-              'A 5-2 plays two deep and gives us one more blocker than we need in the alley, so your job is to take the corner OUT of the play instead of blocking him. Sprint straight up the sideline and do not look back.',
+              'A 5-2 has no alley backer walked up on you, so the man closest to the catch is whoever shows first — usually the playside linebacker scraping out, sometimes the safety filling. Come off the ball like a route, find the nearest jersey, and wall him off from Super. Inside-out. Nobody else is close enough to make this block — it is yours, and the play does not work without it.',
           },
         },
       },
     } satisfies Record<FrontId, FrontPlan>,
     reviewNotes: [
       ...(splitWideScreenRight.reviewNotes ?? []),
-      'GENERATED: this play is mirrorSplitWidePlay(splitWideScreenRight) with every line of prose hand-translated to the left, not machine-flipped. The X↔Y exchange is applied because the balanced set keeps X and Y in their spots — they are mirror-image positions, so their entries trade places when everything else flips: Y is now the playside wide man who blocks or runs off the corner, X is the backside clear-out. Reviewing the right screen reviews the geometry of this one. What it does NOT review is the throw — throwing left off an away-opening drop is a different rep for a right-handed kid, and the left call needs its own practice time before it is live.',
+      'GENERATED: this play is mirrorSplitWidePlay(splitWideScreenRight) with every line of prose hand-translated to the left, not machine-flipped. The X↔Y exchange is applied because the balanced set keeps X and Y in their spots — they are mirror-image positions, so their entries trade places when everything else flips: Y is now the playside wide man who blocks the corner, X is the backside clear-out. The 2026-09-17 rewrite and its second pass mirror cleanly: LT reaches E-L and pushes him right, LG pulls around him to the backer (vs the 5-2 he holds T-L instead and climbs to B-L), L has the alley (the nearest man in the 5-2), RT bumps E-R and climbs, RG holds T-R one count and climbs to nobody. Reviewing the right screen reviews the geometry of this one. What it does NOT review is the throw — throwing left off an away-opening drop is a different rep for a right-handed kid, and the left call needs its own practice time before it is live.',
     ],
   }
 })()
@@ -1356,13 +1444,13 @@ const victoryVs52: FrontPlan = {
       detail: 'Odd front, five rushers, nobody to help you. Punch him, get your feet under you, and do not get pushed back into the quarterback.',
     },
     LG: {
-      rule: 'Block the man on our tackle.',
+      rule: 'Their tackle is on your outside shoulder — he is yours.',
       detail:
-        'In a 5-2 their tackles line up on our tackles, so you take a short set to your outside and pick him up — LT has the end. If nobody shows, look inside for the nose.',
+        'In a 5-2 their tackle lines up right on your outside shoulder, in the gap between you and LT, so he is YOURS and not the tackle\'s — LT has the end outside him. Short set to your outside, hands inside, and ride him past the quarterback. Nobody is coming to help: five rushers, five of us.',
     },
     RG: {
-      rule: 'Block the man on our tackle.',
-      detail: 'Same rule as LG, other side. Short outside set, hands inside, ride him past the quarterback.',
+      rule: 'Their tackle is on your outside shoulder — he is yours.',
+      detail: 'Same rule as LG, other side. Short outside set, hands inside, ride him past the quarterback. RT has the end outside you.',
     },
     S: {
       rule: 'Fake the Dive to the side the quarterback calls, then plant. Vs this front somebody IS coming.',

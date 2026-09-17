@@ -36,6 +36,11 @@
  * Against the two even fronts the center is the one uncovered lineman and steps
  * BACK to help and eat a blitz; against the 5-2 everybody has a man at once and
  * anybody extra is Super's, alone.
+ *
+ * The aiming points are the same on every front (app/data/fronts.ts, 2026-09-17):
+ * their ends sit on our tackles' outside shoulders at x ±3.55 and their tackles
+ * on our guards' outside shoulders at x ±1.8. Only the nose changes anything
+ * between fronts, and he only changes the center's job.
  */
 
 import type {
@@ -199,6 +204,7 @@ const sharedReviewNotes = [
   'NO CHECKDOWN unless a digit buys one. Four receivers and Super blocking means whatever is underneath is whatever the digits put there — call a 2 or a 3 somewhere if the quarterback needs an outlet.',
   'ROUTE GEOMETRY comes straight off the tree in app/data/routes.ts with no stretching. In Red and Black the wing has to widen his out and his wheel because he starts eight yards inside the split end; in Split Wide everybody is already outside on his own side, so each route runs at tree width off his own alignment. A 0 draws as a block, not a route.',
   "VS THE 5-2 IS THE DIFFERENT PICTURE — five down men means every lineman has a man immediately and nobody is free, so anyone extra is Super's, alone. Eyeball those diagrams first.",
+  'ALIGNMENT, 2026-09-17, your words: "N is directly over C. DT should be directly over the last letter on the guard (either the L or the G in RG). DE should be directly over the edge of the circle on the OT." All three fronts are drawn that way now, which means the 5-2 tackle is NOT head-up on our tackle any more — he is a 3-technique on the guard\'s outside shoulder. So in the 5-2 the guards have the tackles, the tackles have the ends on their outside shoulders, the center has the nose, and nobody up front is uncovered. The protection did not change (everyone still takes the man in front of him and leans with the call); the words for the guards and tackles did.',
   'Formation is app/data/split-wide-formation.ts off varsity page 4 — Y wide left at 13, L slot at 8.5 left, R slot at 8.5 right, X wide right at 13, slots a yard off the ball, Super 4½ deep, seven on the line so it is legal. Same confirmation still open as on the rest of the Split Wide package: 8½ and 13 are big splits for 8th graders.',
 ]
 
@@ -231,21 +237,23 @@ export function buildSplitWideAudible(
 
   const drive = (defX: number, targetId: string) => driveBlock(defX, targetId, leanSign)
 
-  const evenLine = {
-    LT: drive(-4.8, 'E-L'),
-    LG: drive(-1.6, 'T-L'),
-    C: C_STEP_BACK,
-    RG: drive(1.6, 'T-R'),
-    RT: drive(4.8, 'E-R'),
+  /**
+   * The four outside drives are the SAME on all three fronts — every front
+   * aligns its ends at x ±3.55 (our tackles' outside shoulders) and its tackles
+   * at x ±1.8 (our guards' outside shoulders). Only the center's job changes.
+   */
+  const outsideDrives = {
+    LT: drive(-3.55, 'E-L'),
+    LG: drive(-1.8, 'T-L'),
+    RG: drive(1.8, 'T-R'),
+    RT: drive(3.55, 'E-R'),
   }
 
-  const oddLine = {
-    LT: drive(-5.2, 'E-L'),
-    LG: drive(-3, 'T-L'),
-    C: drive(0, 'N'),
-    RG: drive(3, 'T-R'),
-    RT: drive(5.2, 'E-R'),
-  }
+  /** Even fronts: nobody on the center, so he steps back and helps. */
+  const evenLine = { ...outsideDrives, C: C_STEP_BACK }
+
+  /** 5-2: a nose head-up on the center, so all five linemen have a man. */
+  const oddLine = { ...outsideDrives, C: drive(0, 'N') }
 
   const lineJob = (extra: string): Assignment => ({
     rule: `${word} — block the man in front of you, lean ${LEAN}. HOLD, and never downfield.`,
@@ -321,24 +329,24 @@ export function buildSplitWideAudible(
         'Snap the ball and get into him the same instant. Get to his outside shoulder and push him with the rest of the line. He is trying to walk you backward into the quarterback — do not let him. Hold your spot.',
     },
     LG: {
-      rule: `The big man just outside you is yours — block him, lean ${LEAN}, and HOLD.`,
+      rule: `Their tackle is on your OUTSIDE SHOULDER — he is yours. Lean ${LEAN} and HOLD.`,
       detail:
-        'In this front their big man lines up between you and your tackle, and your tackle is stepping past him to the end — so he is YOURS. Get into him fast, steer him with everybody else, and give no ground. Never chase downfield; that is a penalty on a pass play.',
+        'In this front their tackle lines up right on your outside shoulder, half a man outside you, and your tackle has the end outside HIM — so this one is YOURS, by yourself. Get into him fast, helmet to his outside shoulder, steer him with everybody else, and give no ground. Never chase downfield; that is a penalty on a pass play.',
     },
     RG: {
-      rule: `The big man just outside you is yours — block him, lean ${LEAN}, and HOLD.`,
+      rule: `Their tackle is on your OUTSIDE SHOULDER — he is yours. Lean ${LEAN} and HOLD.`,
       detail:
-        'Same job as the other guard, other side. Your tackle steps out to the end, so the big man between you two is yours. Get into him, push him with the line, and hold.',
+        'Same job as the other guard, other side. Their tackle is half a man outside you and your tackle has the end, so nobody is coming to help — get into him, push him with the line, and hold.',
     },
     LT: {
-      rule: `Their outside man is yours — outside shoulder, drive him ${call.lean}.`,
+      rule: `The end on your outside shoulder is yours — drive him ${call.lean}.`,
       detail:
-        'Step out to the man on the end of their line. Helmet to his outside shoulder and drive him with everybody else. Hold — no ground given, no going downfield.',
+        'Nobody is head-up on you in this front: their tackle is inside on the guard and their end is sitting on your outside shoulder. Short step out, helmet to his outside shoulder, and drive him with everybody else. Hold — no ground given, no going downfield.',
     },
     RT: {
-      rule: `Their outside man is yours — outside shoulder, drive him ${call.lean}.`,
+      rule: `The end on your outside shoulder is yours — drive him ${call.lean}.`,
       detail:
-        'Step out to the man on the end of their line and drive him. The routes take time to get down the field, so this is the block that has to hold longest.',
+        'Same as the other tackle: the end is half a man outside you and the guard has the tackle inside. Short step out and drive him. The routes take time to get down the field, so this is the block that has to hold longest.',
     },
     S: {
       rule: 'Five rushers, five linemen — the extra man is yours every snap on this front.',
