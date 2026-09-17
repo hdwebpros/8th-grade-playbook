@@ -442,8 +442,8 @@ const vs52: FrontPlan = {
   },
   assignments: {
     C: {
-      rule: 'Step playside. Covered — Scoop with the backside guard.',
-      detail: "Odd front: the nose is head up on you. Step playside and take his playside number until the backside guard takes him over — then climb to the wall, bending back to the backside backer around three to four yards. That's Scoop.",
+      rule: 'Step playside. Covered — engage the nose for a one-count, then Scoop to the backer.',
+      detail: "Odd front: the nose is head up on you. Get your first step playside and lock onto him right away — you are on him alone for about one second, so make it count: get your hat across his playside number and stop him from splitting you. By the time you count one, the backside guard has caught up and taken him over. The instant he's got him, release off the nose and climb to the wall, bending back to the backside backer around three to four yards. That's Scoop.",
     },
     LG: {
       rule: 'Odd — Scoop with C.',
@@ -546,6 +546,7 @@ const reviewNotes = [
   "Center vs the 4-4 (fixed — the wall): his old block ran ten yards to the free safety, a vertical spike straight through the middle of the wall. He now curves up and back toward the backside and sets his bar on the wall at about 3½ yards, on nobody in particular — exactly how the scan draws 'Uncovered: Get Vertical'. The free safety is deliberately left unblocked in this picture.",
   "Vs the 5-2 (rebuilt to the wall 2026-08-10, re-read 2026-08-15, re-aligned 2026-09-17): same picture as the even fronts — one rising wall, every bar cutting backside. The scoop resolves with LG taking the nose over (low bar on his playside number) and the CENTER climbing off it, bending back to the backside backer at about 3½ yards. With the tackles now 3-techniques on the GUARDS, the playside pair SWAPPED jobs from the 2026-08-15 pass: RG bases the tackle on his outside shoulder (bar a yard past the LOS) and RT — who has nobody but the read-key end outside him — releases inside and climbs to the playside backer, the identical stroke he runs vs the even fronts. On the backside LT steps DOWN onto the 3-technique in the gap inside him instead of basing a man head up. The wing PINS tight off the read-key end with the even-front stroke, because the end stands at the same 3.55 on every front now. Y still anchors the backside at 3. Every defender inside is still covered exactly once, the read-key end unblocked.",
   "Down-lineman bars sit a yard OFF the line (Ryan, 2026-08-10): every block on a down lineman — the even-front LT pull and RG base, and the 5-2's LT down block, RG base and LG scoop — sets its bar about a yard past the LOS, beyond the defender's alignment, not at it. The picture is the teaching point: we block DOWN(field) and drive them back off the line; a bar on the LOS reads as a stalemate.",
+  'CENTER vs the 5-2, WORDING CHANGE (Ryan, 2026-09-17): "He needs initial step playside and engage the nose tackle in front of him, just one second. The Guard should have caught up by then, then they continue their climb to the backer." C\'s Scoop rule now spells out that count: he locks onto the nose alone for about a second, LG arrives and takes him over, and only then does C release and climb to the wall. Same block, same landmarks — this just puts the timing into words instead of leaving "until the backside guard takes him over" to guesswork about how long he is on his own.',
 ]
 
 export const veerRightRed: Play = {
@@ -1023,8 +1024,8 @@ const vs52Left: FrontPlan = {
   },
   assignments: {
     C: {
-      rule: 'Step playside. Covered — Scoop with the backside guard.',
-      detail: "Odd front: the nose is head up on you. Step playside and take his playside number until the backside guard takes him over — then climb to the wall, bending back to the backside backer around three to four yards. That's Scoop.",
+      rule: 'Step playside. Covered — engage the nose for a one-count, then Scoop to the backer.',
+      detail: "Odd front: the nose is head up on you. Get your first step playside and lock onto him right away — you are on him alone for about one second, so make it count: get your hat across his playside number and stop him from splitting you. By the time you count one, the backside guard has caught up and taken him over. The instant he's got him, release off the nose and climb to the wall, bending back to the backside backer around three to four yards. That's Scoop.",
     },
     RG: {
       rule: 'Odd — Scoop with C.',
@@ -1126,6 +1127,7 @@ const reviewNotesLeft = [
   "X backside: 'work to the safety' per his rule — drawn as a work-to run path (no block bar) toward the free safety (4-4) / near safety (4-3, 5-2). Not a corner block; he is a full field from the play.",
   "The wall identity carries over from Veer Right (Ryan's 2026-08-10 markup): one rising wall, every blocker a single continuous curved block stroke, climbers' bars at 3–4 yards, down-lineman bars a yard past the LOS, bars cutting back toward the backside (now the RIGHT) except Y's base/kick-outs and the wing's pins. The backside Rip is the exact mirror role-swap: RT pulls behind RG and washes the 3-technique on RG's outside shoulder away; RG releases inside that man and climbs to the backside backer. Vs the 5-2 RT steps down onto that same 3-technique (nobody is head up on him) and RG scoops the nose with C.",
   "Geometry: S's dive, Q's keep, and the pitch relationship are the true mirrors of the right-hand play (dive at the crack of LG, keep breaking at ~45° outside the wing, pitch man holding 5-by-1) — those were kept as exact negations. Y's, L's, and X's strokes are newly drawn because the TE-side surface has no right-hand counterpart.",
+  'CENTER vs the 5-2, WORDING CHANGE (Ryan, 2026-09-17): "He needs initial step playside and engage the nose tackle in front of him, just one second. The Guard should have caught up by then, then they continue their climb to the backer." C\'s Scoop rule now spells out that count: he locks onto the nose alone for about a second, RG arrives and takes him over, and only then does C release and climb to the wall. Same block, same landmarks — this just puts the timing into words instead of leaving "until the backside guard takes him over" to guesswork about how long he is on his own.',
 ]
 
 export const veerLeftRed: Play = {

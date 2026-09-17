@@ -912,14 +912,14 @@ const screenVs44: FrontPlan = {
   },
   assignments: {
     RG: {
-      rule: 'Set one count, pull around the end, and find the playside inside backer.',
+      rule: 'Check the tackle first, then pull around the end and find the playside inside backer.',
       detail:
-        'Hook around the outside of the end RT is reaching and turn up. The inside backer on the screen side is yours — he is the first man to read screen and run at it. If he is gone or you cannot get to him, block any jersey you can find.',
+        'He is lined up right on your outside shoulder — check him quick so he can not get in on you instantly, get him off his pace, then release. Hook around the outside of the end RT is reaching and turn up. The inside backer on the screen side is yours — he is the first man to read screen and run at it. If he is gone or you cannot get to him, block any jersey you can find.',
     },
     R: {
-      rule: 'Block the walked-up backer — the Sam.',
+      rule: 'Block the walked-up backer — the Sam. The most important block on this play.',
       detail:
-        'He is the alley backer, standing on the edge closest to the catch. Come off the ball like a route, break down, and wall him off from Super. Inside-out — never let him cross your face to the sideline.',
+        'He is the alley backer, standing on the edge closest to the catch. Come off the ball like a route, break down, and wall him off from Super. Inside-out — never let him cross your face to the sideline. Nobody else on the field can make this block for you.',
     },
     LT: {
       rule: 'Bump the end, then climb to the away-side backer.',
@@ -938,14 +938,14 @@ const screenVs43: FrontPlan = {
   },
   assignments: {
     RG: {
-      rule: 'Set one count, pull around the end, and find the Mike.',
+      rule: 'Check the tackle first, then pull around the end and find the Mike.',
       detail:
-        'Hook around the outside of the end RT is reaching and turn up. The Mike is the first man to read screen and run at it — he is the one who ruins this play. If he is gone or you cannot get to him, block any jersey you can find.',
+        'He is lined up right on your outside shoulder — check him quick so he can not get in on you instantly, get him off his pace, then release. Hook around the outside of the end RT is reaching and turn up. The Mike is the first man to read screen and run at it — he is the one who ruins this play. If he is gone or you cannot get to him, block any jersey you can find.',
     },
     R: {
-      rule: 'Block the outside backer — the Sam.',
+      rule: 'Block the outside backer — the Sam. The most important block on this play.',
       detail:
-        'He is the alley backer closest to the catch. Get inside-out on him and wall him off from Super.',
+        'He is the alley backer closest to the catch. Get inside-out on him and wall him off from Super. Nobody else on the field can make this block for you.',
     },
     LT: {
       rule: 'Bump the end, then climb to the Will.',
@@ -1011,9 +1011,9 @@ const screenAssignments: Record<OffPosId, Assignment> = {
       'You are the last man protecting the middle. Two counts is all we need — the ball is out before the rush ever gets home.',
   },
   RG: {
-    rule: 'Set one count, then pull around the end and find the linebacker.',
+    rule: 'Check the tackle on your outside shoulder first, then pull around the end and find the linebacker.',
     detail:
-      'Show him a pass set for one count, then pull flat and hook around the OUTSIDE of the end RT is reaching — never inside him, that is where RT is pushing him. Turn up and find the linebacker chasing the screen; get your head across him. If that backer is out of position or you cannot reach him, find any jersey you can block. Never run out there with nobody to hit.',
+      'He is lined up right on your outside shoulder, and your first job is making sure he does not get in on you instantly — hit him with a quick check to knock him off his pace, then get off him. Only then do you pull: flat, around the OUTSIDE of the end RT is reaching — never inside him, that is where RT is pushing him. Turn up and find the linebacker chasing the screen; get your head across him. If that backer is out of position or you cannot reach him, find any jersey you can block. Never run out there with nobody to hit.',
   },
   RT: {
     rule: 'REACH the end. Push him inside, away from the play.',
@@ -1031,9 +1031,9 @@ const screenAssignments: Record<OffPosId, Assignment> = {
       'Run the middle of the field empty. The safety who chases you is the safety who is not sitting in the alley waiting for Super.',
   },
   R: {
-    rule: 'Block the alley backer — the linebacker closest to the play.',
+    rule: 'Block the alley backer — the linebacker closest to the play. The most important block on this play, every front.',
     detail:
-      'You are the playside slot, so the strong-side alley is yours. Come off the ball like a route so nobody smells screen, then break down and take the backer closest to the catch. Inside-out — never let him cross your face to the sideline. Super is running off your block.',
+      'You are the playside slot, so the strong-side alley is yours — and this is the block the whole play lives or dies on, no matter what front you see. Come off the ball like a route so nobody smells screen, then break down and take the backer closest to the catch. Inside-out — never let him cross your face to the sideline. Super is running off your block.',
   },
   S: {
     rule: 'Motion out between R and X. STOP. Get set, hands up — then catch it and get north.',
@@ -1078,6 +1078,7 @@ export const splitWideScreenRight: Play = {
     FORMATION_NOTE,
     'REWRITTEN 2026-09-17 FROM YOUR NOTE: "the DE gets into the backfield, disrupting the pass to the Super or rushing the QB." Every change below is yours, in your order: RT reach-blocks the playside end away from the play (right-side play, push him left) with an aggressive reach step; X goes up and blocks the corner in front of him; R blocks the strong-side alley backer closest to the play; the pulling guard hooks around the end RT is blocking and finds that linebacker — "if that linebacker is out of position or unreachable, find any jersey that you can block"; and the away-side tackle just bumps his end so he cannot get in quick, then gets upfield to a linebacker or a safety.',
     'ADJUSTED 2026-09-17 (SECOND PASS) FROM YOUR NOTES: (1) "Opposite play-side guard: initially block a defender away from the play for about one second until the quarterback starts to throw. Once that point is reached, let your guy go and climb up field and block any jersey. Draw a line blocking nothing, just in the center of the field, so the line knows it can all climb up and block." — LG now has a short block bar on the tackle (the hold) and then a plain arrow up the middle of the field to nobody, on every front. That arrow is the "everybody climbs" picture and the LG text says so. (2) "On a 5-2, the playside wing blocks the nearest defender, which could be the linebacker as well. It is the most important block. And on the 5-2 I don\'t want the right guard pulling until after he blocks the D-tackle just long enough for the quarterback to get the pass off; right as he is doing that, climb up to the playside linebacker." — vs the 5-2 only, RG no longer pulls: short block bar on the tackle over his own outside shoulder (T-R), then a bar up to the playside backer (B-R). R is drawn to that same backer (B-R) as "the nearest defender" and his 5-2 rule calls it the most important block on the play.',
+    'ADJUSTED 2026-09-17 (THIRD PASS) FROM YOUR NOTE: "the play side guard... has to initially make sure the tackle doesn\'t get in instantly. Check him quickly first to get him off pace, but then you do your pull." RG\'s pull technique on the two even fronts now leads with that check — he holds the tackle on his outside shoulder just long enough to knock him off his pace before releasing into the pull around RT\'s reach block. Left alone on purpose: the 5-2, where RG still does not pull at all, because his tackle is the one man nobody else can take once RT leaves to reach the end (see the note below) — that is a scheme reason, not a wording gap, so say so if you actually want him pulling there too. ALSO YOUR NOTE: "against all fronts, the wing that is on play side has the most important block." R\'s alley block is now called the most important block on the play on every front — 44, 43, and 52 — not just the 5-2, where that line was already written in.',
     'BOTH R AND RG ARE DRAWN TO THE PLAYSIDE BACKER IN THE 5-2. That is on purpose, not a mistake: R takes the nearest man who shows (usually that backer), and RG climbs to the same backer with "if R already has him, take the next jersey — the safety" in his text. Two bars on one man is the honest picture of "first one there takes him." If you would rather RG\'s climb be drawn to the strong safety (F-R) so nobody doubles, say so and it is a one-line change.',
     'WHAT CHANGED ON THE DIAGRAM: RT no longer releases — his arrow is a reach step to the end\'s OUTSIDE hip with the block bar pointing back inside at him, which is the picture of "push him left." RG\'s release is now a pull that goes flat, around the outside of the end, and turns up before the block bar goes back inside to the backer. LT\'s arrow is a short block bar on the end\'s inside shoulder (the bump) followed by a second bar up to the away-side inside backer. X now has a block bar on the corner on every front instead of the run-off route.',
     'WHO IS FREE NOW. The old play let the playside end come free on purpose; that is what you saw getting into the backfield, and it is gone. Vs the 4-4 and 4-3 nobody on the screen side is free. The one man who can get home now is the AWAY-side end after LT bumps and leaves him — and he is coming from the side the quarterback opens to, which is why the quarterback\'s detail says to be on time. Vs the 5-2 nobody on the screen side is free either now: your second-pass note has RG holding the tackle on his own outside shoulder instead of pulling, so the man standing in the gap RT vacates for the end is accounted for. The away-side tackle (T-L in the 5-2, on LG\'s outside shoulder) is LG\'s for the one count he holds, then he is loose too — same trade as the end, the ball is already out.',
@@ -1132,9 +1133,9 @@ export const splitWideScreenLeft: Play = (() => {
           'This is a big reach block and it is the block that fixes this play. Aggressive reach step — your outside foot goes hard to the end\'s outside hip — get your hat across his outside number, and run him back to the RIGHT. He does not get upfield and he does not get to Super. If he tries to go outside you, you are already there. If he runs inside, that is where you wanted him — go with him.',
       },
       LG: {
-        rule: 'Set one count, then pull around the end and find the linebacker.',
+        rule: 'Check the tackle on your outside shoulder first, then pull around the end and find the linebacker.',
         detail:
-          'Show him a pass set for one count, then pull flat and hook around the OUTSIDE of the end LT is reaching — never inside him, that is where LT is pushing him. Turn up and find the linebacker chasing the screen; get your head across him. If that backer is out of position or you cannot reach him, find any jersey you can block. Never run out there with nobody to hit.',
+          'He is lined up right on your outside shoulder, and your first job is making sure he does not get in on you instantly — hit him with a quick check to knock him off his pace, then get off him. Only then do you pull: flat, around the OUTSIDE of the end LT is reaching — never inside him, that is where LT is pushing him. Turn up and find the linebacker chasing the screen; get your head across him. If that backer is out of position or you cannot reach him, find any jersey you can block. Never run out there with nobody to hit.',
       },
       C: {
         rule: 'Pass set. Block the first man to your left; if a nose is on you, he is yours alone.',
@@ -1157,9 +1158,9 @@ export const splitWideScreenLeft: Play = (() => {
           'Nothing is coming to you and that is the point. Run hard for four seconds and take the corner and the deep help with you, away from the screen.',
       },
       L: {
-        rule: 'Block the alley backer — the linebacker closest to the play.',
+        rule: 'Block the alley backer — the linebacker closest to the play. The most important block on this play, every front.',
         detail:
-          'You are the playside slot, so the alley on the left is yours. Come off the ball like a route so nobody smells screen, then break down and take the backer closest to the catch. Inside-out — never let him cross your face to the sideline. Super is running off your block.',
+          'You are the playside slot, so the alley on the left is yours — and this is the block the whole play lives or dies on, no matter what front you see. Come off the ball like a route so nobody smells screen, then break down and take the backer closest to the catch. Inside-out — never let him cross your face to the sideline. Super is running off your block.',
       },
       R: {
         rule: 'Clear out — post across the middle.',
@@ -1182,14 +1183,14 @@ export const splitWideScreenLeft: Play = (() => {
         ...m.vs['44'],
         assignments: {
           LG: {
-            rule: 'Set one count, pull around the end, and find the playside inside backer.',
+            rule: 'Check the tackle first, then pull around the end and find the playside inside backer.',
             detail:
-              'Hook around the outside of the end LT is reaching and turn up. The inside backer on the screen side is yours — he is the first man to read screen and run at it. If he is gone or you cannot get to him, block any jersey you can find.',
+              'He is lined up right on your outside shoulder — check him quick so he can not get in on you instantly, get him off his pace, then release. Hook around the outside of the end LT is reaching and turn up. The inside backer on the screen side is yours — he is the first man to read screen and run at it. If he is gone or you cannot get to him, block any jersey you can find.',
           },
           L: {
-            rule: 'Block the walked-up backer on your side.',
+            rule: 'Block the walked-up backer on your side. The most important block on this play.',
             detail:
-              'He is the alley backer, standing on the edge closest to the catch. Come off the ball like a route, break down, and wall him off from Super. Inside-out — never let him cross your face to the sideline.',
+              'He is the alley backer, standing on the edge closest to the catch. Come off the ball like a route, break down, and wall him off from Super. Inside-out — never let him cross your face to the sideline. Nobody else on the field can make this block for you.',
           },
           RT: {
             rule: 'Bump the end, then climb to the away-side backer.',
@@ -1202,14 +1203,14 @@ export const splitWideScreenLeft: Play = (() => {
         ...m.vs['43'],
         assignments: {
           LG: {
-            rule: 'Set one count, pull around the end, and find the Mike.',
+            rule: 'Check the tackle first, then pull around the end and find the Mike.',
             detail:
-              'Hook around the outside of the end LT is reaching and turn up. The Mike is the first man to read screen and run at it — he is the one who ruins this play. If he is gone or you cannot get to him, block any jersey you can find.',
+              'He is lined up right on your outside shoulder — check him quick so he can not get in on you instantly, get him off his pace, then release. Hook around the outside of the end LT is reaching and turn up. The Mike is the first man to read screen and run at it — he is the one who ruins this play. If he is gone or you cannot get to him, block any jersey you can find.',
           },
           L: {
-            rule: 'Block the outside backer on your side.',
+            rule: 'Block the outside backer on your side. The most important block on this play.',
             detail:
-              'He is the alley backer closest to the catch. Get inside-out on him and wall him off from Super.',
+              'He is the alley backer closest to the catch. Get inside-out on him and wall him off from Super. Nobody else on the field can make this block for you.',
           },
           RT: {
             rule: 'Bump the end, then climb to the outside backer on your side.',
