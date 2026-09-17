@@ -125,6 +125,17 @@ const passes = computed(() => [
       <h1>Plays</h1>
     </header>
 
+    <!-- The opening script: first eight plays of every game, with the count.
+         A game-plan door, not a concept, so it sits above the families. -->
+    <NuxtLink to="/plays/script" class="card script-card">
+      <span class="script-icon"><Icon name="lucide:list-ordered" aria-hidden="true" /></span>
+      <span class="script-text">
+        <span class="script-title">Opening Script</span>
+        <span class="script-sub muted">First 8 plays of every game, in order. Know the count.</span>
+      </span>
+      <Icon name="lucide:arrow-right" class="script-arrow" aria-hidden="true" />
+    </NuxtLink>
+
     <section v-if="runs.length" class="family">
       <h2 class="family-title"><Icon name="lucide:footprints" aria-hidden="true" /> Runs</h2>
       <div class="grid">
@@ -241,6 +252,54 @@ const passes = computed(() => [
 }
 .page-head h1 {
   font-size: 2.2rem;
+}
+
+/* Game-day door above the families — red like a hot quick link. */
+.script-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-color: color-mix(in srgb, var(--red) 50%, transparent);
+  transition:
+    border-color var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease);
+}
+.script-card:hover {
+  border-color: var(--red);
+  background: var(--panel-raised);
+}
+.script-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: none;
+  border-radius: var(--r-ctl);
+  background: var(--red-glow);
+  color: var(--red);
+  font-size: 20px;
+}
+.script-text {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+.script-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--red);
+}
+.script-sub {
+  font-size: 0.9rem;
+}
+.script-arrow {
+  margin-left: auto;
+  flex: none;
+  color: var(--red);
 }
 
 .family {

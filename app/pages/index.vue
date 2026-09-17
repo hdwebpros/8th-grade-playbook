@@ -3,11 +3,20 @@ useHead({ title: 'Centennial Wolves Playbook' })
 
 const quickLinks = [
   {
+    to: '/plays/script',
+    icon: 'lucide:list-ordered',
+    title: 'Opening Script',
+    sub: 'First 8 plays, in order. Know the count.',
+    hot: true,
+    wide: true,
+  },
+  {
     to: '/plays/veer-right-red',
     icon: 'lucide:flame',
     title: 'Veer',
     sub: 'Our bread and butter. Start here.',
     hot: true,
+    wide: false,
   },
   {
     to: '/formations',
@@ -15,6 +24,7 @@ const quickLinks = [
     title: 'Formations',
     sub: 'Where do I stand? All four sets.',
     hot: false,
+    wide: false,
   },
   {
     to: '/routes',
@@ -22,6 +32,7 @@ const quickLinks = [
     title: 'Route Tree',
     sub: 'All ten routes, 0 through 9.',
     hot: false,
+    wide: false,
   },
   {
     to: '/quiz',
@@ -29,6 +40,7 @@ const quickLinks = [
     title: 'Know Your Job',
     sub: 'Pick your position. Get quizzed.',
     hot: false,
+    wide: false,
   },
 ]
 </script>
@@ -55,7 +67,13 @@ const quickLinks = [
     </section>
 
     <section class="quick" aria-label="Jump in">
-      <NuxtLink v-for="q in quickLinks" :key="q.to" :to="q.to" class="card quick-card">
+      <NuxtLink
+        v-for="q in quickLinks"
+        :key="q.to"
+        :to="q.to"
+        class="card quick-card"
+        :class="{ wide: q.wide }"
+      >
         <span class="quick-icon" :class="{ hot: q.hot }">
           <Icon :name="q.icon" aria-hidden="true" />
         </span>
@@ -182,6 +200,10 @@ const quickLinks = [
   }
   .quick {
     grid-template-columns: repeat(4, 1fr);
+  }
+  /* The script is the headline card; the four under it stay one clean row. */
+  .quick-card.wide {
+    grid-column: 1 / -1;
   }
 }
 </style>

@@ -6,7 +6,8 @@ import { buildPlayDeck, relapPlayDeck, type PlayCard } from '~/composables/useFl
 import { buildFormationDeck, relapFormationDeck, type FormationCard } from '~/composables/useFormationDeck'
 import { buildJobDeck, relapJobDeck, type JobCard } from '~/composables/useJobDeck'
 import { buildRouteDeck, relapRouteDeck, type RouteCard } from '~/composables/useRouteDeck'
-import { FormationFaces, JobFaces, PlayFaces, RouteFaces } from '#components'
+import { buildScriptDeck, relapScriptDeck, type ScriptCard } from '~/composables/useScriptDeck'
+import { FormationFaces, JobFaces, PlayFaces, RouteFaces, ScriptFaces } from '#components'
 
 useHead({ title: 'Flashcards — Wolves Playbook' })
 
@@ -15,7 +16,7 @@ useHead({ title: 'Flashcards — Wolves Playbook' })
  * own builder, relap and faces component, and the drill loop below stays
  * deck-agnostic. Decks marked available: false are designed, not built yet.
  */
-type AnyCard = PlayCard | FormationCard | JobCard | RouteCard
+type AnyCard = PlayCard | FormationCard | JobCard | RouteCard | ScriptCard
 
 const formationList = Object.values(formations).filter((f): f is Formation => !!f)
 
@@ -66,6 +67,17 @@ const decks: DeckDef[] = [
     build: () => buildRouteDeck(routes),
     relap: (last) => relapRouteDeck(routes, (last as RouteCard).route.num),
     faces: RouteFaces,
+  },
+  {
+    id: 'first-8',
+    icon: 'lucide:list-ordered',
+    title: 'First 8',
+    sub: 'The opening script. Number to call, call to number — and the count.',
+    available: true,
+    build: () => buildScriptDeck(),
+    relap: (last) => relapScriptDeck((last as ScriptCard).slot.playId),
+    faces: ScriptFaces,
+    studyLink: (card) => `/plays/${(card as ScriptCard).slot.playId}`,
   },
   {
     id: 'whats-my-job',
