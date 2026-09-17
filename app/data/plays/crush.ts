@@ -200,17 +200,17 @@ const L_NEAR_COLOR_43: Action = {
 }
 
 /**
- * Y: inside release, under the end's inside hip and up over the top of the
- * tackle's block, then climb. Since the 2026-09-17 alignment the end is a
- * 5-technique at −3.55 — tight to our tackle, not out over the tight end — so
- * the release starts flat behind the line to get past his hip before it turns
- * up through the lane over our tackle.
+ * Y: outside release, around the DE's outside shoulder — not under his inside
+ * hip. Coach Ryan, 2026-09-17: with the end a 5-technique at −3.55, tight to
+ * our tackle, going around his outside shoulder seals the edge instead of
+ * ducking underneath it. Chip him toward the line of scrimmage on the way by
+ * if he shows himself in the path, then climb same as before.
  */
-const Y_INSIDE: Action = {
+const Y_OUTSIDE_52: Action = {
   kind: 'run',
   path: [
-    { x: -4, y: -0.3 },
-    { x: -3, y: 0.4 },
+    { x: -4.6, y: 0.2 },
+    { x: -4.2, y: 1.6 },
     { x: -2.9, y: 2.2 },
   ],
 }
@@ -337,13 +337,15 @@ const vs43: FrontPlan = {
  * the guards are covered and the tackles are not — the guard-and-center double
  * on the nose is gone (the center is alone), the playside tackle and guard
  * take the 3-technique together, and the backside tackle is the free climber.
- * Y still releases inside the end and the end is still the read.
+ * Y still releases past the end and the end is still the read — since
+ * 2026-09-17 that release goes around his OUTSIDE shoulder with a chip if he
+ * shows, not under his inside hip (see Y_OUTSIDE_52).
  */
 const vs52: FrontPlan = {
   readKey: 'E-L',
   actions: {
     ...SKILL,
-    Y: [Y_INSIDE, ...block('B-L')],
+    Y: [Y_OUTSIDE_52, ...block('B-L')],
     L: [L_PIN_52, ...block('B-L')],
     LT: block('T-L'),
     LG: block('T-L'),
@@ -353,9 +355,9 @@ const vs52: FrontPlan = {
   },
   assignments: {
     Y: {
-      rule: 'Inside release — climb to the playside backer.',
+      rule: 'Outside release — chip the end, then climb to the playside backer.',
       detail:
-        'The end is the read key — he lines up tight on our tackle\'s outside shoulder now, so you are going UNDER his inside hip, not around him. Do not touch him. Duck inside, come up through the lane over our tackle and put your helmet on the backer. That block is what springs the keep.',
+        'The end is the read key, lined up tight on our tackle\'s outside shoulder. Go around his OUTSIDE shoulder, not under his inside hip. On your way to the backer, seal the edge: if he shows himself in your path, give him a little chip and push him toward the line of scrimmage, then keep going. Come up and put your helmet on the backer. That block is what springs the keep.',
     },
     L: {
       rule: 'Tight off the read — pin the backer.',
@@ -469,6 +471,7 @@ const reviewNotes = [
   "THE PITCH PHASE IS FLAT AND DEEP. Same fix for the pitch man: the panel runs him flat behind Super's heels and off the edge without ever crossing the line, and page 5 says the relationship is 5x1 with the quarterback. His path now ends at (−10, −2.2), which is five outside and one behind where the quarterback's arrow ends — the numbers finally match the words on his card.",
   "SUPER'S ARROW. The panel stops Super's arrow at the mesh, behind the line, pointed at the playside guard's outside shoulder — it is drawing the ride, not the run. We keep drawing the whole run and still aim him OUTSIDE the playside tackle, which is what makes this outside veer instead of Veer. The mesh now happens at about (−2, −1.2), where the quarterback's flat path crosses him. Confirm the aiming point: if you want Super at the guard's crack like Veer, that is a data change, not a drawing change.",
   "Page 7 also carries DIVE ('automatic give') and SPEEDO ('keep or pitch') off the same look — audibled the same way, Indy left / Hoosier right. Separate calls, NOT in this slice. Flagging them so they don't get lost.",
+  "Y'S RELEASE vs the 5-2, CHANGED (Ryan, 2026-09-17). Y used to duck under the end's inside hip to get to the backer. Now he goes around the end's OUTSIDE shoulder instead — same idea as the wing's release, seal the edge on the way by. If the end shows himself in Y's path, Y gives him a little chip toward the line of scrimmage before climbing on to the backer. Crush Left only — Crush Right vs the 5-2 has no Y on the play side (RT blocks the end there instead), so it is untouched.",
 ]
 
 export const crushLeftRed: Play = {

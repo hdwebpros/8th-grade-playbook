@@ -167,17 +167,17 @@ const L_NEAR_COLOR_43: Action = {
 }
 
 /**
- * Y: inside release, under the end's inside hip and up over the top of the
- * tackle's block, then climb. Since the 2026-09-17 alignment the end is a
- * 5-technique at −3.55 — tight to our tackle, not out over the tight end — so
- * the release starts flat behind the line to get past his hip before it turns
- * up through the lane over our tackle.
+ * Y: outside release, around the DE's outside shoulder — not under his inside
+ * hip. Coach Ryan, 2026-09-17: with the end a 5-technique at −3.55, tight to
+ * our tackle, going around his outside shoulder seals the edge instead of
+ * ducking underneath it. Chip him toward the line of scrimmage on the way by
+ * if he shows himself in the path, then climb same as before.
  */
-const Y_INSIDE: Action = {
+const Y_OUTSIDE_52: Action = {
   kind: 'run',
   path: [
-    { x: -4, y: -0.3 },
-    { x: -3, y: 0.4 },
+    { x: -4.6, y: 0.2 },
+    { x: -4.2, y: 1.6 },
     { x: -2.9, y: 2.2 },
   ],
 }
@@ -319,15 +319,17 @@ const vs43: FrontPlan = {
  * shoulder. So the guards are covered and our tackles are not — the
  * guard-and-center double on the nose is gone (the center is alone), the
  * playside guard and tackle work the 3-technique together, and the backside
- * tackle is the free climber. Y still releases inside the end, going under his
- * inside hip now, and the end is still the read. X still bases the backside
- * end, who now sits on his inside shoulder.
+ * tackle is the free climber. Y still releases past the end and the end is
+ * still the read — since 2026-09-17 that release goes around his OUTSIDE
+ * shoulder with a chip if he shows, not under his inside hip (see
+ * Y_OUTSIDE_52). X still bases the backside end, who now sits on his inside
+ * shoulder.
  */
 const vs52: FrontPlan = {
   readKey: 'E-L',
   actions: {
     ...SKILL,
-    Y: [Y_INSIDE, ...block('B-L')],
+    Y: [Y_OUTSIDE_52, ...block('B-L')],
     L: [L_PIN_52, ...block('B-L')],
     LT: block('T-L'),
     LG: block('T-L'),
@@ -337,9 +339,9 @@ const vs52: FrontPlan = {
   },
   assignments: {
     Y: {
-      rule: 'Inside release — climb to the playside backer.',
+      rule: 'Outside release — chip the end, then climb to the playside backer.',
       detail:
-        'The end is the read key — he lines up tight on our tackle\'s outside shoulder now, so you are going UNDER his inside hip, not around him. Do not touch him. Duck inside, come up through the lane over our tackle and put your helmet on the backer. That block is what springs the keep.',
+        'The end is the read key, lined up tight on our tackle\'s outside shoulder. Go around his OUTSIDE shoulder, not under his inside hip. On your way to the backer, seal the edge: if he shows himself in your path, give him a little chip and push him toward the line of scrimmage, then keep going. Come up and put your helmet on the backer. That block is what springs the keep.',
     },
     L: {
       rule: 'Tight off the read — pin the backer.',
@@ -454,6 +456,7 @@ const reviewNotes = [
   "THE 5-2 LINE BLOCKS WERE RE-RESOLVED (2026-09-17). Ryan: \"N is directly over C. DT should be directly over the last letter on the guard (either the L or the G in RG). DE should be directly over the edge of the circle on the OT.\" That makes the guards covered and our tackles uncovered in the odd front, the opposite of the page-7 50 look this plan was transcribed from. So: the guard-and-center double team on the nose is GONE and the center is alone on him; the playside guard and tackle work the 3-technique together; the backside guard bases his 3-technique and the backside tackle, who used to base a man head up on him, is now the free climber to the backside backer. Y's release and the read key are unchanged. Confirm.",
   "BALANCED SET — no formationTwinId, matching the Split Wide and Veer-out-of-Tight rulings: Tight mirrors onto itself, so there is no Red/Black-style formation twin, just this left/right pair linked by audibleFlipId (Indy = left, Hoosier = right at the line, per DIRECTION_AUDIBLES in app/utils/playbook.ts).",
   "PITCH MAN GEOMETRY — Tight's R wing starts at (+5.7, −1) instead of Red's (+4.2, −1), so the first point of the orbit squiggle was widened to (4.6, −2.7) — the same one-point fix veer-left-tight made. The rest of the motion, the 5-by-1 pitch phase ending at (−10, −2.2), Super's dive and the quarterback's flat arrow are carried over from crushLeftRed unchanged.",
+  "Y'S RELEASE vs the 5-2, CHANGED (Ryan, 2026-09-17), same fix as crushLeftRed. Y used to duck under the end's inside hip to get to the backer. Now he goes around the end's OUTSIDE shoulder instead — same idea as the wing's release, seal the edge on the way by. If the end shows himself in Y's path, Y gives him a little chip toward the line of scrimmage before climbing on to the backer. Left only — Crush Right out of Tight mirrors this automatically.",
 ]
 
 export const crushLeftTight: Play = {
