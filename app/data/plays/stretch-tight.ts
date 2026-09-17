@@ -167,12 +167,12 @@ const vs52: FrontPlan = {
     LT: {
       rule: '45 outside step — combo the end with Y, then climb to the backer.',
       detail:
-        'Nobody is inside you in a 5-2 — their end sits on your OUTSIDE shoulder and Y is reaching him too. Step playside at 45, get your hat and hands on that end with Y, and the second Y has him turned, come off flat for the inside backer. He is the one who fills this play.',
+        'Nobody is inside you in a 5-2 — their end sits on your OUTSIDE shoulder and Y is reaching him too. Step playside at 45, get your helmet and hands on that end with Y, and the second Y has him turned, come off flat for the inside backer. He is the one who fills this play.',
     },
     LG: {
       rule: '45 outside step — reach the man on you.',
       detail:
-        'Their tackle lines up on YOUR outside shoulder in a 5-2, so he is yours alone. Playside foot first at 45 degrees, get your hat across his playside number and run your feet toward the sideline. No help is coming — the center has the nose and your tackle is outside on the end.',
+        'Their tackle lines up on YOUR outside shoulder in a 5-2, so he is yours alone. Playside foot first at 45 degrees, get your helmet across his playside number and run your feet toward the sideline. No help is coming — the center has the nose and your tackle is outside on the end.',
     },
     C: {
       rule: '45 outside step — reach the nose.',
@@ -234,7 +234,7 @@ const vs44: FrontPlan = {
     LT: {
       rule: '45 outside step — climb to the playside backer.',
       detail:
-        'Nobody on you. Step playside at 45, get past the down man the guard is reaching, and put your hat on the backer inside. He is the guy who fills for the stretch.',
+        'Nobody on you. Step playside at 45, get past the down man the guard is reaching, and put your helmet on the backer inside. He is the guy who fills for the stretch.',
     },
     LG: {
       rule: '45 outside step — reach the man on you.',

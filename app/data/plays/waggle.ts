@@ -225,7 +225,7 @@ const vs52: FrontPlan = {
     C: {
       rule: 'Block Stretch to the fake side — the nose is yours.',
       detail:
-        'Odd front, so there is a man head up on you. Step toward the fake, get your hat across him and hold him. The pulling guard is gone, so nobody is coming to help — hold your ground and do not chase.',
+        'Odd front, so there is a man head up on you. Step toward the fake, get your helmet across him and hold him. The pulling guard is gone, so nobody is coming to help — hold your ground and do not chase.',
     },
     LT: {
       rule: 'Block Stretch to the fake side — take the end on your shoulder.',
@@ -274,7 +274,7 @@ const assignments: Record<OffPosId, Assignment> = {
   LT: {
     rule: 'Block Stretch to the fake side — take the first man that way.',
     detail:
-      'This is the Stretch block, not a pass set. Fire out at 45 toward the fake and put your hat on the first defender that way. Stay low, stay on the line — the second you stand up and pass-set, the linebackers know.',
+      'This is the Stretch block, not a pass set. Fire out at 45 toward the fake and put your helmet on the first defender that way. Stay low, stay on the line — the second you stand up and pass-set, the linebackers know.',
   },
   LG: {
     rule: 'Block Stretch to the fake side — take the first man that way.',

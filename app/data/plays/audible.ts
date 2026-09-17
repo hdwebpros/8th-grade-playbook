@@ -383,7 +383,7 @@ const DROPBACK_JOBS = {
 const SPRINT_JOBS = {
   Y: a(
     'Zero — block. You have the end on your side.',
-    'No digit for you on this call, so it is a zero — a route for the Y is still being worked out. You are the back side of a sprint: the quarterback is running away from you, so all you have to do is keep the end from chasing him down. Get your hat across him and stay on your feet.',
+    'No digit for you on this call, so it is a zero — a route for the Y is still being worked out. You are the back side of a sprint: the quarterback is running away from you, so all you have to do is keep the end from chasing him down. Get your helmet across him and stay on your feet.',
   ),
   LT: a(
     'Sprint — REACH to the call side. Block the man in your gap that way.',
@@ -430,7 +430,7 @@ const OVERRIDES_43: Partial<Record<OffPosId, Assignment>> = {
   ),
   C: a(
     'You have the Mike.',
-    'He is stacked head up over the ball, and in this front he is the only backer who can get to the quarterback inside. Snap, slide with the protection, and put your hat on him the moment he moves.',
+    'He is stacked head up over the ball, and in this front he is the only backer who can get to the quarterback inside. Snap, slide with the protection, and put your helmet on him the moment he moves.',
   ),
 }
 

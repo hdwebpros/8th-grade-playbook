@@ -206,7 +206,7 @@ const vs44: FrontPlan = {
     L: {
       rule: 'Down — take the end inside you.',
       detail:
-        'Do not block out. Step down inside and put your hat on the end. The guard is coming around you to kick the man outside — if you block out, you block him into the guard and the play dies.',
+        'Do not block out. Step down inside and put your helmet on the end. The guard is coming around you to kick the man outside — if you block out, you block him into the guard and the play dies.',
     },
     Y: {
       rule: 'Down first — nobody there, climb to the backer.',
@@ -216,7 +216,7 @@ const vs44: FrontPlan = {
     LT: {
       rule: 'Down — take the tackle over the guard.',
       detail:
-        'Our guard is pulling, so the man over him is yours. Step down inside, get your hat across his playside number and pin him. This is the most important down block on the play.',
+        'Our guard is pulling, so the man over him is yours. Step down inside, get your helmet across his playside number and pin him. This is the most important down block on the play.',
     },
     C: {
       rule: 'Uncovered playside — block back.',
@@ -274,7 +274,7 @@ const vs43: FrontPlan = {
     },
     LT: {
       rule: 'Down — take the tackle over the guard.',
-      detail: 'Our guard pulled. Step down inside, get your hat across the tackle and pin him.',
+      detail: 'Our guard pulled. Step down inside, get your helmet across the tackle and pin him.',
     },
     C: {
       rule: 'Uncovered playside — block back.',

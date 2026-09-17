@@ -246,7 +246,7 @@ const vs44: FrontPlan = {
     Y: {
       rule: 'Base the man on you.',
       detail:
-        'The end is head up on you in a 4-4. Take him — that is what moves the read out to the backer behind him. Get your hat on his playside number and do not let him cross your face.',
+        'The end is head up on you in a 4-4. Take him — that is what moves the read out to the backer behind him. Get your helmet on his playside number and do not let him cross your face.',
     },
     L: {
       rule: 'Tight off the read — pin the backer.',
@@ -256,7 +256,7 @@ const vs44: FrontPlan = {
     LT: {
       rule: 'Uncovered — step playside, climb to the backer.',
       detail:
-        'Nobody on you. Step playside off the guard\'s hip and put your hat on the backer inside. He is the man who fills on the dive.',
+        'Nobody on you. Step playside off the guard\'s hip and put your helmet on the backer inside. He is the man who fills on the dive.',
     },
     LG: {
       rule: 'Covered — base him.',
@@ -355,7 +355,7 @@ const vs52: FrontPlan = {
     Y: {
       rule: 'Inside release — climb to the playside backer.',
       detail:
-        'The end is the read key — he lines up tight on our tackle\'s outside shoulder now, so you are going UNDER his inside hip, not around him. Do not touch him. Duck inside, come up through the lane over our tackle and put your hat on the backer. That block is what springs the keep.',
+        'The end is the read key — he lines up tight on our tackle\'s outside shoulder now, so you are going UNDER his inside hip, not around him. Do not touch him. Duck inside, come up through the lane over our tackle and put your helmet on the backer. That block is what springs the keep.',
     },
     L: {
       rule: 'Tight off the read — pin the backer.',
@@ -370,7 +370,7 @@ const vs52: FrontPlan = {
     LG: {
       rule: 'Covered — base him.',
       detail:
-        'Their tackle is on your outside shoulder, not head up, so step with your outside foot and get your hat across his playside number. The tackle is coming down on him with you — do not let him cross either of your faces.',
+        'Their tackle is on your outside shoulder, not head up, so step with your outside foot and get your helmet across his playside number. The tackle is coming down on him with you — do not let him cross either of your faces.',
     },
     C: {
       rule: 'Covered — block the nose. You are alone on him.',
@@ -414,7 +414,7 @@ const assignments: Record<OffPosId, Assignment> = {
   },
   RT: {
     rule: 'Backside — take the man on or outside you.',
-    detail: 'Nothing catches us from behind. Get your hat on him and stay on him until the whistle.',
+    detail: 'Nothing catches us from behind. Get your helmet on him and stay on him until the whistle.',
   },
   Y: {
     rule: 'Block the man on you. Nobody on you — inside release and climb.',
@@ -640,7 +640,7 @@ const vs44Right: FrontPlan = {
     RT: {
       rule: 'Base the end on or outside you.',
       detail:
-        'No tight end on this side, so the end is YOUR man — on Veer you would leave him for the read, on Crush you block him and the read moves one wider. Get your hat on his playside number; the dive is coming off your outside hip and he cannot be in it.',
+        'No tight end on this side, so the end is YOUR man — on Veer you would leave him for the read, on Crush you block him and the read moves one wider. Get your helmet on his playside number; the dive is coming off your outside hip and he cannot be in it.',
     },
     R: {
       rule: 'Tight off the read — pin the backer.',
@@ -747,7 +747,7 @@ const vs52Right: FrontPlan = {
     RT: {
       rule: 'Base the end on or outside you.',
       detail:
-        'Nobody is head up on you in this front any more — their tackle slid out onto our guard, and the end is on your outside shoulder. That end is the man Veer would read, so on Crush he is YOURS. Get your hat on his playside number; the dive comes off your outside hip and he cannot be in it.',
+        'Nobody is head up on you in this front any more — their tackle slid out onto our guard, and the end is on your outside shoulder. That end is the man Veer would read, so on Crush he is YOURS. Get your helmet on his playside number; the dive comes off your outside hip and he cannot be in it.',
     },
     R: {
       rule: 'Tight off the read — pin the backer.',
@@ -757,7 +757,7 @@ const vs52Right: FrontPlan = {
     RG: {
       rule: 'Covered — base him.',
       detail:
-        'Their tackle is on your outside shoulder, not head up. Step with your outside foot and get your hat across his playside number — the dive is running right off that block.',
+        'Their tackle is on your outside shoulder, not head up. Step with your outside foot and get your helmet across his playside number — the dive is running right off that block.',
     },
     C: {
       rule: 'Covered — block the nose. You are alone on him.',

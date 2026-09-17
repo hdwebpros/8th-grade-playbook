@@ -336,7 +336,7 @@ const vs43: FrontPlan = {
   assignments: {
     C: {
       rule: 'Step playside. Uncovered — get vertical to the Mike.',
-      detail: 'Even front again, and the Mike is stacked head up on you. Step playside, get vertical, and put your hat on him.',
+      detail: 'Even front again, and the Mike is stacked head up on you. Step playside, get vertical, and put your helmet on him.',
     },
     RT: {
       rule: 'Step inside, veer inside — climb to the wall.',
@@ -467,11 +467,11 @@ const vs52: FrontPlan = {
   assignments: {
     C: {
       rule: 'Step playside. Covered — Scoop with the backside guard.',
-      detail: "Odd front: the nose is head up on you. Step playside and take his playside number until the backside guard takes him over — then climb to the wall, bending back to the backside backer around three to four yards. That's Scoop.",
+      detail: "Odd front: the nose is head up on you. Step playside and take his playside number until the backside guard takes him over — then climb to the wall, bending back to the backside backer around three to four yards.",
     },
     LG: {
       rule: 'Odd — Scoop with C.',
-      detail: 'Step playside and take the nose over so the center can climb. Get your hat on his playside number and push him back toward the backside. If the nose slants away from us, he is yours alone and the center climbs early.',
+      detail: 'Step playside and take the nose over so the center can climb. Get your helmet on his playside number and push him back toward the backside. If the nose slants away from us, he is yours alone and the center climbs early.',
     },
     LT: {
       rule: 'Step down — take the tackle inside you.',
@@ -479,7 +479,7 @@ const vs52: FrontPlan = {
     },
     RG: {
       rule: 'Base — the tackle on your outside shoulder.',
-      detail: 'You are COVERED in a 5-2: their tackle sits on your outside shoulder, the same place he sits in an even front, so he is yours. Step playside, get your hat across his playside number, and drive him back off the line — your bar sets about a yard past it.',
+      detail: 'You are COVERED in a 5-2: their tackle sits on your outside shoulder, the same place he sits in an even front, so he is yours. Step playside, get your helmet across his playside number, and drive him back off the line — your bar sets about a yard past it.',
     },
     RT: {
       rule: 'Step inside, veer inside — up to the backer.',
@@ -525,7 +525,7 @@ const assignments: Record<OffPosId, Assignment> = {
   },
   LT: {
     rule: 'Rip with the guard inside you. Odd: step down and take the tackle.',
-    detail: 'Your first step is DOWN the line behind the guard, never out. Even front: pull around the far side of the tackle on the guard\'s outside shoulder, get your hat on his playside number, and push him away from the play. Odd front: nobody pulls — that same tackle is in the gap right inside you, so step down and take him. Nothing chases us from behind.',
+    detail: 'Your first step is DOWN the line behind the guard, never out. Even front: pull around the far side of the tackle on the guard\'s outside shoulder, get your helmet on his playside number, and push him away from the play. Odd front: nobody pulls — that same tackle is in the gap right inside you, so step down and take him. Nothing chases us from behind.',
   },
   X: {
     rule: 'Playside: base the first man outside the read key.',

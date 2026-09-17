@@ -213,12 +213,12 @@ const keepVs44: FrontPlan = {
     C: {
       rule: 'Uncovered — step playside and climb to the backer in the B gap.',
       detail:
-        'Nobody on your nose in an even front. Playside foot first, then run through the B gap and put your hat on the backer stacked behind their tackle. He is the man who tackles this play if you miss him.',
+        'Nobody on your nose in an even front. Playside foot first, then run through the B gap and put your helmet on the backer stacked behind their tackle. He is the man who tackles this play if you miss him.',
     },
     R: {
       rule: 'Block the walked-up backer outside our tackle.',
       detail:
-        'The 4-4 walks a backer up on the edge at 6½ yards — he is the man who runs the ball down from the outside. Come off the ball flat, get your hat outside his, and turn him away from the middle.',
+        'The 4-4 walks a backer up on the edge at 6½ yards — he is the man who runs the ball down from the outside. Come off the ball flat, get your helmet outside his, and turn him away from the middle.',
     },
   },
 }
@@ -341,7 +341,7 @@ const keepAssignments: Record<OffPosId, Assignment> = {
   R: {
     rule: 'Play side — block the first man outside our tackle our line has not blocked.',
     detail:
-      'You are the edge. In a 4-4 that is the backer walked up out there; in a 4-3 and a 5-2 our line has every big man, so it is the backer at 4 yards. Come off flat, get your hat outside his, and turn him away from the middle of the field. The keeper is coming inside of your block, not outside it.',
+      'You are the edge. In a 4-4 that is the backer walked up out there; in a 4-3 and a 5-2 our line has every big man, so it is the backer at 4 yards. Come off flat, get your helmet outside his, and turn him away from the middle of the field. The keeper is coming inside of your block, not outside it.',
   },
   S: {
     rule: 'Motion out between R and X. STOP. Get set. Hands up, eyes on the quarterback.',
@@ -1018,7 +1018,7 @@ const screenAssignments: Record<OffPosId, Assignment> = {
   RT: {
     rule: 'REACH the end. Push him inside, away from the play.',
     detail:
-      'This is a big reach block and it is the block that fixes this play. Aggressive reach step — your outside foot goes hard to the end\'s outside hip — get your hat across his outside number, and run him back to the LEFT. He does not get upfield and he does not get to Super. If he tries to go outside you, you are already there. If he runs inside, that is where you wanted him — go with him.',
+      'This is a big reach block and it is the block that fixes this play. Aggressive reach step — your outside foot goes hard to the end\'s outside hip — get your helmet across his outside number, and run him back to the LEFT. He does not get upfield and he does not get to Super. If he tries to go outside you, you are already there. If he runs inside, that is where you wanted him — go with him.',
   },
   X: {
     rule: 'Go up and block the corner in front of you.',
@@ -1130,7 +1130,7 @@ export const splitWideScreenLeft: Play = (() => {
       LT: {
         rule: 'REACH the end. Push him inside, away from the play.',
         detail:
-          'This is a big reach block and it is the block that fixes this play. Aggressive reach step — your outside foot goes hard to the end\'s outside hip — get your hat across his outside number, and run him back to the RIGHT. He does not get upfield and he does not get to Super. If he tries to go outside you, you are already there. If he runs inside, that is where you wanted him — go with him.',
+          'This is a big reach block and it is the block that fixes this play. Aggressive reach step — your outside foot goes hard to the end\'s outside hip — get your helmet across his outside number, and run him back to the RIGHT. He does not get upfield and he does not get to Super. If he tries to go outside you, you are already there. If he runs inside, that is where you wanted him — go with him.',
       },
       LG: {
         rule: 'Check the tackle on your outside shoulder first, then pull around the end and find the linebacker.',

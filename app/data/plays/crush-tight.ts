@@ -215,7 +215,7 @@ const vs44: FrontPlan = {
     Y: {
       rule: 'Base the man on you.',
       detail:
-        'The end is head up on you in a 4-4. Take him — that is what moves the read out to the backer behind him. Get your hat on his playside number and do not let him cross your face.',
+        'The end is head up on you in a 4-4. Take him — that is what moves the read out to the backer behind him. Get your helmet on his playside number and do not let him cross your face.',
     },
     L: {
       rule: 'Tight off the read — pin the backer.',
@@ -225,7 +225,7 @@ const vs44: FrontPlan = {
     LT: {
       rule: 'Uncovered — step playside, climb to the backer.',
       detail:
-        'Nobody on you. Step playside off the guard\'s hip and put your hat on the backer inside. He is the man who fills on the dive.',
+        'Nobody on you. Step playside off the guard\'s hip and put your helmet on the backer inside. He is the man who fills on the dive.',
     },
     LG: {
       rule: 'Covered — base him.',
@@ -339,7 +339,7 @@ const vs52: FrontPlan = {
     Y: {
       rule: 'Inside release — climb to the playside backer.',
       detail:
-        'The end is the read key — he lines up tight on our tackle\'s outside shoulder now, so you are going UNDER his inside hip, not around him. Do not touch him. Duck inside, come up through the lane over our tackle and put your hat on the backer. That block is what springs the keep.',
+        'The end is the read key — he lines up tight on our tackle\'s outside shoulder now, so you are going UNDER his inside hip, not around him. Do not touch him. Duck inside, come up through the lane over our tackle and put your helmet on the backer. That block is what springs the keep.',
     },
     L: {
       rule: 'Tight off the read — pin the backer.',
@@ -354,7 +354,7 @@ const vs52: FrontPlan = {
     LG: {
       rule: 'Covered — base him.',
       detail:
-        'Their tackle is on your outside shoulder, not head up, so step with your outside foot and get your hat across his playside number. The tackle is coming down on him with you — do not let him cross either of your faces.',
+        'Their tackle is on your outside shoulder, not head up, so step with your outside foot and get your helmet across his playside number. The tackle is coming down on him with you — do not let him cross either of your faces.',
     },
     C: {
       rule: 'Covered — block the nose. You are alone on him.',
