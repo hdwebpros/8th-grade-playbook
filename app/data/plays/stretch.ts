@@ -381,9 +381,9 @@ const assignments: Record<OffPosId, Assignment> = {
       'Climb straight up and cut off the backside backer before he can run the ball down from behind. Take the shortest line to his outside shoulder.',
   },
   S: {
-    rule: 'Slow bucket step. Aiming point OUTSIDE the tackle. Key the end man on the line.',
+    rule: 'Slow bucket step. Aim outside the tackle, then hit the hole hard.',
     detail:
-      'Bucket step — first step back and away, slow, let the line move. Take the handoff and press flat at a point OUTSIDE the playside tackle. Now read the end man on the line of scrimmage: if he stays wide, bend it up inside him; if he squeezes down, keep going and bounce it around him. One aiming point, two answers.',
+      'Bucket step — first step back and away, slow, let the line move. Take the handoff and press flat at a point OUTSIDE the playside tackle, then hit whatever hole opens up HARD — left, right, or all the way to the sideline. Same aiming point every time; find your crease and go, no dancing back there.',
   },
   Q: {
     rule: 'Open to the mesh. Work 45 for depth behind the inside leg of the tackle.',
@@ -417,6 +417,7 @@ const reviewNotes = [
   "Q: the scan's quarterback line stops at the mesh — no boot fake is drawn on the Stretch page (Jet and Rocket both say 'carry out boot fake', Stretch's table does not). We drew it literally, stopping at the mesh, and put 'carry out your fake' in the coaching detail. Waggle is the play that punishes a defense for chasing that fake, so you may want it drawn.",
   "RG vs the 4-4 and 4-3: 'gap to climb, 45 INSIDE step' with a tackle on his outside shoulder resolves to cutting that man off, which is what we coded. The RT then also steps down onto that same man rather than fanning out to the end behind him — that is the backside rule you called out on Veer, applied here. Confirm the double is what you want, or tell us where the tackle should end up instead.",
   'ALIGNMENT RETUNE (2026-09-17). Ryan: "N is directly over C. DT should be directly over the last letter on the guard (either the L or the G in RG). DE should be directly over the edge of the circle on the OT." Every front now aligns the ends at ±3.55 (our tackle\'s outside shoulder) and the tackles at ±1.8 (our guard\'s outside shoulder) — the 5-2 included, where their tackle is NO LONGER head up on our tackle. Two 5-2 jobs changed on this play. LG is now the covered guard and reaches that tackle BY HIMSELF (he used to be the free man who comboed and climbed). LT is now covered by the END, the same man Y is reaching, so the playside double-team is LT + Y on the end and LT — the inside man — is the one who comes off it to the backer. That is still page-12\'s dotted climb, just off a different combo. Nobody was left unblocked by the swap. Confirm you want the tackle, not the tight end, coming off that combo.',
+  "SUPER'S READ, SIMPLIFIED (Ryan, 2026-09-17): dropped the 'read the end man, bend it up or bounce it' language. Super now just aims outside the playside tackle and hits whatever hole opens up hard — left, right, or all the way to the sideline. Same footwork and aiming point, just a simpler decision for an 8th grader. Applied across the whole Stretch family, Tight formation included.",
 ]
 
 export const stretchLeftRed: Play = {
@@ -435,7 +436,7 @@ export const stretchLeftRed: Play = {
   audibleFlipId: 'stretch-right-red',
   summary: 'Direct handoff to Super, who runs outside the tackle.',
   description:
-    'Outside zone at the tight end and wing. Everybody up front takes a 45-degree step to the play side and runs the defense sideways; Super takes a slow bucket step, aims OUTSIDE the playside tackle, and reads the end man on the line — bend it up inside him or bounce it around him. We are not blocking a hole, we are moving a wall and letting the back pick the crack.',
+    'Outside zone at the tight end and wing. Everybody up front takes a 45-degree step to the play side and runs the defense sideways; Super takes a slow bucket step, aims OUTSIDE the playside tackle, then hits whatever hole opens up hard — left, right, or all the way to the sideline. We are not blocking a hole, we are moving a wall and letting the back pick the crack.',
   assignments,
   vs: { '44': vs44, '43': vs43, '52': vs52 } satisfies Record<FrontId, FrontPlan>,
   coachNotes,
@@ -545,7 +546,7 @@ const vs52Right: FrontPlan = {
     // is RT's: hands on the end with R, then off to the backer.
     RT: [...block('E-R'), ...block('B-R')],
     R: block('E-R'),
-    X: block('F-R'),
+    X: block('C-R'),
   },
   assignments: {
     RT: {
@@ -589,9 +590,9 @@ const vs52Right: FrontPlan = {
         'Step down inside and wall off anything trying to chase. You and the wing seal the back door together.',
     },
     X: {
-      rule: 'MDM — block the near safety.',
+      rule: 'Playside — block the corner.',
       detail:
-        'You are on the play side now, but your job is still the most dangerous man: work back inside and get in front of the safety on your side.',
+        'Get to the corner in front of you, hat on his outside number, and stay on him. That block is what turns this into a touchdown instead of a tackle at the numbers.',
     },
   },
 }
@@ -612,7 +613,7 @@ const vs44Right: FrontPlan = {
     RG: block('T-R'),
     RT: block('E-R'),
     R: block('O-R'),
-    X: block('F'),
+    X: block('C-R'),
   },
   assignments: {
     RT: {
@@ -656,9 +657,9 @@ const vs44Right: FrontPlan = {
         'Step down inside and wall off anything trying to chase. You and the wing seal the back door together.',
     },
     X: {
-      rule: 'MDM — block the free safety.',
+      rule: 'Playside — block the corner.',
       detail:
-        'Single high safety. Work back inside, get to a spot in front of him, and stay between him and the football.',
+        'Get to the corner in front of you, hat on his outside number, and stay on him. That block is what turns this into a touchdown instead of a tackle at the numbers.',
     },
   },
 }
@@ -674,7 +675,7 @@ const vs43Right: FrontPlan = {
     RG: block('T-R'),
     RT: block('E-R'),
     R: block('B-R'),
-    X: block('F-R'),
+    X: block('C-R'),
   },
   assignments: {
     RT: {
@@ -717,9 +718,9 @@ const vs43Right: FrontPlan = {
         'Step down inside and wall off anything trying to chase. You and the wing seal the back door together.',
     },
     X: {
-      rule: 'MDM — block the near safety.',
+      rule: 'Playside — block the corner.',
       detail:
-        'Work back inside and get in front of the safety on your side — he is the most dangerous man once the ball turns up.',
+        'Get to the corner in front of you, hat on his outside number, and stay on him. That block is what turns this into a touchdown instead of a tackle at the numbers.',
     },
   },
 }
@@ -770,9 +771,9 @@ const assignmentsRight: Record<OffPosId, Assignment> = {
       'Step down and bar the edge man next to you before he can chase the play from behind. Nothing crosses your face.',
   },
   S: {
-    rule: 'Slow bucket step. Aiming point OUTSIDE the tackle. Key the end man on the line.',
+    rule: 'Slow bucket step. Aim outside the tackle, then hit the hole hard.',
     detail:
-      'Bucket step — first step back and away, slow, let the line move. Take the handoff and press flat at a point OUTSIDE the playside tackle. Now read the end man on the line of scrimmage: if he stays wide, bend it up inside him; if he squeezes down, keep going and bounce it around him. One aiming point, two answers.',
+      'Bucket step — first step back and away, slow, let the line move. Take the handoff and press flat at a point OUTSIDE the playside tackle, then hit whatever hole opens up HARD — left, right, or all the way to the sideline. Same aiming point every time; find your crease and go, no dancing back there.',
   },
   Q: {
     rule: 'Open to the mesh. Work 45 for depth behind the inside leg of the tackle.',
@@ -780,9 +781,9 @@ const assignmentsRight: Record<OffPosId, Assignment> = {
       'Open playside and work back at 45 degrees so the mesh happens behind the inside leg of the playside tackle. Deep enough that the back can run flat, ball out early, then get out of his way and carry out your fake.',
   },
   X: {
-    rule: 'MDM — block the most dangerous man.',
+    rule: 'Playside — block the corner in front of you.',
     detail:
-      'You are on the play side this time, but the job is the same: find the deep man who can run this down and go get him. Run to a spot in front of him and stay between him and the football.',
+      'You are split out on the play side this time. Get to the corner in front of you, hat on his outside number, and stay on him — that block is the difference between eight yards and a touchdown.',
   },
 }
 
@@ -798,6 +799,8 @@ const reviewNotesRight = [
   "Geometry: S's bucket/mesh/bend-up and Q's mesh path are the exact x-negations of the page-12 measured paths — page-13's panel draws the same picture on the right (mesh behind RT's inside leg, vertical bend-up at about +3.8, between RT and the wing). Y's cutoff stroke is newly drawn; L, and all line blocks are targeted blocks like the rest of this file.",
   "Unblocked defenders, by front — 4-4: B-L, O-L, both corners; 4-3: B-L, C-L, C-R, F-L; 5-2: E-R is covered but C-L, C-R, F-L are not. None are listed in `ignored` because Stretch has no option to 'handle' them — they are simply men the zone outruns. Say the word if you want dashed rings on any of them.",
   'ALIGNMENT RETUNE (2026-09-17). Ryan: "N is directly over C. DT should be directly over the last letter on the guard (either the L or the G in RG). DE should be directly over the edge of the circle on the OT." In the 5-2 their tackle now sits on the GUARD\'s outside shoulder (±1.8) instead of head up on our tackle, and the end on our tackle\'s outside shoulder (±3.55). Two 5-2 jobs swapped: RG reaches the tackle alone (he is the covered guard) and RT combos the END with the R wing, then climbs to M — the panel\'s playside climb, now coming off the tackle instead of the guard. Geometry moved with it: Super\'s bend-up threads the C-gap lane over RT (x ≈ +2.7) instead of the old dead-vertical at +3.6, which the end now stands on, and Y\'s backside cutoff scramble was re-routed INSIDE the backside end (over LT, x ≈ −2.7). Y is climbing PAST that end, not blocking him — the L wing bars him — so the stroke had to give him room.',
+  "SUPER'S READ, SIMPLIFIED (Ryan, 2026-09-17): dropped the 'read the end man, bend it up or bounce it' language. Super now just aims outside the playside tackle and hits whatever hole opens up hard — left, right, or all the way to the sideline. Same footwork and aiming point, just a simpler decision for an 8th grader. Applied across the whole Stretch family, Tight formation included.",
+  "X RESOLVED (Ryan, 2026-09-17): the open question above about X playing MDM even though he is playside is settled — X now blocks the CORNER in front of him (C-R) on every front, the same call the wing makes on Veer's X. Nobody plays MDM/safety on this play anymore; if you want a body on the safety, that has to come from somewhere else.",
 ]
 
 export const stretchRightRed: Play = {
@@ -816,7 +819,7 @@ export const stretchRightRed: Play = {
   audibleFlipId: 'stretch-left-red',
   summary: 'Direct handoff to Super, who runs outside the tackle.',
   description:
-    'Outside zone away from the tight end — the weak-side stretch. Same 45-degree steps, same slow bucket step and mesh, but the split-end side has fewer bodies: the right wing sets the edge, X works back to the safety, and Y and the left wing cut off the chase. Super still aims outside the playside tackle and reads the end man — bend it up or bounce it.',
+    'Outside zone away from the tight end — the weak-side stretch. Same 45-degree steps, same slow bucket step and mesh, but the split-end side has fewer bodies: the right wing sets the edge, X blocks the corner in front of him, and Y and the left wing cut off the chase. Super still aims outside the playside tackle and hits whatever hole opens up hard.',
   assignments: assignmentsRight,
   vs: { '44': vs44Right, '43': vs43Right, '52': vs52Right } satisfies Record<FrontId, FrontPlan>,
   coachNotes,

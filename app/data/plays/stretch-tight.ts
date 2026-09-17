@@ -387,9 +387,9 @@ const assignments: Record<OffPosId, Assignment> = {
       'Step down and bar the edge man next to you before he can chase the play from behind. Nothing crosses your face.',
   },
   S: {
-    rule: 'Slow bucket step. Aiming point OUTSIDE the tackle. Key the end man on the line.',
+    rule: 'Slow bucket step. Aim outside the tackle, then hit the hole hard.',
     detail:
-      'Bucket step — first step back and away, slow, let the line move. Take the handoff and press flat at a point OUTSIDE the playside tackle. Now read the end man on the line of scrimmage: if he stays wide, bend it up inside him; if he squeezes down, keep going and bounce it around him. One aiming point, two answers.',
+      'Bucket step — first step back and away, slow, let the line move. Take the handoff and press flat at a point OUTSIDE the playside tackle, then hit whatever hole opens up HARD — left, right, or all the way to the sideline. Same aiming point every time; find your crease and go, no dancing back there.',
   },
   Q: {
     rule: 'Open to the mesh. Work 45 for depth behind the inside leg of the tackle.',
@@ -416,6 +416,7 @@ const reviewNotes = [
   'GENERATED SIBLING: Stretch Right out of Tight is mirrorTightPlay(stretchLeftTight) — mirrorPlay plus the X↔Y exchange this balanced set requires (Split Wide hit the same bug: plain mirrorPlay leaves X and Y keyed where they are, which strands the playside tight end\'s reach on the man standing backside). The mirror was checked stroke by stroke: Tight is exactly symmetric and all three fronts are left/right symmetric, so no hand corrections were needed. Review the left play and you have reviewed the right one.',
   'Unblocked defenders, by front — 4-4: B-R, O-R, both corners; 4-3: B-R, C-L, C-R and both safeties; 5-2: C-L, C-R and both safeties. None are listed in `ignored` because Stretch has no option to "handle" them — they are men the zone outruns. Say the word if you want dashed rings on any of them.',
   'ALIGNMENT RETUNE (2026-09-17). Ryan: "N is directly over C. DT should be directly over the last letter on the guard (either the L or the G in RG). DE should be directly over the edge of the circle on the OT." Every front now puts the ends at ±3.55 (our tackle\'s outside shoulder) and the tackles at ±1.8 (our guard\'s outside shoulder), the 5-2 included — their tackle is NO LONGER head up on our tackle. Two 5-2 jobs changed here, exactly as they did on Stretch Left out of Red: LG is the covered guard and reaches that tackle by himself, and the playside double-team is LT + Y on the END with LT coming off it to the backer. Nobody came unblocked in the swap. Geometry: Super\'s bend-up threads the C-gap lane over LT (x ≈ −2.7) instead of the old stroke at −3.6, and X\'s backside cutoff scramble was routed inside the backside end (over RT, x ≈ +2.7) — he climbs past that man, the R wing is the one who blocks him.',
+  "SUPER'S READ, SIMPLIFIED (Ryan, 2026-09-17): dropped the 'read the end man, bend it up or bounce it' language, matching the change on both Red Stretch plays. Super now just aims outside the playside tackle and hits whatever hole opens up hard — left, right, or all the way to the sideline. Same footwork and aiming point, simpler decision for an 8th grader.",
 ]
 
 export const stretchLeftTight: Play = {
@@ -433,7 +434,7 @@ export const stretchLeftTight: Play = {
   audibleFlipId: 'stretch-right-tight',
   summary: 'Direct handoff to Super, who runs outside the tackle.',
   description:
-    'Outside zone to the left out of the two-tight-end set. Everybody up front takes a 45-degree step to the play side and runs the defense sideways; Super takes a slow bucket step, aims OUTSIDE the playside tackle, and reads the end man — bend it up inside him or bounce it around him. Tight gives this play a tight end on BOTH edges: Y and the left wing set the edge we are running to, and X and the right wing seal the back door behind us, so the cutback is real and nothing catches us from behind.',
+    'Outside zone to the left out of the two-tight-end set. Everybody up front takes a 45-degree step to the play side and runs the defense sideways; Super takes a slow bucket step, aims OUTSIDE the playside tackle, then hits whatever hole opens up hard. Tight gives this play a tight end on BOTH edges: Y and the left wing set the edge we are running to, and X and the right wing seal the back door behind us, so the cutback is real and nothing catches us from behind.',
   assignments,
   vs: { '44': vs44, '43': vs43, '52': vs52 } satisfies Record<FrontId, FrontPlan>,
   coachNotes,
@@ -458,7 +459,7 @@ export const stretchRightTight: Play = mirrorTightPlay(stretchLeftTight, {
   ],
   audibleFlipId: 'stretch-left-tight',
   description:
-    'Outside zone to the right out of the two-tight-end set — the same play, other side of the ball. X and the right wing set the edge we are running to, Y and the left wing seal the back door, and Super still buckets, aims outside the playside tackle, and reads the end man: bend it up or bounce it.',
+    'Outside zone to the right out of the two-tight-end set — the same play, other side of the ball. X and the right wing set the edge we are running to, Y and the left wing seal the back door, and Super still buckets, aims outside the playside tackle, then hits whatever hole opens up hard.',
   reviewNotes: [
     ...reviewNotes,
     'GENERATED: this play is mirrorTightPlay(stretchLeftTight) with no hand corrections — the mirror plus the X↔Y exchange. Every judgment call above applies here with left and right swapped: X reaches the end and the right wing takes the corner / force man / outside backer, while Y and the left wing cut off, and the unblocked backside backer in the even fronts is B-L.',
