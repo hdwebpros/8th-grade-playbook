@@ -47,7 +47,8 @@ type Source = { kind: 'example'; digits: string } | { kind: 'own' }
 type PadFormation = 'red' | 'black' | 'split-wide' | 'tight'
 
 const source = ref<Source>({ kind: 'example', digits: audibleExamples[0]!.digits })
-const formation = ref<PadFormation>('red')
+/** null while the pad is empty: nothing is picked and nothing is drawn yet. */
+const formation = ref<PadFormation | null>('red')
 const front = ref<FrontId>('44')
 
 
@@ -62,13 +63,32 @@ const pairFormation = computed<'red' | 'black'>(() => (formation.value === 'blac
 
 /**
  * The call being built on the "Call your own" pad — one per machine, because a
- * Red call, a Split Wide call and a Tight call are not the same shape. Whatever
- * example you were looking at is copied onto the matching one when you press
- * the button, so these initial values are only ever a fallback.
+ * Red call, a Split Wide call and a Tight call are not the same shape. The pad
+ * opens EMPTY: no formation, no digits, protection on Straight (no call). So
+ * these are draft shapes — a digit is null until the kid presses one — and the
+ * real call is only handed to the builder once every digit is in.
  */
-const ownCall = ref<AudibleCall>({ protection: 'none', outside: 9, inside: 2 })
-const ownSwCall = ref<SplitWideCall>({ protection: 'none', digits: [9, 5, 5, 9] })
-const ownTightCall = ref<TightCall>({ protection: 'none', digits: [9, 5, 5, 9] })
+type PairDraft = { protection: Protection; outside: number | null; inside: number | null; backside?: number; dash?: DashSide }
+type QuadDraft = { protection: Protection; digits: (number | null)[]; dash?: DashSide }
+
+const emptyPair = (): PairDraft => ({ protection: 'none', outside: null, inside: null })
+const emptyQuad = (): QuadDraft => ({ protection: 'none', digits: [null, null, null, null] })
+
+const ownCall = ref<PairDraft>(emptyPair())
+const ownSwCall = ref<QuadDraft>(emptyQuad())
+const ownTightCall = ref<QuadDraft>(emptyQuad())
+
+/** A draft is only a call once every digit it needs has been pressed. */
+const pairCall = computed<AudibleCall | null>(() => {
+  const c = ownCall.value
+  return c.outside === null || c.inside === null
+    ? null
+    : { ...c, outside: c.outside, inside: c.inside }
+})
+const quadCall = (draft: QuadDraft): SplitWideCall & TightCall | null =>
+  draft.digits.every((d): d is number => d !== null)
+    ? { ...draft, digits: draft.digits as [number, number, number, number] }
+    : null
 
 /**
  * Deep links from the route tree: `?formation=red|black|split-wide|tight` opens
@@ -106,21 +126,36 @@ const example = computed(() =>
     : audibleExamples.find((e) => e.digits === activeDigits.value),
 )
 
-const play = computed<Play>(() => {
+/** Null until there is a whole call to draw — the pad's empty state. */
+const play = computed<Play | null>(() => {
   const ex = example.value
   if (ex) return ex.playFor(pairFormation.value)
-  if (isSplitWide.value) return buildSplitWideAudible(ownSwCall.value)
-  if (isTight.value) return buildTightAudible(ownTightCall.value)
-  return buildAudible(ownCall.value, pairFormation.value)
+  if (formation.value === null) return null
+  if (isSplitWide.value) {
+    const c = quadCall(ownSwCall.value)
+    return c ? buildSplitWideAudible(c) : null
+  }
+  if (isTight.value) {
+    const c = quadCall(ownTightCall.value)
+    return c ? buildTightAudible(c) : null
+  }
+  return pairCall.value ? buildAudible(pairCall.value, pairFormation.value) : null
 })
 
 /** The call as it is said in the huddle, for the current formation. */
-const spokenCall = computed(() => {
+const spokenCall = computed<string | null>(() => {
   const ex = example.value
   if (ex) return ex.callNameFor(pairFormation.value)
-  if (isSplitWide.value) return splitWideCallName(ownSwCall.value)
-  if (isTight.value) return tightCallName(ownTightCall.value)
-  return callNameOf(ownCall.value, pairFormation.value)
+  if (formation.value === null) return null
+  if (isSplitWide.value) {
+    const c = quadCall(ownSwCall.value)
+    return c ? splitWideCallName(c) : null
+  }
+  if (isTight.value) {
+    const c = quadCall(ownTightCall.value)
+    return c ? tightCallName(c) : null
+  }
+  return pairCall.value ? callNameOf(pairCall.value, pairFormation.value) : null
 })
 
 /**
@@ -130,10 +165,12 @@ const spokenCall = computed(() => {
 const locked = computed(() => example.value?.lockedFormation)
 
 /** Whatever formation the play we are drawing actually sets. */
-const formationInfo = computed(() => formations[play.value.formation]!)
+const formationInfo = computed(() => (play.value ? formations[play.value.formation]! : null))
 
 /** The call word by word, so the stamp explains whatever the pad just built. */
-const callParts = computed(() => callPartsFor(play.value, formationInfo.value))
+const callParts = computed(() =>
+  play.value && formationInfo.value ? callPartsFor(play.value, formationInfo.value) : null,
+)
 const frontInfo = computed(() => fronts[front.value]!)
 const frontOptions = FRONT_ORDER.map((f) => ({ value: f, label: FRONT_LABELS[f] }))
 
@@ -195,16 +232,20 @@ const tightSlots = [
 ]
 
 function setSwDigit(i: number, d: number) {
-  const next = [...ownSwCall.value.digits] as SplitWideCall['digits']
+  const next = [...ownSwCall.value.digits]
   next[i] = d
   ownSwCall.value = { ...ownSwCall.value, digits: next }
 }
 
 function setTightDigit(i: number, d: number) {
-  const next = [...ownTightCall.value.digits] as TightCall['digits']
+  const next = [...ownTightCall.value.digits]
   next[i] = d
   ownTightCall.value = { ...ownTightCall.value, digits: next }
 }
+
+/** "—" until he presses one, then the route that digit names. */
+const digitRoute = (d: number | null | undefined) =>
+  d === null || d === undefined ? 'Not picked yet' : routeName(d)
 
 /** Same three-choice tag as Red and Black: no tag, left, or right. */
 function toggleTightDash(side: DashSide) {
@@ -262,23 +303,25 @@ function chooseExample(d: string) {
   // whichever four-digit formation the pad was sitting on.
   const ex = audibleExamples.find((e) => e.digits === d)
   if (ex?.lockedFormation) formation.value = ex.lockedFormation
-  else if (isFourDigit.value) formation.value = 'red'
+  else if (formation.value === null || isFourDigit.value) formation.value = 'red'
   source.value = { kind: 'example', digits: d }
 }
 
 function callYourOwn() {
-  // Carry the call you were just looking at onto the pad, so the first thing
-  // you do is change a digit and watch what moves.
-  const ex = example.value
-  if (ex?.swCall) ownSwCall.value = { ...ex.swCall, digits: [...ex.swCall.digits] }
-  else if (ex?.call) ownCall.value = { ...ex.call }
+  // Coach Ryan: the pad starts EMPTY. You pick the formation, you pick the
+  // protection — which opens on Straight, the no-call — and you pick the
+  // numbers. Nothing is drawn until the call is a whole call.
+  formation.value = null
+  ownCall.value = emptyPair()
+  ownSwCall.value = emptyQuad()
+  ownTightCall.value = emptyQuad()
   source.value = { kind: 'own' }
 }
 
 /* --- Selection: diagram tap <-> assignment row --- */
 
 const selected = ref<OffPosId | null>(null)
-watch(() => play.value.id, () => (selected.value = null))
+watch(() => play.value?.id, () => (selected.value = null))
 
 const panel = ref<{ revealRow: (pos: OffPosId) => void } | null>(null)
 
@@ -297,7 +340,7 @@ function onDiagramSelect(pos: OffPosId | null) {
       <div class="head-row">
         <div class="head-titles">
           <h1 class="title">Audible</h1>
-          <PlayCallStamp :parts="callParts" />
+          <PlayCallStamp v-if="callParts" :parts="callParts" />
         </div>
 
         <!-- Red and Black are a pair, so the header keeps its two-way toggle.
@@ -330,9 +373,9 @@ function onDiagramSelect(pos: OffPosId | null) {
       <section class="stage" aria-label="Play diagram">
         <div class="stage-bar">
           <SegmentedControl v-model="front" :options="frontOptions" label="Defensive front" />
-          <span class="call-chip">{{ spokenCall }}</span>
+          <span v-if="spokenCall" class="call-chip">{{ spokenCall }}</span>
         </div>
-        <div class="diagram card">
+        <div v-if="play && formationInfo" class="diagram card">
           <PlayDiagram
             :play="play"
             :front="front"
@@ -344,7 +387,11 @@ function onDiagramSelect(pos: OffPosId | null) {
             @select="onDiagramSelect"
           />
         </div>
-        <p class="hint muted">
+        <!-- Nothing called yet: no picture to check yourself against. -->
+        <div v-else class="diagram card diagram-empty">
+          <p>Pick your formation, then your numbers — the play draws itself.</p>
+        </div>
+        <p v-if="play" class="hint muted">
           <Icon name="lucide:pointer" aria-hidden="true" />
           Tap a player to see his job &middot; vs {{ frontInfo.name }}
         </p>
@@ -386,7 +433,7 @@ function onDiagramSelect(pos: OffPosId | null) {
                  change under your thumb as you press the buttons below. -->
             <div class="say">
               <span class="say-label">Say it</span>
-              <p class="say-phrase">{{ spokenCall }}</p>
+              <p class="say-phrase">{{ spokenCall ?? 'Start with the formation…' }}</p>
             </div>
 
             <!-- The formation is the first word out of your mouth, so it is the
@@ -397,13 +444,27 @@ function onDiagramSelect(pos: OffPosId | null) {
                 Formation
                 <em class="pad-route">
                   {{
-                    isFourDigit
-                      ? 'Four digits — one per receiver'
-                      : 'Two digits, three if you buy the backside wing'
+                    formation === null
+                      ? 'Not picked yet — this is the first word you say'
+                      : isFourDigit
+                        ? 'Four digits — one per receiver'
+                        : 'Two digits, three if you buy the backside wing'
                   }}
                 </em>
               </span>
-              <SegmentedControl v-model="formation" :options="formationOptions" label="Formation" />
+              <div class="dir-toggle pad-toggle" role="group" aria-label="Formation">
+                <button
+                  v-for="opt in formationOptions"
+                  :key="opt.value"
+                  type="button"
+                  class="dir-btn"
+                  :class="{ active: formation === opt.value }"
+                  :aria-pressed="formation === opt.value"
+                  @click="formation = opt.value"
+                >
+                  {{ opt.label }}
+                </button>
+              </div>
             </div>
 
             <template v-if="isSplitWide">
@@ -422,7 +483,7 @@ function onDiagramSelect(pos: OffPosId | null) {
               <div v-for="slot in swSlots" :key="slot.i" class="pad-row">
                 <span class="pad-label">
                   {{ slot.ord }} &middot; {{ slot.who }}
-                  <em class="pad-route">{{ routeName(ownSwCall.digits[slot.i]!) }}</em>
+                  <em class="pad-route">{{ digitRoute(ownSwCall.digits[slot.i]) }}</em>
                 </span>
                 <div class="digit-row" role="group" :aria-label="`${slot.ord} — ${slot.who}`">
                   <button
@@ -465,7 +526,7 @@ function onDiagramSelect(pos: OffPosId | null) {
               <div v-for="slot in tightSlots" :key="slot.i" class="pad-row">
                 <span class="pad-label">
                   {{ slot.ord }} &middot; {{ slot.who }}
-                  <em class="pad-route">{{ routeName(ownTightCall.digits[slot.i]!) }}</em>
+                  <em class="pad-route">{{ digitRoute(ownTightCall.digits[slot.i]) }}</em>
                 </span>
                 <div class="digit-row" role="group" :aria-label="`${slot.ord} — ${slot.who}`">
                   <button
@@ -518,7 +579,7 @@ function onDiagramSelect(pos: OffPosId | null) {
               </p>
             </template>
 
-            <template v-else>
+            <template v-else-if="formation">
               <div class="pad-row">
                 <span class="pad-label">
                   Protection
@@ -534,7 +595,7 @@ function onDiagramSelect(pos: OffPosId | null) {
               <div class="pad-row">
                 <span class="pad-label">
                   First digit &middot; X — wide receiver
-                  <em class="pad-route">{{ routeName(ownCall.outside) }}</em>
+                  <em class="pad-route">{{ digitRoute(ownCall.outside) }}</em>
                 </span>
                 <div class="digit-row" role="group" aria-label="First digit — wide receiver">
                   <button
@@ -554,7 +615,7 @@ function onDiagramSelect(pos: OffPosId | null) {
               <div class="pad-row">
                 <span class="pad-label">
                   Second digit &middot; {{ wingLabel }}
-                  <em class="pad-route">{{ routeName(ownCall.inside) }}</em>
+                  <em class="pad-route">{{ digitRoute(ownCall.inside) }}</em>
                 </span>
                 <div class="digit-row" role="group" aria-label="Second digit — wing">
                   <button
@@ -641,6 +702,14 @@ function onDiagramSelect(pos: OffPosId | null) {
                 <NuxtLink to="/routes" class="pad-link">See the route tree</NuxtLink>
               </p>
             </template>
+
+            <!-- Nothing picked yet: the formation decides how many digits the
+                 call even has, so there is nothing to show under it. -->
+            <p v-else class="pad-hint muted">
+              <Icon name="lucide:route" aria-hidden="true" />
+              Pick a formation and the rest of the call opens up under it.
+              <NuxtLink to="/routes" class="pad-link">See the route tree</NuxtLink>
+            </p>
           </div>
 
           <!-- The words that are not digits. Learn these and the rest is math. -->
@@ -745,7 +814,7 @@ function onDiagramSelect(pos: OffPosId | null) {
         </div>
       </section>
 
-      <section class="panel" aria-label="Assignments">
+      <section v-if="play && formationInfo" class="panel" aria-label="Assignments">
         <p class="desc">{{ play.description }}</p>
 
         <AssignmentPanel
@@ -873,6 +942,21 @@ function onDiagramSelect(pos: OffPosId | null) {
 .diagram {
   overflow: hidden;
   background: var(--dg-field);
+}
+.diagram-empty {
+  display: grid;
+  place-items: center;
+  min-height: 180px;
+  padding: 24px 18px;
+  text-align: center;
+  color: var(--chalk-dim);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+.pad-toggle {
+  flex-wrap: wrap;
+  width: fit-content;
 }
 .hint {
   display: flex;
