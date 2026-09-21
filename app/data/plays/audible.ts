@@ -63,6 +63,20 @@
  * Black. It works on either protection, and it trades a blocker for a fourth
  * target.
  *
+ * THE GUN
+ * ---------------------------------------------------------------------------
+ * Any of these calls can be said from the gun — "Red Gun Ram 33" — one word
+ * right after the formation, and never out of Tight. The line does not
+ * change. The quarterback is already 3 yards back (a shorter drop), Super is a
+ * yard left of him and a yard behind in BOTH Red and Black, the called wing
+ * (R in Red, L in Black) is a yard right of him and a yard behind and runs his
+ * digit from there, and the backside wing is out in the open slot on the
+ * tight-end side and runs his digit (or his standing 2) from the slot. Black
+ * Gun is NOT Red Gun mirrored — the backfield stays put and only the slot
+ * changes sides — so the gun backfield is drawn AFTER the mirror, in absolute
+ * coordinates, by `gunAudible` below. The play carries `variant: 'gun'` and
+ * `formationFor` (app/data/shotgun.ts) resolves the alignment it is drawn on.
+ *
  * THE EXAMPLES
  * ---------------------------------------------------------------------------
  *   Red Ram 33 — both digits the same. The simplest call there is.
@@ -96,6 +110,7 @@ import type {
   Pt,
 } from '../../types/football'
 import { mirrorPlay } from '../../utils/mirror'
+import { GUN_SLOT_LEFT, GUN_SLOT_RIGHT, GUN_WING } from '../shotgun'
 import type { DashSide, Protection, Side } from './audible-shared'
 import {
   OPPOSITE,
@@ -103,10 +118,18 @@ import {
   dashPart,
   dashSlugOf,
   dashSuper,
+  dashSuperGun,
   dashTagOf,
+  gunCallPart,
+  gunQuarterbackJob,
+  gunReviewNotes,
+  gunSuperJob,
+  isQuickCall,
   protectionPart,
   protectionSlugOf,
   protectionWordOf,
+  qDropGun,
+  superStayGun,
   redLine,
   routeDetailOf,
   routeNameOf,
@@ -117,7 +140,8 @@ import {
   superStay,
 } from './audible-shared'
 import type { SplitWideCall } from './audible-split-wide'
-import { splitWideDigitsOf } from './audible-split-wide'
+import { gunSplitWideAudible, splitWideDigitsOf } from './audible-split-wide'
+import { gunIdOf } from './gun-shared'
 import { splitWide9559 } from './split-wide-9559'
 
 /** Red alignments (app/data/formations.ts) — the origins routes are hung on. */
@@ -311,6 +335,12 @@ export interface AudibleCall {
    * of blocking. Either side is callable out of either formation.
    */
   dash?: DashSide
+  /**
+   * Said from the GUN: "Red Gun Ram 33". The line does not change; the
+   * quarterback, Super and the two wings start from their gun spots. Never
+   * true out of Tight.
+   */
+  gun?: boolean
 }
 
 /** Hand-written prose the generic builder cannot know. Optional. */
@@ -332,14 +362,21 @@ export const digitsOf = (call: AudibleCall): string =>
   `${call.outside}${call.inside}${call.backside ?? ''}`
 
 /**
- * "Red 33", "Red Bull 33", "Black Ram Dash Left 54". The protection word is in
- * the call only when one was called — say nothing and the line blocks straight
- * up, so the default call is just the formation and the digits. Dash rides
- * after the protection word, or in its place when there is none.
+ * "Red 33", "Red Bull 33", "Black Ram Dash Left 54", "Red Gun Ram 33". The
+ * protection word is in the call only when one was called — say nothing and
+ * the line blocks straight up, so the default call is just the formation and
+ * the digits. "Gun" comes right after the formation; Dash rides after the
+ * protection word, or in its place when there is none.
  */
 export function callNameOf(call: AudibleCall, formation: 'red' | 'black'): string {
   const form = formation === 'red' ? 'Red' : 'Black'
-  return [form, protectionWordOf(call.protection), dashTagOf(call.dash), digitsOf(call)]
+  return [
+    form,
+    call.gun ? gunCallPart().word : '',
+    protectionWordOf(call.protection),
+    dashTagOf(call.dash),
+    digitsOf(call),
+  ]
     .filter(Boolean)
     .join(' ')
 }
@@ -349,6 +386,7 @@ export function callPartsOf(call: AudibleCall, formation: 'red' | 'black'): Call
   const parts: CallPart[] = [
     { word: formation === 'red' ? 'Red' : 'Black', label: 'formation' },
   ]
+  if (call.gun) parts.push(gunCallPart())
   // No word on the default protection — there is nothing said to explain.
   const prot = protectionPart(call.protection)
   if (prot) parts.push(prot)
@@ -413,12 +451,102 @@ function describeCall(call: AudibleCall, formation: 'red' | 'black'): string {
     call.backside === undefined
       ? `${backWing}, runs his standing rule — a 2, speed out, the opposite way`
       : `the third digit, the ${call.backside}, belongs to ${backWing}, so he runs a ${routeNameOf(call.backside).toLowerCase()} off his own side instead of his standing out`
+  // From the gun the drop is spelled out by the gun sentence at the end.
+  const quarterback = call.gun
+    ? 'the quarterback throws from the gun'
+    : `the quarterback takes a ${dropWords(digitList(call)).toLowerCase()}`
   return (
-    `${callNameOf(call, formation)}. ${protectionSentence}, ${superJob}, and the quarterback takes a ${dropWords(digitList(call)).toLowerCase()}. ` +
+    `${callNameOf(call, formation)}. ${protectionSentence}, ${superJob}, and ${quarterback}. ` +
     `Then the digits, read outside-to-in on the wide-receiver side: the ${call.outside} belongs to X, the outside man, ` +
     `so he runs a ${routeNameOf(call.outside).toLowerCase()}; the ${call.inside} belongs to ${wing}, the man inside him, ` +
-    `so he runs a ${routeNameOf(call.inside).toLowerCase()}. Y blocks on this call — a way to send him on a route is still being worked out — and ${backside}.`
+    `so he runs a ${routeNameOf(call.inside).toLowerCase()}. Y blocks on this call — a way to send him on a route is still being worked out — and ${backside}.` +
+    (call.gun ? ` ${gunSentence(call, formation)}` : '')
   )
+}
+
+/**
+ * What the gun changes, in one breath — appended to the description of every
+ * gun call, generic or authored.
+ */
+function gunSentence(call: AudibleCall, formation: 'red' | 'black'): string {
+  const red = formation === 'red'
+  const beside = red ? 'R' : 'L'
+  const slot = red ? 'L' : 'R'
+  const slotSide = red ? 'left' : 'right'
+  const superJob = call.dash
+    ? `still releases on Dash to the ${call.dash.toUpperCase()} flat${call.dash === 'right' ? ', crossing behind the quarterback to get there' : ''}`
+    : 'still stays and protects, checking the left edge first'
+  const drop = isQuickCall(digitList(call)) ? 'catch and throw, one step' : 'a three-step drop, not five'
+  const slotRoute =
+    call.backside === undefined ? 'his standing 2' : `his ${routeNameOf(call.backside).toLowerCase()}`
+  return (
+    `From the gun the line does exactly what it did — same pass block, same protection word. ` +
+    `The quarterback is already 3 yards back, so it is ${drop}. Super is a yard left of him and a yard behind and ${superJob}. ` +
+    `${beside} is a yard right of the quarterback and a yard behind him and runs his ${routeNameOf(call.inside).toLowerCase()} from there; ` +
+    `${slot} is out in the ${slotSide} slot, 8½ yards out and a yard off the ball, and runs ${slotRoute} from the slot.`
+  )
+}
+
+/**
+ * THE GUN BACKFIELD, drawn after the mirror. Super is left of the quarterback
+ * in BOTH sets and the called wing is right of him in both, so nothing here
+ * can come from mirroring Red — it is written in absolute yards for whichever
+ * set was called. The line, X and Y are untouched.
+ */
+function gunAudible(play: Play, call: AudibleCall, formation: 'red' | 'black'): Play {
+  const red = formation === 'red'
+  /** The wing beside the quarterback — R in Red, L in Black. */
+  const beside: OffPosId = red ? 'R' : 'L'
+  /** The other wing, out in the open slot on the tight-end side. */
+  const slot: OffPosId = red ? 'L' : 'R'
+  const slotAt: Pt = red ? GUN_SLOT_LEFT : GUN_SLOT_RIGHT
+  const digits = digitList(call)
+
+  const actions: Partial<Record<OffPosId, Action[]>> = {
+    Q: qDropGun(digits),
+    S: call.dash ? dashSuperGun(call.dash) : superStayGun(),
+  }
+  // The tree is drawn toward the receiver's OUTSIDE: right for R, left for L.
+  actions[beside] = routeOn(call.inside, GUN_WING, red ? 1 : -1)
+  actions[slot] =
+    call.backside === undefined
+      ? routeOn(2, slotAt, red ? -1 : 1)
+      : routeOn(call.backside, slotAt, red ? -1 : 1)
+
+  const vs = Object.fromEntries(
+    (Object.keys(play.vs) as FrontId[]).map((front) => {
+      const plan = play.vs[front]
+      return [front, { ...plan, actions: { ...plan.actions, ...actions } }]
+    }),
+  ) as Record<FrontId, FrontPlan>
+
+  /** Same digit, same route, said from the new spot. */
+  const fromGunSpot = (job: Assignment, where: string): Assignment => ({
+    rule: job.rule,
+    detail: `From the gun you line up ${where}. Same digit, same route — run it from there. ${job.detail ?? ''}`.trim(),
+  })
+
+  const assignments: Record<OffPosId, Assignment> = {
+    ...play.assignments,
+    Q: gunQuarterbackJob(digits),
+    S: gunSuperJob(call.dash),
+    [beside]: fromGunSpot(
+      play.assignments[beside],
+      'beside the quarterback — a yard right of him and a yard behind',
+    ),
+    [slot]: fromGunSpot(
+      play.assignments[slot],
+      `out in the ${red ? 'left' : 'right'} slot, 8½ yards out and a yard off the ball`,
+    ),
+  }
+
+  return {
+    ...play,
+    variant: 'gun',
+    assignments,
+    vs,
+    reviewNotes: [...gunReviewNotes, ...(play.reviewNotes ?? [])],
+  }
 }
 
 /**
@@ -468,10 +596,19 @@ export function buildAudible(
   } as Record<OffPosId, Assignment>
 
   const idFor = (form: 'red' | 'black') =>
-    `audible-${form}${protectionSlugOf(call.protection)}${dashSlugOf(call.dash)}-${digitsOf(call)}`
+    withGun(`audible-${form}${protectionSlugOf(call.protection)}${dashSlugOf(call.dash)}-${digitsOf(call)}`)
+  /** A gun call's id ends in "-gun", the same convention as the gun runs. */
+  const withGun = (id: string) => (call.gun ? gunIdOf(id) : id)
+  /** Authored prose gets the gun sentence appended; generic prose already has it. */
+  const describe = (authored: string | undefined, form: 'red' | 'black') =>
+    authored
+      ? call.gun
+        ? `${authored} ${gunSentence(call, form)}`
+        : authored
+      : describeCall(call, form)
 
   const drawn: Play = {
-    id: authoring.id ?? idFor('red'),
+    id: authoring.id ? withGun(authoring.id) : idFor('red'),
     name: `Audible ${dashTagOf(call.dash) ? `${dashTagOf(call.dash)} ` : ''}${digitsOf(call)}`,
     callName: callNameOf(call, 'red'),
     call: callPartsOf(call, 'red'),
@@ -483,25 +620,30 @@ export function buildAudible(
     ballCarrier: 'Q',
     summary:
       authoring.summary ?? 'Called-at-the-line pass. Drop back; the digits hand out the routes.',
-    description: authoring.description ?? describeCall(call, 'red'),
+    description: describe(authoring.description, 'red'),
     assignments,
     vs: frontPlans(skill, drawSlide, drawDash, digitList(call)),
     reviewNotes: authoring.reviewNotes ?? sharedReviewNotes,
   }
 
-  if (!flip) return drawn
+  const built = flip
+    ? mirrorPlay(drawn, {
+        id: blackAuthoring.id
+          ? withGun(blackAuthoring.id)
+          : authoring.id
+            ? withGun(authoring.id.replace(/-red-/, '-black-'))
+            : idFor('black'),
+        callName: callNameOf(call, 'black'),
+        call: callPartsOf(call, 'black'),
+        formation: 'black' as FormationId,
+        summary: blackAuthoring.summary ?? drawn.summary,
+        description: describe(blackAuthoring.description, 'black'),
+        reviewNotes: blackAuthoring.reviewNotes ?? drawn.reviewNotes,
+      })
+    : drawn
 
-  return mirrorPlay(drawn, {
-    id:
-      blackAuthoring.id ??
-      (authoring.id ? authoring.id.replace(/-red-/, '-black-') : idFor('black')),
-    callName: callNameOf(call, 'black'),
-    call: callPartsOf(call, 'black'),
-    formation: 'black' as FormationId,
-    summary: blackAuthoring.summary ?? drawn.summary,
-    description: blackAuthoring.description ?? describeCall(call, 'black'),
-    reviewNotes: blackAuthoring.reviewNotes ?? drawn.reviewNotes,
-  })
+  // The gun backfield goes on AFTER the mirror — Black Gun is not Red Gun flipped.
+  return call.gun ? gunAudible(built, call, formation) : built
 }
 
 // ---------------------------------------------------------------------------
@@ -527,11 +669,18 @@ export interface AudibleExample {
   swCall?: SplitWideCall
   /** Set when this example lives in ONE formation and the toggle does not apply. */
   lockedFormation?: FormationId
-  /** The play to draw for whichever side of the toggle the page is showing. */
-  playFor: (formation: 'red' | 'black') => Play
+  /**
+   * The play to draw for whichever side of the toggle the page is showing —
+   * and from the gun when the pad's Gun toggle is on.
+   */
+  playFor: (formation: 'red' | 'black', gun?: boolean) => Play
   /** The call as it is said out loud, for that same side. */
-  callNameFor: (formation: 'red' | 'black') => string
-  /** Every play this example contributes to the book. */
+  callNameFor: (formation: 'red' | 'black', gun?: boolean) => string
+  /**
+   * Every play this example contributes to the book — under center only. The
+   * gun versions are built on the pad and stay out of the book, like the gun
+   * runs, until Coach Ryan signs the football off.
+   */
   plays: Play[]
 }
 
@@ -543,12 +692,16 @@ function example(
 ): AudibleExample {
   const red = buildAudible(call, 'red', redAuthoring)
   const black = buildAudible(call, 'black', redAuthoring, blackAuthoring)
+  const gunCall: AudibleCall = { ...call, gun: true }
+  const redGun = buildAudible(gunCall, 'red', redAuthoring)
+  const blackGun = buildAudible(gunCall, 'black', redAuthoring, blackAuthoring)
   return {
     digits: digitsOf(call),
     blurb,
     call,
-    playFor: (formation) => (formation === 'red' ? red : black),
-    callNameFor: (formation) => callNameOf(call, formation),
+    playFor: (formation, gun = false) =>
+      formation === 'red' ? (gun ? redGun : red) : gun ? blackGun : black,
+    callNameFor: (formation, gun = false) => callNameOf(gun ? gunCall : call, formation),
     plays: [red, black],
   }
 }
@@ -559,13 +712,15 @@ function example(
  * on that exact call.
  */
 function splitWideExample(blurb: string, call: SplitWideCall, play: Play): AudibleExample {
+  const gunPlay = gunSplitWideAudible(play, call)
   return {
     digits: splitWideDigitsOf(call),
     blurb,
     swCall: call,
     lockedFormation: play.formation,
-    playFor: () => play,
-    callNameFor: () => play.callName ?? play.name,
+    playFor: (_formation, gun = false) => (gun ? gunPlay : play),
+    callNameFor: (_formation, gun = false) =>
+      (gun ? gunPlay.callName : play.callName) ?? play.name,
     plays: [play],
   }
 }
@@ -694,7 +849,9 @@ const audible54 = example(
  */
 const audible9559 = splitWideExample(
   'Four receivers, four digits: fades outside, curls inside.',
-  { protection: 'bull', digits: [9, 5, 5, 9] },
+  // The play itself is the straight call — no protection word — so the pad's
+  // copy of the call says the same thing.
+  { protection: 'none', digits: [9, 5, 5, 9] },
   splitWide9559,
 )
 

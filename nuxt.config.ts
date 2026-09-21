@@ -1,6 +1,16 @@
+import { gunPlayList } from './app/data'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
+  nitro: {
+    prerender: {
+      // Gun plays are reached only through the Under center / Gun toggle, whose
+      // links carry ?front=; the crawler skips query routes, so list them here
+      // or they 404 offline. Under-center plays are found from /plays as usual.
+      routes: gunPlayList.map((p) => `/plays/${p.id}`),
+    },
+  },
   // Parallel agents/build tasks can each set NUXT_BUILD_DIR to avoid racing on .nuxt
   buildDir: process.env.NUXT_BUILD_DIR || '.nuxt',
   devtools: { enabled: true },

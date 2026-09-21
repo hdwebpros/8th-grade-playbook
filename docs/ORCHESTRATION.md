@@ -498,3 +498,63 @@ Split Wide DRAFT gate; no git commits unless asked.
   pre-existing errors. Nothing committed.
 - STILL OPEN: all Split Wide football remains behind the HANDOFF §10 review
   gate; the left screen additionally needs its own throwing reps ruling.
+
+## 2026-09-21 — Shotgun ("Gun") variation, lineups only (LANDED, awaiting Ryan review)
+
+- Ryan's rulings: Gun is a VARIATION of Red/Black/Split Wide (never Tight),
+  called with one word after the formation ("Red Gun Veer Right"). QB at 3 yd,
+  Super 1 left/1 behind him, a wing 1 right/1 behind him, the other wing out
+  to the open slot (±8.5, y −1) on the tight-end side. Super is on the QB's
+  LEFT in both Red and Black (Black Gun ≠ mirror of Red Gun). Split Wide:
+  only Q and S move. NO plays from gun yet ("no triple option from gun");
+  a Gun option on /audible is a liked future idea.
+- Orchestrator DONE: `FormationVariantId`/`Formation.variant` in football.ts;
+  `app/data/shotgun.ts` (gunOf, gunMoves, hasGun, redGun/blackGun/
+  splitWideGun, gunFormations) exported from data/index.ts; `GunGuide` +
+  `FormationGuide.gun?` in formation-guides/types.ts.
+- Diagram agent (opus) DONE: FormationDiagram `moves?: GunMove[]` prop —
+  ghost marker at old spot + dashed motion-style shift line; framing includes
+  ghosts; default render byte-identical (one extra `<!---->`). Orchestrator
+  then set per-shift trim = min(pathStartTrim, len*0.3) and a dimmed-ghost
+  floor GHOST_DIM 0.18. Dev sandbox app/pages/dev/gun.vue kept.
+- Page agent (fable) RUNNING: gun prose in formation-guides red/black/
+  split-wide (`gun` sections), Under-center/Gun SegmentedControl on
+  /formations/[id] (URL `?set=gun`, kept across Red⇄Black, dropped for Tight),
+  "+ Gun" cue on /formations cards. Owns only those 5 files.
+- After it lands: vue-tsc (ignore nuxt.config errors), generate with
+  NUXT_BUILD_DIR=.nuxt-gun, SSR-check /formations, /formations/red?set=gun,
+  black, split-wide, tight; eyeball wording of the three `remember` blocks;
+  report to Ryan (no screenshots), he reviews on his own :3000 dev server.
+  No git commits unless asked.
+
+**Landed 2026-09-21.** Page agent finished: `gun` blocks in red/black/split-wide guides, Under center/Gun toggle on `/formations/[id]` (`?set=gun`, kept Red⇄Black⇄Split Wide, dropped for Tight), "+ Gun" chips on index. Verified: vue-tsc clean (nuxt.config errors pre-existing), `generate` OK, SSR of red/black/split-wide `?set=gun` shows "<Set> Gun" h1 + ghost group (4 shifts Red/Black, 2 Split Wide), Tight ignores `?set=gun`. Open football questions for Ryan: Black L crosses behind QB wording; QB "hands out" stance cue; "Say it" line names no play. Dev sandbox `app/pages/dev/gun.vue` kept alongside existing dev pages. Not committed.
+
+## 2026-09-21 — Gun RUN plays (LANDED, awaiting Ryan review)
+
+Ryan's rulings: Split Wide gun runs the same plays (Keep still motions Super out). Veer/Crush from gun: NO motion; playside back dives (Red Right R, Red Left S; Black Right L, Black Left S), the other back swings behind the QB as the pitch. Buck Sweep + Stretch: same playside rule, other back fakes/leads, guards still pull, slot wing blocks down. Playside backer with the wing in the backfield: "just draw something up, I can always change it." Pass plays later. Gun plays are APP ONLY for now: in `plays` record, not in `playList` (print book, flashcards, KYJ untouched).
+
+Orchestrator edits: `Play.variant?: FormationVariantId` (frozen type); `formationFor(play)` in app/data/shotgun.ts; `app/data/plays/gun-shared.ts` (`gunPlay(base, spec)`, `gunIdOf`, `baseIdOf`, `isGunPlay`, `GUN_CALL_PART`); stubs `app/data/plays/{veer,crush,buck-sweep,stretch,split-wide}-gun.ts`; `gunPlayList` + merged `plays` in app/data/index.ts; play page line 19 → `formationFor(play)`. Shared agent brief: scratchpad/gun-plays-brief.md.
+
+Agents (parallel): Fable × Veer, Crush, Buck Sweep; Opus × Stretch, Split Wide runs; Opus × play page toggle (`app/pages/plays/[id].vue`, `index.vue`). Ids = base id + `-gun`. Twin/flip ids link gun↔gun only.
+
+After they land: vue-tsc; `NUXT_BUILD_DIR=.nuxt-gun npm run generate`; SSR-check /plays, /plays/veer-right-red-gun?front=52 etc.; collect every DRAFT reviewNote into the report for Ryan; no commits.
+
+**Status at 2nd compaction (2026-09-21):** LANDED — play page toggle (`plays/[id].vue`, `plays/index.vue`), split-wide-gun.ts (4 plays), crush-gun.ts (4), veer-gun.ts (4), buck-sweep-gun.ts (4). STILL RUNNING — Stretch agent (`stretch-gun.ts`, Opus, port 4744, build dir .nuxt-stretch-gun). All landed files typechecked clean by their authors; DRAFT football decisions are in each play's `reviewNotes` (never rendered) — collect them from the files with `grep -n "DRAFT" app/data/plays/*-gun.ts` for Ryan's report. Known base-file wording issues flagged by agents, NOT fixed: veer.ts calls the 4-3 playside backer "Sam" on veer-right-red where it renders as W; crush.ts calls F-R "strong safety" on Red Right. Then: vue-tsc, generate with NUXT_BUILD_DIR=.nuxt-gun, SSR-check /plays + gun ids, report to Ryan, no commits.
+
+**LANDED (2026-09-21, awaiting Ryan review):** stretch-gun.ts (4 plays) landed; all 20 gun plays in `gunPlayList`. Integration: vue-tsc clean; `npm run generate` clean; all 20 `/plays/*-gun` pages prerendered with the toggle and the gun note; under-center pages unchanged apart from the toggle; Tight and pass plays show no toggle; /plays still 11 concept cards, 6 with the "+ Gun" chip (Veer, Crush, Buck Sweep, Stretch, SW Dive, SW Keep). Two orchestrator fixes after the agents: (1) the gun toggle in `plays/[id].vue` was a SegmentedControl (button + router.replace) — swapped for the same NuxtLink `dir-toggle` pattern the Direction/Formation toggles use so the crawler and offline cache can reach the gun pages; (2) those links carry `?front=` and the crawler skips query routes, so `nuxt.config.ts` now sets `nitro.prerender.routes` from `gunPlayList`. Still open: Ryan's sign-off on the DRAFT reviewNotes; gun PASS plays; Gun on /audible; the two base-file wording issues above.
+
+## 2026-09-21 — Buck Sweep gun rewrite per Ryan (LANDED, awaiting Ryan review)
+
+Ryan rejected the drafted gun Buck Sweep (no motion, playside back carries) and gave the real design. Black Gun Buck Sweep Left: R (slot) motions back toward the QB pre-snap; L fakes the buck right into the RG's area; S runs out around the LT to block the weak-side alley; X blocks the corner; R takes the handoff and sweeps left outside X's spot; LT contains; LG engages the DT a count or two then pulls to help S / nearest LB; RG one push on the DT then pulls around the LT and upfield on any jersey. Red Gun Buck Sweep Right is the mirror in roles (S crosses behind the QB — flagged). TE-side versions not described; same structure, all DRAFT. Spec verbatim: scratchpad/buck-sweep-gun-spec.md. One agent (general-purpose) rewriting `app/data/plays/buck-sweep-gun.ts` only, port 4746, build dir .nuxt-buck-gun. After: vue-tsc, generate, report, no commits.
+
+**Status at 3rd compaction (2026-09-21):** Buck Sweep gun rewrite agent still running (it had read everything and was writing the replacement `buck-sweep-gun.ts`). When it reports: vue-tsc (`| grep -v nuxt.config`), `NUXT_BUILD_DIR=.nuxt-gun npm run generate` then `rm -rf .nuxt-gun .output`, confirm the four `/plays/buck-sweep-*-gun` pages render the motion/fake/carry per the spec, report the four plays + DRAFT calls to Ryan in plain style, no commits. Do not read the agent's .output transcript file — wait for the completion notification.
+
+**LANDED (2026-09-21):** Agent rewrote `app/data/plays/buck-sweep-gun.ts` only. vue-tsc clean, `npm run generate` clean, all four `/plays/buck-sweep-*-gun` pages prerendered with motion wing carrying, other wing faking the buck, Super to the alley, guards engage-then-pull. Scratch server/build dir gone. Nothing committed. DRAFT calls in reviewNotes: TE-side plays use a hairpin return motion and Y stalks the corner; Super crosses behind the QB on both right-going plays; pull targets per front (S: O/B/B, playside G: inside backer, backside G: safety); the DT over the playside guard is released with nobody on him. Agent could not draw the "count or two" vs "one push" timing difference (words only).
+
+## 2026-09-21 — Stretch gun: Super always carries (LANDED, awaiting Ryan review)
+Ryan: "Stretch in the gun should always go to the super." One general-purpose agent rewriting `app/data/plays/stretch-gun.ts` only (S carries all four, wing beside QB is fake/lead, DRAFT in reviewNotes). Scratch server port 4747, build dir `.nuxt-stretch-gun`. When it reports: vue-tsc (`| grep -v nuxt.config`), `NUXT_BUILD_DIR=.nuxt-gun npm run generate` then `rm -rf .nuxt-gun .output`, confirm the four `/plays/stretch-*-gun` pages, report plain style, no commits, do not read the agent transcript.
+**LANDED (2026-09-21):** `stretch-gun.ts` rewritten, S carries all four. vue-tsc and generate clean, four `/plays/stretch-*-gun` pages prerendered. DRAFT in reviewNotes: right-going mesh a step wider; R drop-step swing lead on Red Right; L fakes playside A gap on Black Right; crowded right-side backfield strokes. Nothing committed.
+
+## 2026-09-21 — Gun: Split Wide Screen/Victory + audible pad Gun toggle, then PR (LANDED, PR open)
+Ryan: "do Victory, screen and audible with Gun abilities. Once done, open a PR for it and get me the Vercel preview link." (Waggle/other passes from gun NOT requested.) Two agents: (A) `split-wide-gun.ts` adds `split-wide-screen-{right,left}-gun` and `split-wide-victory-gun`, port 4748, dir `.nuxt-sw-gun`; (B) audible pad Gun toggle for Red/Black/Split Wide (never Tight), call word "Gun" after formation, edits audible.vue + audible*.ts, port 4749, dir `.nuxt-aud-gun`. After both report: vue-tsc, generate + clean, then git: branch `gun-formation` off main, commit ALL gun work (Ryan authorized commits via the PR ask), push, `gh pr create`, wait for Vercel bot comment on the PR for the preview URL, give Ryan the link. Do not read agent transcripts.
+**LANDED (2026-09-21):** 23 gun play pages prerender; audible pad has an Under center / Gun toggle for Red/Black/Split Wide (call word "Gun" after the formation, ids `-gun`, pad plays runtime-only). vue-tsc and generate clean. Committed on branch `gun-formation`, PR opened; Vercel preview from the PR's bot comment.

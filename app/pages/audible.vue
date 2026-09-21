@@ -11,8 +11,11 @@
  * digits (app/data/plays/audible.ts), Split Wide takes four, one per receiver
  * (app/data/plays/audible-split-wide.ts), and Tight takes four as well but
  * blocks it up with Red's slide (app/data/plays/audible-tight.ts) — and the
- * formation picker is what chooses between them. That is the practice loop:
- * say a call, then check yourself against the picture.
+ * formation picker is what chooses between them. Next to it sits the Gun
+ * toggle: Red, Black and Split Wide can all be said from the gun (never
+ * Tight), which puts "Gun" in the call right after the formation and draws the
+ * same call with the backfield on its gun spots (app/data/shotgun.ts). That is
+ * the practice loop: say a call, then check yourself against the picture.
  */
 import type { FrontId, OffPosId, Play } from '~/types/football'
 import {
@@ -21,8 +24,9 @@ import {
   buildAudible,
   buildSplitWideAudible,
   callNameOf,
-  formations,
+  formationFor,
   fronts,
+  gunFormations,
   routes,
   splitWideCallName,
   buildTightAudible,
@@ -55,6 +59,21 @@ const front = ref<FrontId>('44')
 const isSplitWide = computed(() => formation.value === 'split-wide')
 const isTight = computed(() => formation.value === 'tight')
 
+/* --- Under center / Gun ---
+   The gun is a VARIATION of Red, Black and Split Wide, never Tight: one word
+   after the formation, the line does not change, the backfield re-forms
+   around a quarterback who is already 3 yards back. It is page state, not a
+   machine of its own — the same call goes to the same builder with `gun` on. */
+const gun = ref(false)
+/** Only the sets with a gun offer the toggle; Tight (and no formation) never do. */
+const gunAvailable = computed(() => formation.value !== null && !!gunFormations[formation.value])
+/** The toggle as it reaches the builders — always off where there is no gun. */
+const gunOn = computed(() => gun.value && gunAvailable.value)
+// Picking Tight (or clearing the pad) turns the gun OFF, not just hides it.
+watch(formation, (f) => {
+  if (f === null || !gunFormations[f]) gun.value = false
+})
+
 /** Split Wide and Tight both hand out four digits, one per receiver. */
 const isFourDigit = computed(() => isSplitWide.value || isTight.value)
 
@@ -83,11 +102,11 @@ const pairCall = computed<AudibleCall | null>(() => {
   const c = ownCall.value
   return c.outside === null || c.inside === null
     ? null
-    : { ...c, outside: c.outside, inside: c.inside }
+    : { ...c, outside: c.outside, inside: c.inside, gun: gunOn.value }
 })
 const quadCall = (draft: QuadDraft): SplitWideCall & TightCall | null =>
   draft.digits.every((d): d is number => d !== null)
-    ? { ...draft, digits: draft.digits as [number, number, number, number] }
+    ? { ...draft, digits: draft.digits as [number, number, number, number], gun: gunOn.value }
     : null
 
 /**
@@ -129,7 +148,7 @@ const example = computed(() =>
 /** Null until there is a whole call to draw — the pad's empty state. */
 const play = computed<Play | null>(() => {
   const ex = example.value
-  if (ex) return ex.playFor(pairFormation.value)
+  if (ex) return ex.playFor(pairFormation.value, gunOn.value)
   if (formation.value === null) return null
   if (isSplitWide.value) {
     const c = quadCall(ownSwCall.value)
@@ -145,7 +164,7 @@ const play = computed<Play | null>(() => {
 /** The call as it is said in the huddle, for the current formation. */
 const spokenCall = computed<string | null>(() => {
   const ex = example.value
-  if (ex) return ex.callNameFor(pairFormation.value)
+  if (ex) return ex.callNameFor(pairFormation.value, gunOn.value)
   if (formation.value === null) return null
   if (isSplitWide.value) {
     const c = quadCall(ownSwCall.value)
@@ -164,8 +183,8 @@ const spokenCall = computed<string | null>(() => {
  */
 const locked = computed(() => example.value?.lockedFormation)
 
-/** Whatever formation the play we are drawing actually sets. */
-const formationInfo = computed(() => (play.value ? formations[play.value.formation]! : null))
+/** Whatever set the play we are drawing actually lines up in — the gun when it is on. */
+const formationInfo = computed(() => (play.value ? formationFor(play.value) : null))
 
 /** The call word by word, so the stamp explains whatever the pad just built. */
 const callParts = computed(() =>
@@ -189,6 +208,12 @@ const formationOptions: { value: PadFormation; label: string }[] = [
   { value: 'black', label: 'Black' },
   { value: 'split-wide', label: 'Split Wide' },
   { value: 'tight', label: 'Tight' },
+]
+
+/** Same two words as the play page's Under center / Gun control. */
+const setOptions: { value: boolean; label: string }[] = [
+  { value: false, label: 'Under center' },
+  { value: true, label: 'Gun' },
 ]
 
 /**
@@ -343,29 +368,51 @@ function onDiagramSelect(pos: OffPosId | null) {
           <PlayCallStamp v-if="callParts" :parts="callParts" />
         </div>
 
-        <!-- Red and Black are a pair, so the header keeps its two-way toggle.
-             Split Wide and Tight are balanced sets with no twin — they are
-             chosen on the pad and have nothing to toggle. -->
-        <nav v-if="!locked && !isFourDigit" class="dir-toggle" aria-label="Formation">
-          <button
-            type="button"
-            class="dir-btn"
-            :class="{ active: formation === 'red' }"
-            :aria-pressed="formation === 'red'"
-            @click="formation = 'red'"
+        <div class="head-controls">
+          <!-- Red and Black are a pair, so the header keeps its two-way toggle.
+               Split Wide and Tight are balanced sets with no twin — they are
+               chosen on the pad and have nothing to toggle. -->
+          <nav v-if="!locked && !isFourDigit" class="dir-toggle" aria-label="Formation">
+            <button
+              type="button"
+              class="dir-btn"
+              :class="{ active: formation === 'red' }"
+              :aria-pressed="formation === 'red'"
+              @click="formation = 'red'"
+            >
+              Red
+            </button>
+            <button
+              type="button"
+              class="dir-btn"
+              :class="{ active: formation === 'black' }"
+              :aria-pressed="formation === 'black'"
+              @click="formation = 'black'"
+            >
+              Black
+            </button>
+          </nav>
+          <!-- An example from the gun. The pad has its own copy of this toggle
+               beside the formation picker, so it only shows up here while an
+               example is up. -->
+          <nav
+            v-if="activeDigits !== null && gunAvailable"
+            class="dir-toggle"
+            aria-label="Under center or gun"
           >
-            Red
-          </button>
-          <button
-            type="button"
-            class="dir-btn"
-            :class="{ active: formation === 'black' }"
-            :aria-pressed="formation === 'black'"
-            @click="formation = 'black'"
-          >
-            Black
-          </button>
-        </nav>
+            <button
+              v-for="opt in setOptions"
+              :key="`hg-${opt.value}`"
+              type="button"
+              class="dir-btn"
+              :class="{ active: gun === opt.value }"
+              :aria-pressed="gun === opt.value"
+              @click="gun = opt.value"
+            >
+              {{ opt.label }}
+            </button>
+          </nav>
+        </div>
       </div>
     </header>
 
@@ -446,24 +493,48 @@ function onDiagramSelect(pos: OffPosId | null) {
                   {{
                     formation === null
                       ? 'Not picked yet — this is the first word you say'
-                      : isFourDigit
+                      : (isFourDigit
                         ? 'Four digits — one per receiver'
-                        : 'Two digits, three if you buy the backside wing'
+                        : 'Two digits, three if you buy the backside wing') +
+                        (gunOn ? ' · from the gun' : '')
                   }}
                 </em>
               </span>
-              <div class="dir-toggle pad-toggle" role="group" aria-label="Formation">
-                <button
-                  v-for="opt in formationOptions"
-                  :key="opt.value"
-                  type="button"
-                  class="dir-btn"
-                  :class="{ active: formation === opt.value }"
-                  :aria-pressed="formation === opt.value"
-                  @click="formation = opt.value"
+              <div class="pad-toggles">
+                <div class="dir-toggle pad-toggle" role="group" aria-label="Formation">
+                  <button
+                    v-for="opt in formationOptions"
+                    :key="opt.value"
+                    type="button"
+                    class="dir-btn"
+                    :class="{ active: formation === opt.value }"
+                    :aria-pressed="formation === opt.value"
+                    @click="formation = opt.value"
+                  >
+                    {{ opt.label }}
+                  </button>
+                </div>
+                <!-- The gun rides next to the formation because it is one word
+                     after it. Red, Black and Split Wide have one; Tight does
+                     not, so the toggle is gone (and off) there. -->
+                <div
+                  v-if="gunAvailable"
+                  class="dir-toggle pad-toggle"
+                  role="group"
+                  aria-label="Under center or gun"
                 >
-                  {{ opt.label }}
-                </button>
+                  <button
+                    v-for="opt in setOptions"
+                    :key="`pg-${opt.value}`"
+                    type="button"
+                    class="dir-btn"
+                    :class="{ active: gun === opt.value }"
+                    :aria-pressed="gun === opt.value"
+                    @click="gun = opt.value"
+                  >
+                    {{ opt.label }}
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -728,6 +799,20 @@ function onDiagramSelect(pos: OffPosId | null) {
                 </dd>
               </div>
               <div class="term">
+                <dt>Gun</dt>
+                <dd>
+                  One word, right after the formation, and any Red, Black or Split Wide call
+                  can take it: <em>Red Gun Ram 33</em>, <em>Split Wide Gun 95-59</em>. Never
+                  out of Tight. The line does not change — same pass block, same protection
+                  word. The quarterback is already 3 yards back, so quick digits are catch and
+                  throw and the deep ones are a <strong>three-step</strong> drop; Super is a
+                  yard left of him and a yard behind and still protects (or still runs the
+                  <strong>Dash</strong>); the wing on the wide-receiver side is a yard right of
+                  the quarterback and runs his digit from there, and the other wing is out in
+                  the open slot and runs his from the slot.
+                </dd>
+              </div>
+              <div class="term">
                 <dt>Say nothing &middot; straight pass pro</dt>
                 <dd>
                   The <strong>default</strong>, and most calls are this: no protection word at
@@ -874,6 +959,12 @@ function onDiagramSelect(pos: OffPosId | null) {
   justify-items: start;
   gap: 10px;
 }
+.head-controls {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
 .title {
   font-size: 2.4rem;
 }
@@ -957,6 +1048,12 @@ function onDiagramSelect(pos: OffPosId | null) {
 .pad-toggle {
   flex-wrap: wrap;
   width: fit-content;
+}
+.pad-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px;
 }
 .hint {
   display: flex;

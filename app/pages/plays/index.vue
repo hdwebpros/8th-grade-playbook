@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Play } from '~/types/football'
-import { audiblePlays, plays, formations } from '~/data'
+import { audiblePlays, plays, formations, gunIdOf, isGunPlay } from '~/data'
 import { filmPlayIds } from '~/data/film'
 import { DIRECTION_AUDIBLES } from '~/utils/playbook'
 
@@ -31,6 +31,8 @@ interface Concept {
     direction: Play['direction']
     doors: { id: string; formationName: string; hasFilm?: boolean }[]
   }[]
+  /** At least one of this concept's plays has a gun version behind it. */
+  gun?: boolean
   /** Set instead of `directions` when the card is a single door. */
   to?: string
   toLabel?: string
@@ -41,6 +43,9 @@ const DIRECTION_ORDER: Play['direction'][] = ['right', 'left']
 
 /** "INDY flips it left · HOOSIER flips it right" — taught once per two-way card. */
 const audibleHint = `${DIRECTION_AUDIBLES.left.toUpperCase()} flips it left · ${DIRECTION_AUDIBLES.right.toUpperCase()} flips it right`
+
+/** A concept whose plays have gun twins says so once, on the card. */
+const hasGunTwin = (group: Play[]) => group.some((p) => !!plays[gunIdOf(p.id)])
 
 /** The audible examples live on /audible, not on a card of their own. */
 const audibleIds = new Set(audiblePlays.map((p) => p.id))
@@ -59,6 +64,9 @@ const concepts = computed<Concept[]>(() => {
   const byName = new Map<string, Play[]>()
   for (const play of Object.values(plays) as Play[]) {
     if (audibleIds.has(play.id)) continue
+    // Gun plays are the same concepts, reached by the toggle on the play page —
+    // never their own card or their own door.
+    if (isGunPlay(play)) continue
     const list = byName.get(play.name) ?? []
     list.push(play)
     byName.set(play.name, list)
@@ -79,6 +87,7 @@ const concepts = computed<Concept[]>(() => {
         name: first.name,
         family: first.family,
         summary: first.summary,
+        gun: hasGunTwin(group),
         matrix: DIRECTION_ORDER.filter((d) => dirs.has(d)).map((direction) => ({
           direction,
           doors: group
@@ -102,6 +111,7 @@ const concepts = computed<Concept[]>(() => {
       callName: shared ? callNames[0] : undefined,
       family: first.family,
       summary: first.summary,
+      gun: hasGunTwin(group),
       directions: group.map((p) => ({
         id: p.id,
         formationName: formations[p.formation]?.name ?? p.formation,
@@ -143,6 +153,7 @@ const passes = computed(() => [
         <article v-for="c in runs" :key="c.name" class="card play-card">
           <div class="play-head">
             <h3 class="play-name">{{ c.name }}</h3>
+            <span v-if="c.gun" class="gun-chip" title="Also runs from the gun">+ Gun</span>
             <span v-if="c.callName" class="call muted">{{ c.callName }}</span>
           </div>
           <p class="play-desc muted">{{ c.summary }}</p>
@@ -192,6 +203,7 @@ const passes = computed(() => [
         <article v-for="c in passes" :key="c.name" class="card play-card">
           <div class="play-head">
             <h3 class="play-name">{{ c.name }}</h3>
+            <span v-if="c.gun" class="gun-chip" title="Also runs from the gun">+ Gun</span>
             <span v-if="c.callName" class="call muted">{{ c.callName }}</span>
           </div>
           <p class="play-desc muted">{{ c.summary }}</p>
@@ -341,6 +353,21 @@ const passes = computed(() => [
 }
 .play-name {
   font-size: 1.6rem;
+}
+/* Quiet cue, same chip as /formations: this concept has gun versions. */
+.gun-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px dashed var(--line);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--steel);
+  white-space: nowrap;
 }
 .call {
   font-family: var(--font-display);

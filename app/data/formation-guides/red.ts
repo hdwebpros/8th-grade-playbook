@@ -70,4 +70,36 @@ export const redGuide: FormationGuide = {
     'Wings: a yard outside, a yard back. Off the line, every time.',
   ],
   twinId: 'black',
+  gun: {
+    tagline: 'Same set, QB backs up',
+    spotIt: [
+      'Quarterback standing three yards back, not under center.',
+      'Two backs stacked behind him — Super on his left, the wing on his right.',
+      'Nobody packed next to the tight end — that wing is out wide in the left slot.',
+    ],
+    why: 'The quarterback catches the snap already three yards deep, so he has time and a clear look at the defense with a back on each hip.',
+    moves: {
+      Q: {
+        where: 'Three big steps straight back from the ball — 3 yards deep, hands out in front of you, ready. You are not under center.',
+        check: 'Eyes on the ball for the snap. You cannot feel it come up any more, so watch it all the way into your hands.',
+      },
+      S: {
+        where: 'Off the quarterback\'s LEFT hip: a yard to his left and a yard behind him.',
+        check: 'Stay a yard back so you are behind the quarterback, not even with him.',
+      },
+      R: {
+        where: 'Leave your wing spot and step in beside the quarterback: a yard to his RIGHT and a yard behind him — off his right hip.',
+        check: 'Stay a yard back so you are not even with the quarterback. Super is on his left, you are on his right.',
+      },
+      L: {
+        where: 'Out to the left slot: about 8½ yards from the ball — halfway to the numbers — and a yard back off the ball. Nobody on the line outside you.',
+        check: 'Stay a yard OFF the line — you are a back out there. If you creep up onto the line, Y is not eligible any more.',
+      },
+    },
+    remember: [
+      'Gun changes the backfield, never the line.',
+      'Super left, wing right, every time. In Red that wing is R — L goes out to the slot.',
+      'Say it right after the set: Red Gun.',
+    ],
+  },
 }

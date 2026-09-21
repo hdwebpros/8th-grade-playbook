@@ -9,7 +9,7 @@
  * quiz uses, so picking it once anywhere in the app is enough.
  */
 import type { FormationId, OffPosId, Play } from '~/types/football'
-import { audiblePlays, formations, playList } from '~/data'
+import { audiblePlays, formations, gunMoves, gunOf, hasGun, playList } from '~/data'
 import { formationGuideList, formationGuides } from '~/data/formation-guides'
 import { POSITION_GROUPS, POSITION_NAMES } from '~/utils/playbook'
 
@@ -18,22 +18,64 @@ const router = useRouter()
 
 const id = computed(() => String(route.params.id) as FormationId)
 const guide = computed(() => formationGuides[id.value])
-const formation = computed(() => formations[id.value])
+/** The set as drawn in the book — under center. */
+const base = computed(() => formations[id.value])
 
-if (!guide.value || !formation.value) {
+if (!guide.value || !base.value) {
   throw createError({ statusCode: 404, statusMessage: 'No such formation', fatal: true })
 }
 
+/* --- Under center / Gun ---
+   The gun is a VARIATION of Red, Black, and Split Wide (never Tight): the
+   line never moves, the quarterback backs up to 3 yards and the backfield
+   re-forms around him. It lives in the URL as `?set=gun` so a coach can text
+   a kid straight to it, the same way the play page keeps `?front=`. */
+type SetVariant = 'under' | 'gun'
+const gunAvailable = computed(() => !!base.value && hasGun(base.value))
+const wantsGun = (q: unknown) => q === 'gun'
+const set = ref<SetVariant>(wantsGun(route.query.set) && gunAvailable.value ? 'gun' : 'under')
+watch(set, (s) => {
+  if (!route.params.id) return
+  if (wantsGun(route.query.set) === (s === 'gun')) return
+  const query = { ...route.query }
+  if (s === 'gun') query.set = 'gun'
+  else delete query.set
+  router.replace({ query })
+})
+watch(
+  () => [route.query.set, gunAvailable.value] as const,
+  ([q, ok]) => {
+    set.value = wantsGun(q) && ok ? 'gun' : 'under'
+  },
+)
+const isGun = computed(() => set.value === 'gun' && gunAvailable.value)
+const setVariantOptions: { value: SetVariant; label: string }[] = [
+  { value: 'under', label: 'Under center' },
+  { value: 'gun', label: 'Gun' },
+]
+
+/** What the page draws and names: the base set, or its gun. */
+const formation = computed(() => (isGun.value ? gunOf(base.value!) : base.value))
+const gunGuide = computed(() => (isGun.value ? (guide.value.gun ?? null) : null))
+/** The kids who shift into the gun — drawn as ghost + dashed line. */
+const moves = computed(() => (isGun.value ? gunMoves(base.value!) : []))
+const movedSet = computed(() => new Set(moves.value.map((m) => m.pos)))
+
 useHead({ title: computed(() => `${formation.value?.name ?? 'Formation'} — Wolves Playbook`) })
 
-/* --- hop between sets without leaving the page --- */
+/* --- hop between sets without leaving the page. `?set=gun` rides along to
+   a set that has a gun and is dropped for Tight. --- */
 const setOptions = formationGuideList.map((g) => ({
   value: g.id,
   label: formations[g.id]?.name ?? g.id,
 }))
 const setModel = computed({
   get: () => id.value,
-  set: (v: FormationId) => router.replace(`/formations/${v}`),
+  set: (v: FormationId) => {
+    const target = formations[v]
+    const keepGun = isGun.value && target && hasGun(target)
+    router.replace({ path: `/formations/${v}`, query: keepGun ? { set: 'gun' } : {} })
+  },
 })
 
 /* --- my position (shared with the quiz's "last time" chip) --- */
@@ -57,7 +99,13 @@ function pick(p: OffPosId | null) {
   }
 }
 
+/* Where do I stand? In the gun a kid who MOVES gets his gun spot (and a
+   one-line reminder of his normal one); everyone else gets his normal spot
+   and a plain "you do not move". */
 const spot = computed(() => (pos.value ? guide.value.lineup[pos.value] : null))
+const gunSpot = computed(() => (pos.value && gunGuide.value ? (gunGuide.value.moves[pos.value] ?? null) : null))
+const shown = computed(() => gunSpot.value ?? spot.value)
+const SAME_IN_GUN = 'Same spot in the gun — you do not move. Gun only changes the backfield.'
 
 const strengthLabel = computed(() => {
   const s = guide.value.strength.side
@@ -69,6 +117,13 @@ const strengthIcon = computed(() => {
 })
 
 const twin = computed(() => (guide.value.twinId ? formations[guide.value.twinId] : null))
+
+/* Spot it / why / remember swap to the gun's words when it is on. */
+const tagline = computed(() => gunGuide.value?.tagline ?? guide.value.tagline)
+const spotIt = computed(() => gunGuide.value?.spotIt ?? guide.value.spotIt)
+const why = computed(() => gunGuide.value?.why ?? guide.value.why)
+const remember = computed(() => gunGuide.value?.remember ?? guide.value.remember)
+const whereFor = (p: OffPosId) => gunGuide.value?.moves[p]?.where ?? guide.value.lineup[p].where
 
 /* --- plays we run from this set: one door per concept name. The audible
    examples are one system, so (as on /plays) they collapse into one door. --- */
@@ -109,17 +164,25 @@ const groups = POSITION_GROUPS
     </div>
 
     <header class="page-head">
-      <p class="eyebrow">{{ guide.tagline }}</p>
+      <p class="eyebrow">{{ tagline }}</p>
       <h1>{{ formation.name }}</h1>
+      <div v-if="gunAvailable" class="variant-bar">
+        <SegmentedControl v-model="set" :options="setVariantOptions" label="Under center or gun" />
+        <p v-if="isGun" class="say-it">
+          <Icon name="lucide:megaphone" aria-hidden="true" />
+          <span>Say it: <strong>{{ formation.name }}</strong>, then the play. "Gun" goes right after the set.</span>
+        </p>
+      </div>
     </header>
 
     <div class="hero">
     <!-- The picture -->
     <div class="card diagram-card">
-      <FormationDiagram :formation="formation" :highlight="pos" interactive @select="pick" />
+      <FormationDiagram :formation="formation" :highlight="pos" :moves="moves" interactive @select="pick" />
       <p class="tap-hint muted">
         <Icon name="lucide:pointer" aria-hidden="true" />
-        Tap a player to see where he stands
+        <template v-if="isGun">Tap a player · faded marks show where he stood under center</template>
+        <template v-else>Tap a player to see where he stands</template>
       </p>
     </div>
 
@@ -150,16 +213,23 @@ const groups = POSITION_GROUPS
       </div>
 
       <Transition name="pop" mode="out-in">
-        <div v-if="pos && spot" :key="pos" class="answer">
+        <div v-if="pos && shown" :key="`${pos}-${set}`" class="answer">
           <div class="answer-who">
             <span class="answer-letter">{{ pos }}</span>
             <span class="answer-name">{{ POSITION_NAMES[pos] }}</span>
+            <span v-if="gunSpot" class="moves-tag">
+              <Icon name="lucide:move" aria-hidden="true" /> In the gun you move
+            </span>
           </div>
-          <p class="answer-where">{{ spot.where }}</p>
-          <p v-if="spot.check" class="answer-check">
+          <p class="answer-where">{{ shown.where }}</p>
+          <p v-if="shown.check" class="answer-check">
             <Icon name="lucide:check-circle-2" aria-hidden="true" />
-            <span>{{ spot.check }}</span>
+            <span>{{ shown.check }}</span>
           </p>
+          <p v-if="gunSpot && spot" class="answer-under muted">
+            <strong>Under center:</strong> {{ spot.where }}
+          </p>
+          <p v-else-if="isGun" class="answer-under muted">{{ SAME_IN_GUN }}</p>
         </div>
         <p v-else class="answer-empty muted">
           Pick your position above, or tap yourself on the field.
@@ -173,7 +243,7 @@ const groups = POSITION_GROUPS
       <section class="card info-card">
         <h2 class="info-title"><Icon name="lucide:eye" aria-hidden="true" /> Spot it</h2>
         <ul class="spot-list">
-          <li v-for="(s, i) in guide.spotIt" :key="i">{{ s }}</li>
+          <li v-for="(s, i) in spotIt" :key="i">{{ s }}</li>
         </ul>
       </section>
 
@@ -188,18 +258,23 @@ const groups = POSITION_GROUPS
 
     <section class="card info-card">
       <h2 class="info-title"><Icon name="lucide:lightbulb" aria-hidden="true" /> Why we get in it</h2>
-      <p class="info-body">{{ guide.why }}</p>
-      <p v-if="guide.vsRed" class="vs-red muted">
+      <p class="info-body">{{ why }}</p>
+      <p v-if="guide.vsRed && !isGun" class="vs-red muted">
         <strong>vs Red:</strong> {{ guide.vsRed }}
       </p>
-      <NuxtLink v-if="twin" :to="`/formations/${twin.id}`" class="twin-link">
+      <NuxtLink v-if="twin && isGun" :to="{ path: `/formations/${twin.id}`, query: { set: 'gun' } }" class="twin-link">
+        <Icon name="lucide:flip-horizontal-2" aria-hidden="true" />
+        Same backfield, line flipped — open {{ twin.name }} Gun
+        <Icon name="lucide:arrow-right" aria-hidden="true" />
+      </NuxtLink>
+      <NuxtLink v-else-if="twin" :to="`/formations/${twin.id}`" class="twin-link">
         <Icon name="lucide:flip-horizontal-2" aria-hidden="true" />
         {{ twin.name }} is {{ formation.name }} flipped — open {{ twin.name }}
         <Icon name="lucide:arrow-right" aria-hidden="true" />
       </NuxtLink>
     </section>
 
-    <CoachNote title="Remember" :notes="guide.remember" />
+    <CoachNote title="Remember" :notes="remember" />
 
     <!-- Everybody's spot -->
     <details class="card everyone">
@@ -221,8 +296,11 @@ const groups = POSITION_GROUPS
               {{ p }}
             </button>
             <div class="everyone-text">
-              <span class="everyone-name">{{ POSITION_NAMES[p] }}</span>
-              <span class="everyone-where">{{ guide.lineup[p].where }}</span>
+              <span class="everyone-name">
+                {{ POSITION_NAMES[p] }}
+                <span v-if="movedSet.has(p)" class="moved-chip">Moves</span>
+              </span>
+              <span class="everyone-where">{{ whereFor(p) }}</span>
             </div>
           </li>
         </ul>
@@ -281,6 +359,35 @@ const groups = POSITION_GROUPS
 .page-head h1 {
   font-size: 2.6rem;
   margin-top: 2px;
+}
+.variant-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin-top: 10px;
+}
+.say-it {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: var(--chalk-dim);
+}
+.say-it .iconify {
+  flex: none;
+  margin-top: 3px;
+  color: var(--red);
+  font-size: 18px;
+}
+.say-it strong {
+  color: var(--chalk);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 /* --- diagram --- */
@@ -403,6 +510,34 @@ const groups = POSITION_GROUPS
   display: flex;
   align-items: baseline;
   gap: 10px;
+  flex-wrap: wrap;
+}
+.moves-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--red);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  align-self: center;
+}
+.answer-under {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line);
+}
+.answer-under strong {
+  color: var(--red);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 .answer-letter {
   font-family: var(--font-display);
@@ -635,6 +770,17 @@ const groups = POSITION_GROUPS
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--steel);
+}
+.moved-chip {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--red) 50%, transparent);
+  color: var(--red);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  vertical-align: 1px;
 }
 .everyone-where {
   font-size: 0.98rem;
