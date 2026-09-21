@@ -1,9 +1,19 @@
 /**
- * SPLIT WIDE BULL 95-59 — the audible system said out of Split Wide.
+ * SPLIT WIDE 95-59 — the audible system said out of Split Wide.
  *
  * Coach Ryan's call, verbatim: "Split Wide Bull 95-59. Formation is split wide.
  * Blockers block to the left (Bull), same as stretch-boot-red. Routes are for
  * the 4 receivers RtoL, Fade (Go), curl, curl, fade (Go)."
+ *
+ * IT IS CALLED WITH NO PROTECTION WORD NOW. When this went in, the only two
+ * protections in the system were Ram and Bull, so a call had to pick one. Coach
+ * Ryan has since given us the default: "We don't have to call out a protection
+ * where we push left or right. If we don't say anything, you just block
+ * straight up like a normal pass protection, create a pocket." Nothing about
+ * this call needs the line slid — the routes are the same on both sides — so it
+ * is now said plain, "Split Wide 95-59", and the five linemen block the men in
+ * front of them. Say "Split Wide Bull 95-59" and you get the identical four
+ * routes with the line sliding left, exactly as it was drawn before.
  *
  *     X  (wide right, +13)   9 — fade
  *     R  (right slot, +8.5)  5 — curl
@@ -28,14 +38,14 @@
 import type { Play } from '../../types/football'
 import { buildSplitWideAudible } from './audible-split-wide'
 
-export const splitWideBull9559: Play = buildSplitWideAudible(
-  { lean: 'left', digits: [9, 5, 5, 9] },
+export const splitWide9559: Play = buildSplitWideAudible(
+  { protection: 'none', digits: [9, 5, 5, 9] },
   {
     id: 'split-wide-9559',
     name: 'Split Wide 95-59',
     summary: 'Four-receiver pass. Fades outside, curls underneath, both sides.',
     description:
-      'The audible system said out of Split Wide, with a digit for every one of the four receivers instead of two. Right to left: fade, curl, curl, fade. "Bull" is the protection — the line blocks the men in front of it and leans LEFT, the same way it does on Stretch Boot, and Super sets on the right tackle\'s inside hip to take anyone who comes through the thin side. The two fades run the corners off and the two curls sit down at ten in the room they leave. Same picture on both sides of the ball: the quarterback takes five steps, picks the curl the defense left alone, and throws the fade over the top of any corner who cheats up on it.',
+      'The audible system said out of Split Wide, with a digit for every one of the four receivers instead of two. Right to left: fade, curl, curl, fade. Nobody says a protection word, so the line blocks STRAIGHT UP — each of the five pass blocks the man in front of him, kick-steps back and builds a pocket, nobody past the line — and Super stays back to chip the nearest man who comes free. The two fades run the corners off and the two curls sit down at ten in the room they leave. Same picture on both sides of the ball. The fades are deep routes, so this one is a five-step drop, and the quarterback throws to whichever of the four the defense left alone.',
     assignments: {
       X: {
         rule: 'First digit: 9 — fade. You are the widest man on the right.',
@@ -58,50 +68,34 @@ export const splitWideBull9559: Play = buildSplitWideAudible(
           'Same fade X is running, other sideline. Straight up leaning out, and go get it over your outside shoulder. Two fades means neither corner can help inside on the curls — run it hard even on the snaps you know it is not coming.',
       },
       RT: {
-        rule: 'Bull — block the man in front of you, lean LEFT. HOLD, and never downfield.',
+        rule: 'Pass block STRAIGHT UP. Take the man in front of you and HOLD.',
         detail:
-          'You are the blind side on a five-step drop and the fades take time, so your block has to last longest. Helmet to his outside shoulder, drive him left, and hold. Super is at your inside hip if somebody comes underneath.',
+          'You are the blind side on a five-step drop and the fades take time, so your block has to last longest. Short kick-step back, hands inside on the man in front of you, take him around the pocket and hold — never up the field, that is a penalty on a pass.',
       },
       S: {
-        rule: 'Off the inside hip of the RIGHT tackle — the tackle away from the lean. First man through is yours.',
+        rule: 'Stay back and protect. Chip the nearest man who comes free.',
         detail:
-          'Four receivers are out, so you are the only help the line has. The line is leaning left, which leaves the right side thinner — set at the right tackle’s inside hip, chest square, eyes inside-out, and take the first man who comes through there. If nobody comes, STAY HOME. You are the last thing between a blitzer and the quarterback and there is no checkdown on this play.',
+          'Four receivers are out, so you are the only help the line has. You do not have a gap and you do not have a side — sit back there, find the nearest incoming defender and block him. If nobody comes, STAY HOME. You are the last thing between a blitzer and the quarterback.',
       },
       Q: {
-        rule: 'Five-step drop. Curls first, fades if a corner jumps one.',
+        rule: 'Five-step drop — the fades are deep routes.',
         detail:
-          'Straight back off the midline, five steps, ball at your chest. Your first look is the two curls — they are the rhythm throw and they come open at ten. Pick the side where the backer has widened or where the corner has turned and run with the fade. If a corner sits down on a curl instead of running with the fade, throw the fade over the top of him. Feet set on the last step and let it go — Super is blocking, so there is no checkdown: if nothing is there, throw it away or run.',
-      },
-    },
-    frontAssignments: {
-      '44': {
-        S: {
-          rule: 'Set on the right tackle’s inside hip. Two backers inside — one of them may come.',
-          detail:
-            'The 4-4 keeps eight men close to the ball, so somebody usually comes. Get to the tackle’s inside hip fast, chest square, and take the first man through. Do not go looking for work outside — the tackle has that man.',
-        },
-      },
-      '43': {
-        C: {
-          rule: 'Nobody in front of you — step BACK, help a guard, eat any blitz.',
-          detail:
-            'No one is on your nose. Snap it and take one short step back — never forward, that is a penalty on a pass play. The Mike is stacked straight over the ball: if he comes, he is yours. If he drops, push in and help whichever guard is losing his fight.',
-        },
+          'Straight back off the midline, five steps, ball at your chest. Four men are out, so take whichever one the defense left alone. Feet set on the last step and let it go; if nothing is there, throw it away or run. If they are getting in quickly, come back to three steps and get the ball out.',
       },
     },
     reviewNotes: [
       'DRAFT — Coach Ryan must approve this football before it reaches a player.',
-      'YOUR CALL, TRANSCRIBED: "Split Wide Bull 95-59 … blockers block to the left (Bull), same as stretch-boot-red … routes are for the 4 receivers RtoL, Fade (Go), curl, curl, fade (Go)." Read right to left across the formation: X (wide right) 9 fade, R (right slot) 5 curl, L (left slot) 5 curl, Y (wide left) 9 fade. Confirm "right to left" means across the formation from the offense\'s point of view — from the sideline it reverses, and because this particular call is symmetric you would never catch the mistake on this play, only on the next one.',
-      'FOUR DIGITS IS NOW THE SPLIT WIDE RULE. Every other call in the book is two digits (three with the backside wing), the digits belonging to X and the wings with Y as a zero. Split Wide detaches four men, so out of this formation every one of them gets a number and nobody has a standing rule — and the caller pad on /audible now builds any four-digit Split Wide call, not just this one. That is the answer to the open Y question in app/data/plays/audible.ts, arrived at from a different direction: if four digits is right here, the Y being the fourth number in Red and Black is the same idea. Say the word and we will wire that side of it too.',
-      'THE HYPHEN. Written as "95-59" the way you said it, with the hyphen splitting the right pair from the left pair — which also means each side reads outside-in, the same direction the Red/Black calls read. If the kids should say "ninety-five fifty-nine" as one four-digit number with no break, tell us and the label loses the hyphen everywhere.',
-      'PROTECTION IS STRETCH BOOT\'S, NOT THE p15 SLIDE. You said "same as stretch-boot-red", so the builder imports the same `driveBlock` helper from app/data/plays/stretch-boot.ts — every lineman takes the man in front of him, gets to his outside shoulder, drives him LEFT, holds, and never goes downfield. Vs the 4-4 and 4-3 the center is uncovered and steps BACK to help and eat a blitz; vs the 5-2 everybody has a man immediately. That is a DIFFERENT protection from the "Bull" on varsity p15, which slides the whole line into the gap on the call side. We kept your word "Bull" because it names the direction the line leans, but two protections sharing one word will confuse a 13-year-old — worth either a second word or a decision that Bull always means this out of Split Wide.',
-      'SUPER IS THE SIXTH BLOCKER and he is drawn off the inside hip of the RIGHT tackle — the tackle away from the lean — which is the rule the Red/Black dropback audibles already give him (varsity p15, "SUPER — OFF HIP OF TACKLE AWAY"). You did not say what he does on this call. The alternatives: (a) he scans the whole line like he does on Split Wide Victory rather than owning one hip; (b) he releases to the flat, which is the "Dash" tag and would make it a five-man route with no help at all — which is why Dash is not offered out of Split Wide on the caller pad. Drafted as the hip because four receivers are already out and the line is leaning away from the right side.',
-      "NO CHECKDOWN. Four receivers run deep-ish routes (curls at ten, fades) and Super blocks, so there is nothing underneath. The quarterback's assignment says so out loud — throw it away or run. If you want an outlet on this particular call, the cheapest change is a digit, not a tag: make one of the 5s a 3 and somebody is sitting at six.",
-      "ROUTE GEOMETRY comes straight off the tree in app/data/routes.ts with no stretching: the 5 breaks inside so the slots have no ground to make up sideways, and the 9 runs at tree width off a 13-yard split, finishing about 15 yards from the ball — the same fade picture Split Wide Victory already draws for X. Depths are the tree's: curls at ten, fades leaning out from eight.",
-      'THE TWO CURLS SIT AT THE SAME DEPTH ON BOTH SIDES, which is the point — it is one picture the kid reads twice, once per side. It also means the middle of the field is empty on this call: nothing crosses, nothing sits inside the hashes. Against a front that drops a backer straight into the middle that is free grass we are not using. Flag it if you want one of the 5s to become something else (a 3 hitch underneath, or a 7 post) and it stops being symmetric.',
-      'ALIGNMENT, 2026-09-17, your words: "N is directly over C. DT should be directly over the last letter on the guard (either the L or the G in RG). DE should be directly over the edge of the circle on the OT." Every front is drawn that way now, so the five drive blocks aim at the same five spots on all three fronts — ends at 3½ yards out on our tackles\' outside shoulders, tackles on the guards\' outside shoulders — and the only thing the 5-2 changes is that the center has a nose to block instead of a step back. It also means the 5-2 tackle is NOT head-up on our tackle any more: in this front the guards have the tackles and the tackles have the ends, and nobody up front is uncovered.',
-      'DIRECTION is set to "left" in the data because the line leans left; the football itself is balanced. That only affects playside/backside badges in the UI. And because the call is symmetric, this play has no mirror twin — the mirror of it is "Split Wide Ram 95-59", a different call rather than a translation, and the caller pad can now build that one on demand.',
-      'Formation is app/data/split-wide-formation.ts off varsity page 4 — Y wide left at 13, L slot at 8.5 left, R slot at 8.5 right, X wide right at 13, slots a yard off the ball, Super 4½ deep, seven on the line so it is legal. Same confirmation still open as on the rest of the Split Wide package: 8½ and 13 are big splits for 8th graders.',
+      'YOUR CALL, TRANSCRIBED: "Split Wide Bull 95-59 … blockers block to the left (Bull) … routes are for the 4 receivers RtoL, Fade (Go), curl, curl, fade (Go)." Read right to left across the formation: X (wide right) 9 fade, R (right slot) 5 curl, L (left slot) 5 curl, Y (wide left) 9 fade. Confirm "right to left" means across the formation from the offense\'s point of view — from the sideline it reverses, and because this call is symmetric you would never catch the mistake on this play, only on the next one.',
+      'FOUR DIGITS IS NOW THE SPLIT WIDE RULE. Every Red and Black call is two digits (three with the backside wing), the digits belonging to X and the wings with Y as a zero. Split Wide detaches four men, so out of this formation every one of them gets a number and nobody has a standing rule — and the caller pad on /audible now builds any four-digit Split Wide call, not just this one. If four digits is right here, the Y being a fourth number in Red and Black is the same idea. Say the word and we will wire that side of it too.',
+      'THE HYPHEN. Written as "95-59" the way you said it, with the hyphen splitting the right pair from the left pair. If the kids should say "ninety-five fifty-nine" as one four-digit number with no break, tell us and the label loses the hyphen everywhere.',
+      'THE PROTECTION WORD CAME OFF THIS CALL (2026-09-21). You gave us the default — "if we don\'t say anything, you just block straight up like a normal pass protection, create a pocket" — and nothing about 95-59 needs the line slid, so it is now called plain: "Split Wide 95-59", five men on the five men in front of them, no lean. Your original transcription did say "Bull", so if you meant the line to slide LEFT on this specific call, say so and the one word goes back — the routes and everything else are untouched either way, and "Split Wide Bull 95-59" is still callable on the pad.',
+      'THE PROTECTION IS A PASS SET. Your rule: on a pass the linemen pass block whoever is in front of them and never go upfield. So this call no longer borrows the Boot drive block: all five take a short kick-step back off the ball and stay square. Same helper as Red, Black and Tight (`passLine` in app/data/plays/audible-shared.ts), so a pass set means one thing everywhere.',
+      'SUPER IS THE SIXTH BLOCKER and he does what he does on every call: stays back and chips the nearest man who comes free. You did not say anything different for this one. The old build gave him an alignment off the right tackle\'s hip; that is gone.',
+      'THE TWO CURLS SIT AT THE SAME DEPTH ON BOTH SIDES, which is the point — it is one picture the kid reads twice, once per side. It also means the middle of the field is empty on this call. Flag it if you want one of the 5s to become something else (a 3 hitch underneath, or a 7 post) and it stops being symmetric.',
+      'ROUTE GEOMETRY comes straight off the tree in app/data/routes.ts with nothing stretched: curls at ten, fades leaning out from eight, each off the man\'s own alignment.',
+      'ALIGNMENT, 2026-09-17, your words: "N is directly over C. DT should be directly over the last letter on the guard (either the L or the G in RG). DE should be directly over the edge of the circle on the OT." Every front is drawn that way now, so the five pass sets meet the same five spots on all three fronts.',
+      'DIRECTION is set to "right" in the data only because the badge code needs a side; nothing in this call leans anywhere, and the football itself is balanced. That only affects playside/backside badges in the UI. And because the call is symmetric, this play has no mirror twin — the mirror of it is itself — with no slide there is nothing to flip, and the caller pad can build that one on demand.',
+      'Formation is app/data/split-wide-formation.ts — Y wide left at 13, L slot at 8.5 left, R slot at 8.5 right, X wide right at 13, slots a yard off the ball, Super 4½ deep, seven on the line so it is legal. Same confirmation still open as on the rest of the Split Wide package: 8½ and 13 are big splits for 8th graders.',
     ],
   },
 )

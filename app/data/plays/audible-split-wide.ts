@@ -14,9 +14,9 @@
  * FOUR DIGITS, READ RIGHT TO LEFT
  * ---------------------------------------------------------------------------
  *     X  (wide right, +13)   first digit
- *     R  (right slot, +8.5)  second digit
+ *     R  (right wing, +8.5)  second digit
  *     ------------------------------- the hyphen is the middle of the field
- *     L  (left slot, −8.5)   third digit
+ *     L  (left wing, −8.5)   third digit
  *     Y  (wide left, −13)    fourth digit
  *
  * Written "95-59" with the hyphen splitting the right pair from the left pair,
@@ -25,22 +25,20 @@
  *
  * THE PROTECTION
  * ---------------------------------------------------------------------------
- * Per Coach Ryan the Split Wide protection is STRETCH BOOT'S, not the varsity
- * p15 slide: every lineman takes the man in front of him, gets to his outside
- * shoulder, drives him toward the call side, and HOLDS — never back into the
- * quarterback, never downfield. So this file imports `driveBlock` from
- * stretch-boot.ts instead of redrawing it. "Bull" leans the line LEFT, "Ram"
- * leans it RIGHT, and Super sets on the inside hip of the tackle AWAY from the
- * lean, which is the same rule the Red/Black dropback calls give him.
+ * A PASS SET, the same one every other audible uses. Coach Ryan's rule: a
+ * lineman more than a yard past the line on a pass is an ineligible receiver
+ * downfield and a penalty on us, so on these calls nobody drives anybody
+ * upfield and nobody goes after a backer. All five take a short kick-step BACK
+ * off the ball. Say nothing — the default — and that is the whole job: each man
+ * blocks the one in front of him and the five of them make a pocket. Say a word
+ * and they work their hands over together instead: "Ram" sets the line RIGHT,
+ * "Bull" sets it LEFT. Shares `passLine` from audible-shared.ts with Red, Black
+ * and Tight. (The Boot drive block still belongs to the RUN plays in
+ * stretch-boot.ts; it is not used here any more.) Super stays back and chips
+ * the nearest man who comes free, the same rule he has on every other audible.
  *
- * Against the two even fronts the center is the one uncovered lineman and steps
- * BACK to help and eat a blitz; against the 5-2 everybody has a man at once and
- * anybody extra is Super's, alone.
- *
- * The aiming points are the same on every front (app/data/fronts.ts, 2026-09-17):
- * their ends sit on our tackles' outside shoulders at x ±3.55 and their tackles
- * on our guards' outside shoulders at x ±1.8. Only the nose changes anything
- * between fronts, and he only changes the center's job.
+ * The picture is the same against all three fronts: the front changes which
+ * jersey shows up in a man's gap, never anybody's job.
  */
 
 import type {
@@ -53,27 +51,33 @@ import type {
   Play,
   Pt,
 } from '../../types/football'
+import type { Protection, Side } from './audible-shared'
+import {
+  dropWords,
+  passLine,
+  protectionSlugOf,
+  protectionWordOf,
+  qDrop,
+  slideOf,
+  superStay,
+} from './audible-shared'
 import { routes } from '../routes'
 import { splitWide } from '../split-wide-formation'
-import { driveBlock } from './stretch-boot'
 
 // ---------------------------------------------------------------------------
 // The call
 // ---------------------------------------------------------------------------
 
-/** Which way the line leans. "Bull" is left, "Ram" is right. */
-export type Lean = 'left' | 'right'
-
 /**
- * A Split Wide call: which way the line leans, and four digits read RIGHT TO
- * LEFT across the formation — X, R, L, Y.
+ * A Split Wide call: the protection — 'none' by default, which is no word at
+ * all and a straight pass set, plus the two words that slide the line, Ram
+ * (RIGHT) and Bull (LEFT) — and four digits read RIGHT TO LEFT across the
+ * formation: X, R, L, Y.
  */
 export interface SplitWideCall {
-  lean: Lean
+  protection: Protection
   digits: [number, number, number, number]
 }
-
-export const LEAN_LABELS: Record<Lean, string> = { left: 'Bull', right: 'Ram' }
 
 /** "95-59" — the hyphen splits the right pair from the left pair. */
 export const splitWideDigitsOf = (call: SplitWideCall): string => {
@@ -81,23 +85,30 @@ export const splitWideDigitsOf = (call: SplitWideCall): string => {
   return `${x}${r}-${l}${y}`
 }
 
-/** "Split Wide Bull 95-59" — the whole thing as it is said in the huddle. */
+/** "Split Wide 95-59", "Split Wide Bull 95-59" — as it is said in the huddle. */
 export const splitWideCallName = (call: SplitWideCall): string =>
-  `Split Wide ${LEAN_LABELS[call.lean]} ${splitWideDigitsOf(call)}`
+  ['Split Wide', protectionWordOf(call.protection), splitWideDigitsOf(call)]
+    .filter(Boolean)
+    .join(' ')
 
 /** The same call, word by word, with what each word tells the huddle. */
-export const splitWideCallParts = (call: SplitWideCall): CallPart[] => [
-  { word: 'Split Wide', label: 'formation' },
-  { word: LEAN_LABELS[call.lean], label: 'protection — which way the line leans' },
-  { word: splitWideDigitsOf(call), label: 'routes — right to left: X, R, L, Y' },
-]
+export const splitWideCallParts = (call: SplitWideCall): CallPart[] => {
+  const parts: CallPart[] = [{ word: 'Split Wide', label: 'formation' }]
+  // Nothing said, nothing to explain: no word means the straight pass set.
+  const slide = slideOf(call.protection)
+  if (slide) {
+    parts.push({
+      word: protectionWordOf(call.protection),
+      label: `protection — the line slides ${slide.toUpperCase()}`,
+    })
+  }
+  parts.push({ word: splitWideDigitsOf(call), label: 'routes — right to left: X, R, L, Y' })
+  return parts
+}
 
 // ---------------------------------------------------------------------------
 // Small authoring helpers
 // ---------------------------------------------------------------------------
-
-/** A set step into an empty gap you own, capped with the block bar. */
-const setBlock = (path: Pt[]): Action[] => [{ kind: 'block', path }]
 
 const ROUTE_BY_NUM = new Map(routes.map((r) => [r.num, r]))
 
@@ -109,10 +120,7 @@ const routeDetailOf = (num: number): string => ROUTE_BY_NUM.get(num)?.descriptio
  * `side` is +1 when his sideline is to the offense's right, because the tree is
  * drawn once with +x toward the receiver's OUTSIDE.
  *
- * Nothing is widened here, unlike the Red/Black audibles. There the wing starts
- * eight yards inside the split end and has to make that ground up sideways; in
- * Split Wide every receiver is already outside on his own side, so each route
- * runs at its tree width off his own alignment.
+ * Nothing is reshaped: each route runs at its tree width off his own alignment.
  *
  * Zero is not a route, it is a block, so it comes back with the block kind —
  * otherwise a called 0 would draw a two-yard "route" into a defender.
@@ -146,14 +154,14 @@ const RECEIVERS = [
     at: { x: 8.5, y: -1 } as Pt,
     side: 1 as const,
     ord: 'Second',
-    where: 'the right slot',
+    where: 'R, the RIGHT WING',
   },
   {
     pos: 'L' as OffPosId,
     at: { x: -8.5, y: -1 } as Pt,
     side: -1 as const,
     ord: 'Third',
-    where: 'the left slot',
+    where: 'L, the LEFT WING',
   },
   {
     pos: 'Y' as OffPosId,
@@ -163,20 +171,6 @@ const RECEIVERS = [
     where: 'the widest man on the LEFT',
   },
 ]
-
-/** Five-step drop, straight back off the midline. */
-const Q_DROP: Action[] = [
-  {
-    kind: 'run',
-    path: [
-      { x: -0.3, y: -3.7 },
-      { x: -0.5, y: -6.2 },
-    ],
-  },
-]
-
-/** The center's job vs an even front: step BACK, help a guard, eat any blitz. */
-const C_STEP_BACK = setBlock([{ x: -0.5, y: -0.9 }])
 
 // ---------------------------------------------------------------------------
 // THE MACHINE — one call in, one Play out.
@@ -199,13 +193,14 @@ const sharedReviewNotes = [
   'DRAFT — Coach Ryan must approve this football before it reaches a player.',
   "FOUR DIGITS IS THE SPLIT WIDE RULE. Every Red and Black call is two digits (three with the backside wing), the digits belonging to X and the wings with Y as a zero. Split Wide detaches four men, so out of this formation every receiver gets a number and nobody has a standing rule. Read RIGHT TO LEFT across the formation from the offense's point of view: X, R, L, Y.",
   'THE HYPHEN. Written "95-59" with the hyphen splitting the right pair from the left pair, which also makes each side read outside-in, the same direction the Red/Black calls read. If the kids should say it as one four-digit number with no break, the label loses the hyphen everywhere.',
-  'PROTECTION IS STRETCH BOOT\'S, NOT THE p15 SLIDE. Coach Ryan\'s instruction was "same as stretch-boot-red", so this shares the same `driveBlock` helper from app/data/plays/stretch-boot.ts — every lineman takes the man in front of him, gets his outside shoulder, drives him toward the lean, holds, and never goes downfield. That is a DIFFERENT protection from the "Ram / Bull" on varsity p15, which slides the whole line into the gap on the call side. The words are kept because they name the direction the line leans, but two protections sharing one word will confuse a 13-year-old — worth either a second word or a decision that Ram and Bull always mean this out of Split Wide.',
-  'SUPER IS THE SIXTH BLOCKER, set off the inside hip of the tackle AWAY from the lean — the rule the Red/Black dropback calls already give him (varsity p15, "SUPER — OFF HIP OF TACKLE AWAY"). With four receivers out he is the only help the line has, and there is no Dash tag offered out of Split Wide because releasing him would leave five blockers and no help at all. Say the word if you want Dash here anyway.',
-  'NO CHECKDOWN unless a digit buys one. Four receivers and Super blocking means whatever is underneath is whatever the digits put there — call a 2 or a 3 somewhere if the quarterback needs an outlet.',
-  'ROUTE GEOMETRY comes straight off the tree in app/data/routes.ts with no stretching. In Red and Black the wing has to widen his out and his wheel because he starts eight yards inside the split end; in Split Wide everybody is already outside on his own side, so each route runs at tree width off his own alignment. A 0 draws as a block, not a route.',
-  "VS THE 5-2 IS THE DIFFERENT PICTURE — five down men means every lineman has a man immediately and nobody is free, so anyone extra is Super's, alone. Eyeball those diagrams first.",
-  'ALIGNMENT, 2026-09-17, your words: "N is directly over C. DT should be directly over the last letter on the guard (either the L or the G in RG). DE should be directly over the edge of the circle on the OT." All three fronts are drawn that way now, which means the 5-2 tackle is NOT head-up on our tackle any more — he is a 3-technique on the guard\'s outside shoulder. So in the 5-2 the guards have the tackles, the tackles have the ends on their outside shoulders, the center has the nose, and nobody up front is uncovered. The protection did not change (everyone still takes the man in front of him and leans with the call); the words for the guards and tackles did.',
-  'Formation is app/data/split-wide-formation.ts off varsity page 4 — Y wide left at 13, L slot at 8.5 left, R slot at 8.5 right, X wide right at 13, slots a yard off the ball, Super 4½ deep, seven on the line so it is legal. Same confirmation still open as on the rest of the Split Wide package: 8½ and 13 are big splits for 8th graders.',
+  'STRAIGHT IS THE DEFAULT HERE TOO — your words: "We don\'t have to call out a protection where we push left or right. If we don\'t say anything, you just block straight up like a normal pass protection, create a pocket." A Split Wide call with no protection word is "Split Wide 95-59", and the five sets are drawn with no lean at all.',
+  'THE PROTECTION IS A PASS SET, NOT THE BOOT DRIVE. Your rule: "when you pass block, you just pass block who\'s in front of you... they just block straight or the left or the right." So these calls no longer borrow the Boot drive block — all five linemen take a short step back, work their hands to the call side when Ram or Bull is called, and nobody goes past the line. Split Wide, Red, Black and Tight now share one helper (`passLine` in app/data/plays/audible-shared.ts), so Ram and Bull mean exactly the same thing in all four formations. The Boot drive block is untouched where it belongs, on the RUN plays in stretch-boot.ts.',
+  'SUPER IS THE SIXTH BLOCKER and he does what he does on every other call: stays back, finds the nearest incoming defender and chips him. He has no alignment rule and he never has an end. There is no Dash tag on the Split Wide pad yet — say the word if you want it here.',
+  'NO PER-FRONT RULES — the line and Super do the same thing against the 4-4, the 4-3 and the 5-2. The front changes which jersey shows up in a gap, not the job, so the front picker no longer rewrites anybody\'s assignment.',
+  'THE QUARTERBACK PICKS THE DROP — quick, fast-developing plays are three steps, a deep post or go is five, and if the defense is getting in quickly he stays at three and gets the ball out. Nothing here tells him who to throw to.',
+  'ROUTE GEOMETRY comes straight off the tree in app/data/routes.ts with nothing stretched — each route runs at tree width off the man\'s own alignment. A 0 draws as a block, not a route.',
+  'ALIGNMENT, 2026-09-17, your words: "N is directly over C. DT should be directly over the last letter on the guard (either the L or the G in RG). DE should be directly over the edge of the circle on the OT." All three fronts are drawn that way now.',
+  'Formation is app/data/split-wide-formation.ts — Y wide left at 13, L wing at 8.5 left, R wing at 8.5 right, X wide right at 13, wings a yard off the ball, Super 4½ deep, seven on the line so it is legal. Same confirmation still open as on the rest of the Split Wide package: 8½ and 13 are big splits for 8th graders.',
 ]
 
 /**
@@ -217,48 +212,35 @@ export function buildSplitWideAudible(
   call: SplitWideCall,
   authoring: SplitWideAuthoring = {},
 ): Play {
-  const leanSign: 1 | -1 = call.lean === 'left' ? -1 : 1
-  const LEAN = call.lean.toUpperCase() // LEFT / RIGHT
-  const word = LEAN_LABELS[call.lean] // Bull / Ram
-  /** The tackle away from the lean — Super's hip, and the thin side. */
-  const awayTackle = call.lean === 'left' ? 'RIGHT' : 'LEFT'
-  const hipSign: 1 | -1 = call.lean === 'left' ? 1 : -1
+  // Null when nothing was called: no lean, every man on the man in front of him.
+  const lean: Side | null = slideOf(call.protection)
+  const LEAN = lean ? lean.toUpperCase() : 'STRAIGHT UP'
+  const word = protectionWordOf(call.protection) // Ram / Bull, or nothing
 
-  /** Super: the inside hip of the tackle away from the lean. */
-  const S_HIP: Action[] = setBlock([
-    { x: 1.1 * hipSign, y: -3.5 },
-    { x: 2.3 * hipSign, y: -2.1 },
-  ])
-
-  const skill: Partial<Record<OffPosId, Action[]>> = { Q: Q_DROP, S: S_HIP }
+  const DROP = dropWords(call.digits)
+  const skill: Partial<Record<OffPosId, Action[]>> = { Q: qDrop(call.digits), S: superStay() }
   for (const [i, r] of RECEIVERS.entries()) {
     skill[r.pos] = routeOn(call.digits[i]!, r.at, r.side)
   }
 
-  const drive = (defX: number, targetId: string) => driveBlock(defX, targetId, leanSign)
-
   /**
-   * The four outside drives are the SAME on all three fronts — every front
-   * aligns its ends at x ±3.55 (our tackles' outside shoulders) and its tackles
-   * at x ±1.8 (our guards' outside shoulders). Only the center's job changes.
+   * All five pass set, the same on every front: kick-step back off the ball and
+   * either take the man in front of you (nothing called) or work your hands
+   * over together (Ram or Bull). Nobody past the line either way. The front
+   * changes WHO is in a man's gap, not the set.
    */
-  const outsideDrives = {
-    LT: drive(-3.55, 'E-L'),
-    LG: drive(-1.8, 'T-L'),
-    RG: drive(1.8, 'T-R'),
-    RT: drive(3.55, 'E-R'),
-  }
+  const line = passLine(lean)
 
-  /** Even fronts: nobody on the center, so he steps back and helps. */
-  const evenLine = { ...outsideDrives, C: C_STEP_BACK }
-
-  /** 5-2: a nose head-up on the center, so all five linemen have a man. */
-  const oddLine = { ...outsideDrives, C: drive(0, 'N') }
-
-  const lineJob = (extra: string): Assignment => ({
-    rule: `${word} — block the man in front of you, lean ${LEAN}. HOLD, and never downfield.`,
-    detail: `Same protection you run on Boot: take the man in front of you, get your helmet to his outside shoulder, and drive him ${call.lean} with the rest of the line. Hold your ground — do not get pushed back into the quarterback, and never chase downfield, that is a penalty on a pass play. ${extra}`,
-  })
+  const lineJob = (extra: string): Assignment =>
+    lean === null
+      ? {
+          rule: 'Pass block STRAIGHT UP. Take the man in front of you and HOLD.',
+          detail: `No protection word was called, so nobody slides: short kick-step BACK off the ball, hands inside on the man lined up in front of you, and let him come to you. Stay square — the five of us setting back together is what makes the pocket. Never up the field: a lineman more than a yard past the line on a pass is an ineligible receiver downfield, a penalty on us, so you never chase a backer. Hold your ground and do not get pushed back into the quarterback. ${extra}`,
+        }
+      : {
+          rule: `${word} — pass block, set ${LEAN}. Take the man in front of you and HOLD.`,
+          detail: `This is a pass, so you PASS BLOCK: short step BACK off the ball, hands inside on the man in front of you, and let him come to you. We only hear ${word} when Coach wants the line moved: it sets the whole line ${lean} together, and that is the only place you go — never up the field. A lineman more than a yard past the line on a pass is an ineligible receiver downfield, a penalty on us, so you never chase a backer. Hold your ground and do not get pushed back into the quarterback. ${extra}`,
+        }
 
   /** One receiver's job, straight off the route tree. */
   const receiverJob = (i: number): Assignment => {
@@ -281,98 +263,59 @@ export function buildSplitWideAudible(
     R: receiverJob(1),
     L: receiverJob(2),
     Y: receiverJob(3),
-    LT: lineJob('You are on the end of the line — turn a rusher around the pocket, never into it.'),
+    LT: lineJob('You are on the end of the line — kick back and turn a rusher around the pocket, never into it.'),
     LG: lineJob(
-      'The whole line moving one way together is what makes this hold: your man cannot cross your face if you get to his outside shoulder first.',
+      'The whole line setting one way together is what makes this hold: your man cannot cross your face if your hands and your feet go that way first.',
     ),
     C: {
-      rule: 'Snap, then block the man in front of you — or step BACK and help if nobody is there.',
-      detail:
-        'Snap it and go to work the same instant. A man on your nose is yours — hold him, give no ground. If nobody is in front of you, take one short step BACK (never forward — penalty), look for a blitzer, and help the guard next to you who needs it.',
+      rule: 'Snap, then pass set on the man in front of you — or set BACK and help if nobody is there.',
+      detail: `Snap it and go to work the same instant. A man on your nose is yours — hands on him, hold him, give no ground. If nobody is in front of you, take one short step BACK ${lean ? 'with the call' : 'and stay square'} (never up the field — penalty), look for a blitzer, and help the guard next to you who needs it.`,
     },
-    RG: lineJob(
-      `Do not turn and chase a man who goes away from you — Super is set behind the ${awayTackle.toLowerCase()} tackle for exactly that.`,
-    ),
+    RG: lineJob('Do not turn and chase a man who goes away from you. Take the one in front of you.'),
     RT: lineJob(
-      'The four routes take time to get down the field, so this block has to last. Helmet to his outside shoulder, drive, and hold.',
+      'The four routes take time to get down the field, so this block has to last. Hands inside, feet moving, and hold.',
     ),
     S: {
-      rule: `Off the inside hip of the ${awayTackle} tackle — the tackle away from the lean. First man through is yours.`,
-      detail: `Four receivers are out, so you are the only help the line has. The line is leaning ${call.lean}, which leaves the ${awayTackle.toLowerCase()} side thinner — set at that tackle's inside hip, chest square, eyes inside-out, and take the first man who comes through. If nobody comes, STAY HOME. You are the last thing between a blitzer and the quarterback.`,
+      rule: 'Stay back and protect. Chip the nearest man who comes free.',
+      detail: 'Four receivers are out, so you are the only help the line has. You do not have a gap and you do not have a side — sit back there, find the nearest incoming defender and block him. You never have an end; the tackles have those. If nobody comes, STAY HOME. You are the last thing between a blitzer and the quarterback.',
     },
     Q: {
-      rule: 'Five-step drop. Work the digits, side to side.',
-      detail:
-        'Straight back off the midline, five steps, ball at your chest. Four digits means four live receivers, so the call itself tells you the picture — pick your side before the snap off how they line up, then take the man the defense left alone. Feet set on the last step and let it go. Super is blocking, so if nothing is there, throw it away or run.',
+      rule: `${DROP}.`,
+      detail: `Straight back off the midline, ball at your chest. The drop is yours to pick: a quick, fast-developing play is a three-step drop, a deep post or go route is five. These digits are a ${DROP.toLowerCase()}. If the defense is getting in quickly, stick to three-step drops and get the ball out quickly. Four digits means four live receivers — take the one they left alone, and if nothing is there, throw it away or run.`,
     },
   }
 
-  const front = (
-    id: FrontId,
-    line: typeof evenLine,
-    extra: Partial<Record<OffPosId, Assignment>>,
-  ): FrontPlan => ({
+  /**
+   * The same picture against all three fronts: the line pass blocks whoever is
+   * in front of it, Super stays back. The front changes which jersey shows up
+   * in a gap, never anybody's job.
+   */
+  const front = (id: FrontId): FrontPlan => ({
     actions: { ...skill, ...line },
-    assignments: { ...extra, ...authoring.frontAssignments?.[id] },
+    assignments: { ...authoring.frontAssignments?.[id] },
   })
-
-  const evenCenter: Assignment = {
-    rule: 'Nobody in front of you — step BACK, help a guard, eat any blitz.',
-    detail:
-      'No one is on your nose in this front. Snap it and take one short step back — never forward, that is a penalty on a pass play. Eyes up: if a backer comes, he is yours. If nobody comes, push in and help whichever guard is losing his fight.',
-  }
-
-  const oddOverrides: Partial<Record<OffPosId, Assignment>> = {
-    C: {
-      rule: `A man is right on your nose — he is yours. Drive him ${call.lean} with everybody else.`,
-      detail:
-        'Snap the ball and get into him the same instant. Get to his outside shoulder and push him with the rest of the line. He is trying to walk you backward into the quarterback — do not let him. Hold your spot.',
-    },
-    LG: {
-      rule: `Their tackle is on your OUTSIDE SHOULDER — he is yours. Lean ${LEAN} and HOLD.`,
-      detail:
-        'In this front their tackle lines up right on your outside shoulder, half a man outside you, and your tackle has the end outside HIM — so this one is YOURS, by yourself. Get into him fast, helmet to his outside shoulder, steer him with everybody else, and give no ground. Never chase downfield; that is a penalty on a pass play.',
-    },
-    RG: {
-      rule: `Their tackle is on your OUTSIDE SHOULDER — he is yours. Lean ${LEAN} and HOLD.`,
-      detail:
-        'Same job as the other guard, other side. Their tackle is half a man outside you and your tackle has the end, so nobody is coming to help — get into him, push him with the line, and hold.',
-    },
-    LT: {
-      rule: `The end on your outside shoulder is yours — drive him ${call.lean}.`,
-      detail:
-        'Nobody is head-up on you in this front: their tackle is inside on the guard and their end is sitting on your outside shoulder. Short step out, helmet to his outside shoulder, and drive him with everybody else. Hold — no ground given, no going downfield.',
-    },
-    RT: {
-      rule: `The end on your outside shoulder is yours — drive him ${call.lean}.`,
-      detail:
-        'Same as the other tackle: the end is half a man outside you and the guard has the tackle inside. Short step out and drive him. The routes take time to get down the field, so this is the block that has to hold longest.',
-    },
-    S: {
-      rule: 'Five rushers, five linemen — the extra man is yours every snap on this front.',
-      detail: `Everybody up front already has a man, so anyone else who comes is yours and yours alone. Set on the ${awayTackle.toLowerCase()} tackle's inside hip, eyes inside-out, and go get him. Most often it is a backer running through the middle. Do not leave early — nobody is behind you.`,
-    },
-  }
 
   const digits = splitWideDigitsOf(call)
 
   return {
-    id: authoring.id ?? `split-wide-audible-${call.lean}-${call.digits.join('')}`,
+    id: authoring.id ?? `audible-split-wide${protectionSlugOf(call.protection)}-${call.digits.join('')}`,
     name: authoring.name ?? `Split Wide ${digits}`,
     callName: splitWideCallName(call),
     call: splitWideCallParts(call),
     family: 'pass',
     formation: splitWide.id,
-    direction: call.lean,
+    // Straight protection has no direction in it; the playside badges want one,
+    // and this formation is balanced, so it takes the book's default side.
+    direction: lean ?? 'right',
     ballCarrier: 'Q',
     summary:
       authoring.summary ?? 'Called-at-the-line pass. Four receivers, a digit and a route each.',
     description: authoring.description ?? describeSplitWide(call),
     assignments: { ...assignments, ...authoring.assignments },
     vs: {
-      '44': front('44', evenLine, { C: evenCenter }),
-      '43': front('43', evenLine, { C: evenCenter }),
-      '52': front('52', oddLine, oddOverrides),
+      '44': front('44'),
+      '43': front('43'),
+      '52': front('52'),
     } satisfies Record<FrontId, FrontPlan>,
     reviewNotes: authoring.reviewNotes ?? sharedReviewNotes,
   }
@@ -380,8 +323,11 @@ export function buildSplitWideAudible(
 
 /** The generic, no-prose decode of a call — used when nothing is authored. */
 function describeSplitWide(call: SplitWideCall): string {
-  const word = LEAN_LABELS[call.lean]
-  const awayTackle = call.lean === 'left' ? 'right' : 'left'
+  const lean = slideOf(call.protection)
+  const protectionSentence =
+    lean === null
+      ? 'Nobody called a protection, so the line blocks straight up: all five pass block the man in front of them, kick-stepping back into a pocket and never past the line'
+      : `"${protectionWordOf(call.protection)}" is the protection: all five linemen pass block, setting ${lean.toUpperCase()} together and never past the line`
   const parts = RECEIVERS.map((r, i) => {
     const d = call.digits[i]!
     return d === 0
@@ -390,9 +336,9 @@ function describeSplitWide(call: SplitWideCall): string {
   })
   return (
     `${splitWideCallName(call)}. Four receivers, four digits — out of Split Wide every man gets a number. ` +
-    `"${word}" is the protection: the line blocks the men in front of it and leans ${call.lean.toUpperCase()}, the same way it does on Boot, ` +
-    `and Super sets on the ${awayTackle} tackle's inside hip to take anyone who comes through the thin side. ` +
+    `${protectionSentence}, ` +
+    `and Super stays back to chip the nearest man who comes free. ` +
     `Then the digits, said right to left across the formation: ${parts.join('; ')}. ` +
-    `The quarterback takes five steps and throws to whichever one of the four the defense left alone.`
+    `The quarterback drops — ${dropWords(call.digits).toLowerCase()}, off the digits — and throws to whichever one of the four the defense left alone.`
   )
 }

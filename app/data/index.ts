@@ -32,18 +32,24 @@ export {
   buildAudible,
   callNameOf,
   digitsOf,
-  PROTECTION_LABELS,
 } from './plays/audible'
-export type { AudibleCall, AudibleExample, Protection } from './plays/audible'
+export type { AudibleCall, AudibleExample } from './plays/audible'
+export { PROTECTION_LABELS, slideOf } from './plays/audible-shared'
+export type { DashSide, Protection, Side } from './plays/audible-shared'
 export {
-  LEAN_LABELS,
   buildSplitWideAudible,
   splitWideCallName,
   splitWideDigitsOf,
 } from './plays/audible-split-wide'
-export type { Lean, SplitWideCall } from './plays/audible-split-wide'
+export type { SplitWideCall } from './plays/audible-split-wide'
+export {
+  buildTightAudible,
+  tightCallName,
+  tightDigitsOf,
+} from './plays/audible-tight'
+export type { TightCall } from './plays/audible-tight'
 export { splitWidePlays } from './plays/split-wide'
-export { splitWideBull9559 } from './plays/split-wide-9559'
+export { splitWide9559 } from './plays/split-wide-9559'
 export { stretchPlays } from './plays/stretch'
 export { stretchLeftTight, stretchRightTight, stretchTightPlays } from './plays/stretch-tight'
 export { stretchBootBlack, stretchBootPlays, stretchBootRed } from './plays/stretch-boot'
@@ -77,7 +83,7 @@ export const playList: Play[] = [
   ...splitWidePlays,
 ]
 
-/** Keyed by Play.id — 'veer-right-red', 'audible-33-red', … */
+/** Keyed by Play.id — 'veer-right-red', 'audible-red-33', … */
 export const plays: Record<string, Play> = Object.fromEntries(
   playList.map((p) => [p.id, p]),
 )

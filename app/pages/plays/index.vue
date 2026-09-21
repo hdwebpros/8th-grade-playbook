@@ -47,9 +47,10 @@ const audibleIds = new Set(audiblePlays.map((p) => p.id))
 
 const audibleCard: Concept = {
   name: 'Audible',
-  callName: 'Formation · protection · digits',
+  callName: 'Formation · digits',
   family: 'pass',
-  summary: 'The numbered passing system. Formation, protection, digits — call any pass at the line.',
+  summary:
+    'The numbered passing system. Formation and digits — plus Ram or Bull when you want the line slid — called at the line.',
   to: '/audible',
   toLabel: 'Open',
 }
