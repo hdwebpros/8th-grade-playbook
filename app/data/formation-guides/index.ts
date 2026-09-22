@@ -9,7 +9,7 @@ import { blackGuide } from './black'
 import { tightGuide } from './tight'
 import { splitWideGuide } from './split-wide'
 
-export type { FormationGuide, LineupSpot, Strength } from './types'
+export type { FormationGuide, GunGuide, LineupSpot, Strength } from './types'
 
 /** Book order: the base set, its mirror, then the two balanced sets. */
 export const formationGuideList: FormationGuide[] = [redGuide, blackGuide, tightGuide, splitWideGuide]

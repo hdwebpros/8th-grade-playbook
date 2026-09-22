@@ -17,6 +17,14 @@ export interface Pt {
 
 export type FormationId = 'red' | 'black' | 'split-wide' | 'tight'
 
+/**
+ * A formation VARIATION: the same set with a few kids moved, called by adding
+ * one word after the formation ("Red Gun Veer Right"). It is not its own
+ * FormationId — a Formation carrying `variant` is derived from its base set
+ * (app/data/shotgun.ts) and keeps the base id.
+ */
+export type FormationVariantId = 'gun'
+
 /** 4-4 and 4-3 are even fronts; 5-2 is odd. */
 export type FrontId = '44' | '43' | '52'
 
@@ -46,6 +54,8 @@ export interface FormationPlayer {
 
 export interface Formation {
   id: FormationId
+  /** Set on a derived variation of the base set; absent on the base set itself. */
+  variant?: FormationVariantId
   name: string
   /** Kid-facing one-liner: what this formation is and when we're in it. */
   description: string
@@ -163,6 +173,12 @@ export interface Play {
   call?: CallPart[]
   family: PlayFamily
   formation: FormationId
+  /**
+   * Set when this play is drawn from a variation of the base set (the gun).
+   * The formation id stays the base set; resolve the actual alignment with
+   * `formationFor(play)` in app/data/shotgun.ts. Absent on under-center plays.
+   */
+  variant?: FormationVariantId
   direction: 'left' | 'right'
   /** Primary ball carrier (emphasized by the renderer). Option plays: the dive back. */
   ballCarrier: OffPosId

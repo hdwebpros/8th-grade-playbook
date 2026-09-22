@@ -39,6 +39,15 @@
  *
  * The picture is the same against all three fronts: the front changes which
  * jersey shows up in a man's gap, never anybody's job.
+ *
+ * THE GUN
+ * ---------------------------------------------------------------------------
+ * "Split Wide Gun 95-59" — one word after the formation. Split Wide has no
+ * wings to move, so only the quarterback (3 yards back, a shorter drop) and
+ * Super (a yard left of him and a yard behind) re-origin; the four receivers,
+ * their digits and the line are untouched. `gunSplitWideAudible` below puts
+ * the gun on a built play, and `formationFor` (app/data/shotgun.ts) resolves
+ * the alignment it is drawn on.
  */
 
 import type {
@@ -54,13 +63,21 @@ import type {
 import type { Protection, Side } from './audible-shared'
 import {
   dropWords,
+  gunCallPart,
+  gunQuarterbackJob,
+  gunReviewNotes,
+  gunSuperJob,
+  isQuickCall,
   passLine,
   protectionSlugOf,
   protectionWordOf,
   qDrop,
+  qDropGun,
   slideOf,
   superStay,
+  superStayGun,
 } from './audible-shared'
+import { gunIdOf } from './gun-shared'
 import { routes } from '../routes'
 import { splitWide } from '../split-wide-formation'
 
@@ -77,6 +94,8 @@ import { splitWide } from '../split-wide-formation'
 export interface SplitWideCall {
   protection: Protection
   digits: [number, number, number, number]
+  /** Said from the GUN: "Split Wide Gun 95-59". Only Q and Super move. */
+  gun?: boolean
 }
 
 /** "95-59" — the hyphen splits the right pair from the left pair. */
@@ -85,15 +104,24 @@ export const splitWideDigitsOf = (call: SplitWideCall): string => {
   return `${x}${r}-${l}${y}`
 }
 
-/** "Split Wide 95-59", "Split Wide Bull 95-59" — as it is said in the huddle. */
+/**
+ * "Split Wide 95-59", "Split Wide Bull 95-59", "Split Wide Gun 95-59" — as it
+ * is said in the huddle. "Gun" comes right after the formation.
+ */
 export const splitWideCallName = (call: SplitWideCall): string =>
-  ['Split Wide', protectionWordOf(call.protection), splitWideDigitsOf(call)]
+  [
+    'Split Wide',
+    call.gun ? gunCallPart().word : '',
+    protectionWordOf(call.protection),
+    splitWideDigitsOf(call),
+  ]
     .filter(Boolean)
     .join(' ')
 
 /** The same call, word by word, with what each word tells the huddle. */
 export const splitWideCallParts = (call: SplitWideCall): CallPart[] => {
   const parts: CallPart[] = [{ word: 'Split Wide', label: 'formation' }]
+  if (call.gun) parts.push(gunCallPart())
   // Nothing said, nothing to explain: no word means the straight pass set.
   const slide = slideOf(call.protection)
   if (slide) {
@@ -212,6 +240,70 @@ export function buildSplitWideAudible(
   call: SplitWideCall,
   authoring: SplitWideAuthoring = {},
 ): Play {
+  // Build it under center, then put the gun on it — the gun only moves Q and
+  // Super, so everything else is the under-center play verbatim.
+  const under = buildUnderCenter({ ...call, gun: false }, authoring)
+  return call.gun ? gunSplitWideAudible(under, call) : under
+}
+
+/**
+ * THE GUN, put on a built Split Wide audible: id "-gun", `variant: 'gun'`,
+ * "Gun" in the call, the quarterback's shorter drop from (0, −3) and Super's
+ * chip from (−1, −4). The four receivers and the line are untouched.
+ */
+export function gunSplitWideAudible(play: Play, call: SplitWideCall): Play {
+  const gunCall: SplitWideCall = { ...call, gun: true }
+  const digits = call.digits
+  // The WORDS come off the built play, so an authored call keeps its own
+  // protection word and only gains "Gun" after the formation.
+  const callName = play.callName
+    ? play.callName.replace(/^Split Wide\b/, `Split Wide ${gunCallPart().word}`)
+    : splitWideCallName(gunCall)
+  const callParts = play.call?.length
+    ? [play.call[0]!, gunCallPart(), ...play.call.slice(1)]
+    : splitWideCallParts(gunCall)
+  const actions: Partial<Record<OffPosId, Action[]>> = {
+    Q: qDropGun(digits),
+    S: superStayGun(),
+  }
+  const vs = Object.fromEntries(
+    (Object.keys(play.vs) as FrontId[]).map((front) => {
+      const plan = play.vs[front]
+      return [front, { ...plan, actions: { ...plan.actions, ...actions } }]
+    }),
+  ) as Record<FrontId, FrontPlan>
+
+  const drop = isQuickCall(digits) ? 'catch and throw, one step' : 'a three-step drop, not five'
+  const sentence =
+    `From the gun the line and all four receivers do exactly what they did. Only two kids move: ` +
+    `the quarterback is already 3 yards back, so it is ${drop}, and Super is a yard left of him and a yard behind, ` +
+    `where he stays and protects, checking the left edge first.`
+
+  return {
+    ...play,
+    id: gunIdOf(play.id),
+    variant: 'gun',
+    callName,
+    call: callParts,
+    description: `${play.description} ${sentence}`,
+    assignments: {
+      ...play.assignments,
+      Q: gunQuarterbackJob(
+        digits,
+        'Four digits means four live receivers — take the one they left alone, and if nothing is there, throw it away or run.',
+      ),
+      S: gunSuperJob(),
+    },
+    vs,
+    reviewNotes: [
+      ...gunReviewNotes,
+      'DRAFT — SPLIT WIDE GUN moves only the quarterback and Super. There are no wings to move and no Dash tag on the Split Wide pad, so the four receivers and the line are the under-center play verbatim.',
+      ...(play.reviewNotes ?? []),
+    ],
+  }
+}
+
+function buildUnderCenter(call: SplitWideCall, authoring: SplitWideAuthoring): Play {
   // Null when nothing was called: no lean, every man on the man in front of him.
   const lean: Side | null = slideOf(call.protection)
   const LEAN = lean ? lean.toUpperCase() : 'STRAIGHT UP'

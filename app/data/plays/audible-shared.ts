@@ -38,8 +38,9 @@
  * the line has those. The Dash tag is the one thing that takes him out of it.
  */
 
-import type { Action, CallPart, OffPosId, Pt } from '../../types/football'
+import type { Action, Assignment, CallPart, OffPosId, Pt } from '../../types/football'
 import { routes } from '../routes'
+import { GUN_CALL_PART } from './gun-shared'
 
 // ---------------------------------------------------------------------------
 // Sides
@@ -328,3 +329,144 @@ export const qDrop = (digits: number[]): Action[] =>
 /** "Three-step drop" / "Five-step drop", to match what is drawn. */
 export const dropWords = (digits: number[]): string =>
   isQuickCall(digits) ? 'Three-step drop' : 'Five-step drop'
+
+// ---------------------------------------------------------------------------
+// THE GUN — the same audible, with the backfield re-formed around the QB.
+// ---------------------------------------------------------------------------
+
+/**
+ * Any Red, Black or Split Wide audible can be said from the gun — "Red Gun Ram
+ * 33", "Split Wide Gun 95-59" — and Tight cannot. The word goes right after
+ * the formation. The LINE NEVER CHANGES: same pass set, same Ram/Bull/straight,
+ * same rule about never going past the line. What changes is where three or
+ * four kids start (app/data/shotgun.ts): the quarterback is 3 yards back,
+ * Super is a yard LEFT of him and a yard behind in every gun set, the wing
+ * beside him is a yard RIGHT of him and a yard behind, and the other wing is
+ * out in the open slot. Everything below is drawn from THOSE spots.
+ *
+ * DRAFT — Coach Ryan has ruled the alignments and the call word; the football
+ * for the audible from the gun (the drop, Super's edge, the Dash paths) is
+ * authored here and flagged in every gun play's reviewNotes.
+ */
+
+/** "Gun", the word after the formation — same CallPart the gun runs use. */
+export const gunCallPart = (): CallPart => GUN_CALL_PART
+
+/**
+ * THE DROP FROM THE GUN IS SHORTER — he already has 3 yards. Quick digits
+ * (hitch, slant, speed out, curl) are CATCH AND THROW: one step to set the
+ * feet and the ball is out. The deep ones are a THREE-step drop from the gun,
+ * where under center they were five. Both start at the gun spot (0, −3).
+ */
+export const Q_DROP_GUN_QUICK: Action[] = [
+  {
+    kind: 'run',
+    path: [
+      { x: -0.1, y: -3.6 },
+      { x: -0.2, y: -4.1 },
+    ],
+  },
+]
+
+export const Q_DROP_GUN_3: Action[] = [
+  {
+    kind: 'run',
+    path: [
+      { x: -0.2, y: -4 },
+      { x: -0.4, y: -5.6 },
+    ],
+  },
+]
+
+/** The drop the digits ask for, from the gun. */
+export const qDropGun = (digits: number[]): Action[] =>
+  isQuickCall(digits) ? Q_DROP_GUN_QUICK : Q_DROP_GUN_3
+
+/** The gun drop as a rule line, to match what is drawn. */
+export const dropWordsGun = (digits: number[]): string =>
+  isQuickCall(digits) ? 'Catch and throw — one step from the gun' : 'Three-step drop from the gun'
+
+/** The quarterback's job from the gun. `extra` is a formation's own last line. */
+export const gunQuarterbackJob = (digits: number[], extra = ''): Assignment =>
+  isQuickCall(digits)
+    ? {
+        rule: `${dropWordsGun(digits)}.`,
+        detail: `You are already 3 yards back, so there is no drop to take: catch the snap, one step to set your feet, and throw. These digits are quick routes — the ball is out on the receiver's break. If the rush is coming it is still one step; you do not have anywhere farther to go. ${extra}`.trim(),
+      }
+    : {
+        rule: `${dropWordsGun(digits)}.`,
+        detail: `You are already 3 yards back, so the five steps you would take under center are THREE from here: catch it, three steps straight back off the midline, feet set on the last one, then throw. These digits need the time. If the defense is getting in quickly, cut it to one step and get the ball out. ${extra}`.trim(),
+      }
+
+/**
+ * SUPER STAYS, FROM THE GUN. He is a yard left of the quarterback and a yard
+ * behind him in every gun set, so the LEFT edge is the one he can see — he
+ * checks it first, then chips the nearest man who comes free. Drawn as a short
+ * step up and out to his left from (−1, −4), capped with the block bar.
+ */
+export const superStayGun = (): Action[] =>
+  setBlock([
+    { x: -1.4, y: -3.2 },
+    { x: -1.9, y: -2.2 },
+  ])
+
+/**
+ * DASH FROM THE GUN. Same flat, same landmark as under center (about 10 yards
+ * out, 2 past the line), but he starts a yard LEFT of the quarterback: Dash
+ * Left releases straight out to the left flat; Dash Right means crossing
+ * BEHIND the quarterback first, then bending out to the right flat.
+ */
+export const dashSuperGun = (side: DashSide): Action[] => [
+  {
+    kind: 'route',
+    path:
+      side === 'left'
+        ? [
+            { x: -3.4, y: -4.2 },
+            { x: -6, y: -3.1 },
+            { x: -8.6, y: -1 },
+            { x: -10.2, y: 2 },
+          ]
+        : [
+            // A yard deeper first, so he passes behind the wing at (1, −4) too.
+            { x: 0.4, y: -5.2 },
+            { x: 3.4, y: -5 },
+            { x: 6.4, y: -2.6 },
+            { x: 8.6, y: -1 },
+            { x: 10.2, y: 2 },
+          ],
+  },
+]
+
+/** Super's job from the gun — stay and protect, or the Dash tag. */
+export const gunSuperJob = (dash?: DashSide): Assignment => {
+  if (!dash) {
+    return {
+      rule: 'Stay back and protect from your gun spot. Check the LEFT edge first, then chip the nearest man who comes free.',
+      detail:
+        'From the gun you are a yard left of the quarterback and a yard behind him, so the left edge is the one you can see — look there first. You still do not have a gap and you do not have a side: find the nearest incoming defender and block him. You never have the end; the line has him every single time. If nobody comes, stay home.',
+    }
+  }
+  return dash === 'left'
+    ? {
+        rule: 'DASH LEFT — you are not blocking. Release from your gun spot to the LEFT flat.',
+        detail:
+          'You are already on the left, so go: straight out of the backfield, get to about three yards deep in the left flat, numbers back to the quarterback. Nobody is blocking your spot now, so RUN — the sooner you are a target, the sooner the ball can come out.',
+      }
+    : {
+        rule: 'DASH RIGHT — you are not blocking. Cross BEHIND the quarterback to the RIGHT flat.',
+        detail:
+          'You are a yard left of the quarterback, so Dash Right means crossing behind him first — stay BEHIND him, never in front of the throw — then bend out to about three yards deep in the right flat, numbers back to him. Nobody is blocking your spot now, so RUN.',
+      }
+}
+
+/**
+ * The gun REVIEW NOTES every gun audible carries on top of its own — every
+ * football decision in this section, for Coach Ryan.
+ */
+export const gunReviewNotes: string[] = [
+  'DRAFT — THE GUN AUDIBLE: same call with "Gun" said right after the formation ("Red Gun Ram 33", "Split Wide Gun 95-59"). The line never changes — same pass set, same Ram/Bull/straight, nobody past the line. Only the backfield moves, to the gun spots in app/data/shotgun.ts. No gun out of Tight.',
+  'DRAFT — THE DROP FROM THE GUN: he already has 3 yards, so quick digits (hitch, slant, speed out, curl) are catch and throw — one step — and the deep ones are a THREE-step drop from the gun instead of five. Say the word if you want the deep drop to stay at five from the gun.',
+  'DRAFT — SUPER STAYS FROM HIS GUN SPOT, a yard left of the quarterback and a yard behind him in every gun set, so he checks the LEFT edge first and then chips the nearest man who comes free. Same rule, same no-gap-no-side, he still never has the end.',
+  'DRAFT — DASH FROM THE GUN: Dash Left releases straight to the left flat (he is already on the left). Dash Right crosses BEHIND the quarterback, then bends to the right flat. Both finish at the same flat landmark as under center.',
+]

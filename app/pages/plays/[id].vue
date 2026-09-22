@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { FrontId, OffPosId, Play } from '~/types/football'
-import { plays, formations, fronts } from '~/data'
+import { baseIdOf, formationFor, fronts, gunIdOf, isGunPlay, plays } from '~/data'
 import { film } from '~/data/film'
 import { FRONT_LABELS, FRONT_ORDER, callPartsFor } from '~/utils/playbook'
 import { labelForId } from '~/utils/defense'
@@ -16,7 +16,7 @@ const play = computed<Play>(() => {
   return p
 })
 
-const formation = computed(() => formations[play.value.formation]!)
+const formation = computed(() => formationFor(play.value))
 
 /** Practice clips of this exact play, if any — see app/data/film.ts. */
 const filmClips = computed(() => film[play.value.id] ?? [])
@@ -28,7 +28,11 @@ const filmClips = computed(() => film[play.value.id] ?? [])
  */
 const twin = computed(() =>
   (Object.values(plays) as Play[]).find(
-    (p) => p.name === play.value.name && p.id !== play.value.id,
+    (p) =>
+      p.name === play.value.name &&
+      p.id !== play.value.id &&
+      // A gun play's twin is another gun play — the doors stay inside the gun.
+      p.variant === play.value.variant,
   ),
 )
 
@@ -117,12 +121,40 @@ const variantFormationOptions = computed(() => {
     .filter((p): p is Play => !!p)
     .map((p) => ({
       id: p.id,
-      label: formations[p.formation]?.name ?? p.formation,
+      label: formationFor(p).name,
       active: p.id === play.value.id,
     }))
 })
 
+/* --- Under center / Gun ---
+   The gun is a VARIATION of Red, Black and Split Wide (never Tight): the line
+   never moves, the quarterback backs up to 3 yards and the backfield re-forms
+   around him. A gun play is a play of its own — base id + '-gun' — so this
+   control NAVIGATES between the twins rather than holding page state, and the
+   whole query rides along so ?front= survives the hop. Tight plays, the
+   passing game and the audible have no gun twin, so nothing renders. */
+type SetVariant = 'under' | 'gun'
+const isGun = computed(() => isGunPlay(play.value))
+const underPlay = computed<Play | undefined>(() =>
+  isGun.value ? plays[baseIdOf(play.value.id)] : play.value,
+)
+const gunTwin = computed<Play | undefined>(() =>
+  isGun.value ? play.value : plays[gunIdOf(play.value.id)],
+)
+const gunAvailable = computed(() => !!underPlay.value && !!gunTwin.value)
+// Real links, not a button: the static crawler only prerenders pages it can
+// reach by href, and offline the gun page has to exist on disk.
+const setVariantOptions = computed<{ value: SetVariant; label: string; id: string; active: boolean }[]>(() => [
+  { value: 'under', label: 'Under center', id: underPlay.value?.id ?? play.value.id, active: !isGun.value },
+  { value: 'gun', label: 'Gun', id: gunTwin.value?.id ?? play.value.id, active: isGun.value },
+])
+
 useHead(() => {
+  // A gun play titles itself with the call, in call order: "Red Gun Veer Right".
+  if (isGun.value) {
+    const said = callParts.value.map((part) => part.word).join(' ')
+    return { title: `${said} — Wolves Playbook` }
+  }
   // "Split Wide Screen" already names its formation — don't say it twice.
   const sayFormation = !play.value.name.startsWith(formation.value.name)
   const base = hasVariantControls.value
@@ -149,6 +181,27 @@ useHead(() => {
             Going {{ play.direction }}
             <span v-if="asideCallName">&middot; also called {{ asideCallName }}</span>
           </p>
+
+          <!-- Same control, same words as /formations/[id]: the gun is a
+               variation of the set, so it sits with the name, not with the
+               Direction × Formation toggles. -->
+          <div v-if="gunAvailable" class="set-bar">
+            <nav class="dir-toggle" aria-label="Under center or gun">
+              <NuxtLink
+                v-for="opt in setVariantOptions"
+                :key="opt.value"
+                :to="{ path: `/plays/${opt.id}`, query: { front } }"
+                class="dir-btn"
+                :class="{ active: opt.active }"
+                :aria-current="opt.active ? 'page' : undefined"
+              >
+                {{ opt.label }}
+              </NuxtLink>
+            </nav>
+            <p v-if="isGun" class="gun-note muted">
+              Same play, from the gun. The line's job does not change.
+            </p>
+          </div>
         </div>
 
         <!-- Direction × Formation: two link-toggles over the four-play graph.
@@ -199,7 +252,7 @@ useHead(() => {
             :to="{ path: `/plays/${twin.id}`, query: { front } }"
             class="dir-btn"
           >
-            {{ formations[twin.formation]?.name ?? twin.formation }}
+            {{ formationFor(twin).name }}
           </NuxtLink>
         </nav>
       </div>
@@ -301,6 +354,18 @@ useHead(() => {
 }
 .subtitle {
   font-size: 0.95rem;
+}
+
+/* Under center / Gun, and the one quiet line that goes with it. */
+.set-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.gun-note {
+  font-size: 0.9rem;
+  line-height: 1.4;
 }
 
 .dir-toggle {

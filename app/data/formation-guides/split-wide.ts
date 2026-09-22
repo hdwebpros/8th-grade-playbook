@@ -72,4 +72,28 @@ export const splitWideGuide: FormationGuide = {
   ],
   vsRed:
     'Red with everybody stretched out — Y goes from tight to wide left, both wings become slots at 8½, X stays wide right, and Super is the only back.',
+  gun: {
+    tagline: 'Four wide, QB backs up',
+    spotIt: [
+      'Quarterback standing three yards back, not under center.',
+      'Super off his left hip instead of straight behind him.',
+      'Everything else is Split Wide — four wide, slots a yard off the ball.',
+    ],
+    why: 'The quarterback catches the snap already three yards deep, so he has time and a clear look at four receivers with Super right beside him.',
+    moves: {
+      Q: {
+        where: 'Three big steps straight back from the ball — 3 yards deep, hands out in front of you, ready. You are not under center.',
+        check: 'Eyes on the ball for the snap. You cannot feel it come up any more, so watch it all the way into your hands.',
+      },
+      S: {
+        where: 'Off the quarterback\'s LEFT hip: a yard to his left and a yard behind him. Same spot as Red Gun and Black Gun.',
+        check: 'Stay a yard back so you are behind the quarterback, not even with him.',
+      },
+    },
+    remember: [
+      'Gun changes the backfield, never the line.',
+      'Only two kids move: the quarterback backs up, Super goes to his left hip. The slots and the wideouts stay put.',
+      'Say it right after the set: Split Wide Gun.',
+    ],
+  },
 }

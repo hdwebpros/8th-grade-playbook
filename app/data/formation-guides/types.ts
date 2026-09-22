@@ -28,6 +28,24 @@ export interface LineupSpot {
 
 export type Strength = 'left' | 'right' | 'balanced'
 
+/**
+ * The gun version of a set, said to a kid. Only the kids who MOVE get a
+ * `moves` entry — everyone else stands exactly where he does under center,
+ * and the page says so once instead of repeating eleven rows.
+ */
+export interface GunGuide {
+  /** 2–5 word hook: "Same set, QB backs up". */
+  tagline: string
+  /** How to spot it in one glance. 2–3 bullets, each one short line. */
+  spotIt: string[]
+  /** Why we get in it. One sentence. */
+  why: string
+  /** Where the kids who move end up. Nobody else changes. */
+  moves: Partial<Record<OffPosId, LineupSpot>>
+  /** Coach reminders. One short line each, THREE at most. */
+  remember: string[]
+}
+
 export interface FormationGuide {
   id: FormationId
   /** 2–5 word hook that sits under the name: "Our base set". */
@@ -49,4 +67,6 @@ export interface FormationGuide {
    * kid who already knows Red only has to learn the change.
    */
   vsRed?: string
+  /** The gun variation of this set, if it has one (Tight does not). */
+  gun?: GunGuide
 }

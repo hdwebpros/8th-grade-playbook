@@ -4,7 +4,7 @@
  * scale so a kid can see that Split Wide is wide and Tight is tight before
  * reading a word. Tap a card to open the set and find your spot.
  */
-import { formations } from '~/data'
+import { formations, hasGun } from '~/data'
 import { formationGuideList } from '~/data/formation-guides'
 
 useHead({ title: 'Formations — Wolves Playbook' })
@@ -12,7 +12,8 @@ useHead({ title: 'Formations — Wolves Playbook' })
 const cards = computed(() =>
   formationGuideList
     .map((guide) => ({ guide, formation: formations[guide.id] }))
-    .filter((c) => c.formation),
+    .filter((c) => c.formation)
+    .map((c) => ({ ...c, gun: hasGun(c.formation!) })),
 )
 
 const strengthLabel = (side: 'left' | 'right' | 'balanced') =>
@@ -25,8 +26,8 @@ const strengthLabel = (side: 'left' | 'right' | 'balanced') =>
       <p class="eyebrow">Line up right</p>
       <h1>Formations</h1>
       <p class="muted lead">
-        Four sets, same eleven kids. Know where you stand before you know what you do.
-        Tap a set to find your spot.
+        Four sets, same eleven kids — and three of them can be run from the gun.
+        Know where you stand before you know what you do. Tap a set to find your spot.
       </p>
     </header>
 
@@ -44,6 +45,7 @@ const strengthLabel = (side: 'left' | 'right' | 'balanced') =>
         <div class="fcard-body">
           <div class="fcard-head">
             <h2 class="fcard-name">{{ c.formation!.name }}</h2>
+            <span v-if="c.gun" class="gun-chip" title="Can be run from the gun">+ Gun</span>
             <span class="strength" :class="`side-${c.guide.strength.side}`">
               <Icon
                 :name="
@@ -130,6 +132,21 @@ const strengthLabel = (side: 'left' | 'right' | 'balanced') =>
 .fcard-name {
   font-size: 1.7rem;
   margin: 0;
+  margin-right: auto;
+}
+.gun-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px dashed var(--line);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--steel);
+  white-space: nowrap;
 }
 .strength {
   display: inline-flex;
