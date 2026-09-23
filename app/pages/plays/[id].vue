@@ -175,12 +175,12 @@ useHead(() => {
         <div class="head-titles">
           <h1 class="title">{{ play.name }}</h1>
           <PlayCallStamp :parts="callParts" />
-          <!-- Coach has pulled this play: say so before anything else. -->
-          <div v-if="play.doNotRun" class="do-not-run" role="alert">
-            <span class="dnr-badge">
-              <Icon name="lucide:octagon-x" aria-hidden="true" /> Do not run
+          <!-- Coach keeps this one out of the regular rotation: say when to call it. -->
+          <div v-if="play.uncommon" class="uncommon" role="note">
+            <span class="uncommon-badge">
+              <Icon name="lucide:triangle-alert" aria-hidden="true" /> Uncommon play
             </span>
-            <p class="dnr-reason">{{ play.doNotRun }}</p>
+            <p class="uncommon-reason">{{ play.uncommon }}</p>
           </div>
           <!-- The call stamp already says the direction on variant plays, so
                the subtitle only earns its place on the legacy two-play shape. -->
@@ -204,15 +204,15 @@ useHead(() => {
               >
                 {{ opt.label }}
                 <Icon
-                  v-if="opt.value === 'gun' && gunTwin?.doNotRun"
-                  name="lucide:octagon-x"
-                  class="dnr-mark"
-                  aria-label="Do not run"
+                  v-if="opt.value === 'gun' && gunTwin?.uncommon"
+                  name="lucide:triangle-alert"
+                  class="uncommon-mark"
+                  aria-label="Uncommon play"
                 />
               </NuxtLink>
             </nav>
-            <p v-if="isGun && play.doNotRun" class="gun-note muted">
-              From the gun the playside tackle blocks the end.
+            <p v-if="isGun && play.uncommon" class="gun-note muted">
+              From the gun both tackles block the ends.
             </p>
             <p v-else-if="isGun" class="gun-note muted">
               Same play, from the gun. The line's job does not change.
@@ -384,36 +384,36 @@ useHead(() => {
   line-height: 1.4;
 }
 
-.do-not-run {
+.uncommon {
   display: grid;
   gap: 6px;
   justify-items: start;
   padding: 10px 12px;
-  border: 1px solid var(--red);
+  border: 1px solid var(--amber);
   border-radius: var(--r-ctl);
-  background: var(--red-glow);
+  background: var(--amber-glow);
 }
-.dnr-badge {
+.uncommon-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 3px 10px;
   border-radius: 999px;
-  background: var(--red);
-  color: #fff;
+  background: var(--amber);
+  color: var(--ink);
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 0.95rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
-.dnr-reason {
+.uncommon-reason {
   margin: 0;
   font-size: 0.9rem;
   line-height: 1.4;
 }
-.dnr-mark {
-  color: var(--red);
+.uncommon-mark {
+  color: var(--amber);
   margin-left: 4px;
   vertical-align: -2px;
 }

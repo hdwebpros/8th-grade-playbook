@@ -18,6 +18,9 @@
   /* Derived, app-shell use */
   --chalk-dim: #b7bdc4;
   --red-glow: rgba(214, 32, 47, 0.14);
+  /* Caution, not alarm: the Uncommon Play badge. */
+  --amber: #e0a526;
+  --amber-glow: rgba(224, 165, 38, 0.12);
   --focus-ring: 2px solid var(--red);
 
   /* Type */

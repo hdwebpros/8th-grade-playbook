@@ -4,43 +4,45 @@
  * app/data/shotgun.ts: Q (0,−3), Super (−1,−4), the wing beside the
  * quarterback at (1,−4) — R in Red, L in Black — and the other wing out in
  * the open slot: L at (−8.5,−1) in Red, R at (8.5,−1) in Black. The line, X
- * and Y never move, so the linemen, X and Y inherit their base jobs.
+ * and Y never move.
  *
- * Coach Ryan's rulings (2026-09-21) baked in here:
+ * Coach Ryan's rulings (2026-09-21):
  *   - No pre-snap motion.
  *   - Playside back gets the ball: the back on the playside of the
- *     quarterback dives at the crack of the playside guard; the other back
- *     swings BEHIND the quarterback into pitch relationship (about 5 wide by
- *     1 back) — Red Right: R dives, Super pitches. Red Left: Super dives, R
- *     pitches. Black Right: L dives, Super pitches. Black Left: Super dives,
- *     L pitches.
+ *     quarterback dives at the B gap, right off the playside guard's hip; the
+ *     other back swings BEHIND the quarterback into pitch relationship (about
+ *     5 wide by 1 back) — Red Right: R dives, Super pitches. Red Left: Super
+ *     dives, R pitches. Black Right: L dives, Super pitches. Black Left: Super
+ *     dives, L pitches.
  *
- * DO NOT RUN (Coach Ryan, 2026-09-23): "In the gun formation, the Veer plays
- * won't work as designed because when there's an open defensive end, under
- * shotgun they can just sprint down and get the running back and
- * quarterback." All four plays carry `doNotRun`, and the drawing is changed
- * so the playside end is BLOCKED — by the playside tackle, the man he lines
- * up on (5-technique on the tackle's outside shoulder, every front). The
- * tackle is the only blocker INSIDE the end, so he is the only one who can
- * stop him coming down the line; Y on the tight-end side is outside him and
- * a down block would drive the end into the dive. The quarterback's read
- * moves out to the first playside defender the blocking leaves free (the
- * per-front `readKey`), and whoever the tackle used to climb to is left for
- * that read — the hole that keeps these plays pulled.
- *
- * The gun also takes away the PLAYSIDE WING on the wing-side veer (Red
- * Right, Black Left): under center he squeezed off the read key and pinned
- * the first backer. Now he is the dive back. The answers per front are
- * listed as DRAFT review notes on each play; Ryan said "draw something up, I
- * can always change it."
+ * UNCOMMON PLAY (Coach Ryan, 2026-09-23). An open end in the gun can sprint
+ * down and take the back and the quarterback, so from the gun BOTH TACKLES
+ * BLOCK THE ENDS: "The goal of the play is to keep the defensive ends away
+ * from the center. The right tackle and the left tackle, that should be
+ * their main focus. The opposite side should block the D-end for 1-2 seconds
+ * and try to let them in the backfield because by then the running back
+ * should be up through the line. We are not as concerned with linemen
+ * climbing on this one."
+ *   - Playside tackle: blocks the playside end and keeps him OUTSIDE.
+ *   - Backside tackle: blocks the backside end for 1–2 seconds, sliding
+ *     INSIDE toward the center so the end has to go outside and around him.
+ *   - Guards base the tackle on their outside shoulder; the center fills the
+ *     playside A gap (even fronts) or bases the nose (5-2). Nobody climbs.
+ *   - Quarterback: "still reads the defensive end because if he beats his
+ *     man inside he should keep. Generally this is a handoff, but the
+ *     quarterback must still read." Read key = the playside end.
+ *   - Wing side (Red Right / Black Left): the slot on the back side blocks
+ *     the "S" in the alley and Y climbs to the inside backer on his side.
+ * All four plays carry `uncommon`: call it only when the B gap is open.
  *
  * Every path below is ABSOLUTE yards from the GUN starts (the renderer
  * prepends the player's alignment), not an offset of the base strokes.
- * Black Gun is NOT Red Gun mirrored — Super is left of the quarterback in
- * both sets — so each Black play is built from its own Black base.
+ * Black Gun is NOT Red Gun mirrored in the backfield — Super is left of the
+ * quarterback in both sets — so only the line, Y and slot strokes are
+ * mirrored; the backfield strokes are shared by direction.
  */
 
-import type { Action, Assignment, Play } from '../../types/football'
+import type { Action, Assignment, FrontId, OffPosId, Play } from '../../types/football'
 import { gunPlay } from './gun-shared'
 import { veerLeftBlack, veerLeftRed, veerRightBlack, veerRightRed } from './veer'
 
@@ -157,56 +159,239 @@ const PITCH_LEFT: Action[] = [
 ]
 
 // ---------------------------------------------------------------------------
-// The slot wing's jobs. In the gun one wing stands in the open slot, 8½ wide
-// and a yard off the ball — on the BACKSIDE of the wing-side veer (Red Right:
-// L; Black Left: R) and on the PLAYSIDE of the tight-end veer (Red Left: L;
-// Black Right: R).
+// Mirroring helpers for the line, Y and slot (never the backfield).
+// ---------------------------------------------------------------------------
+
+type ActionMap = Partial<Record<OffPosId, Action[]>>
+type AssignmentMap = Partial<Record<OffPosId, Assignment>>
+
+/**
+ * Negate every x of a stroke and swap a side-suffixed target (-L ⇄ -R) —
+ * turns a left-hand stroke into its right-hand twin.
+ */
+const flipX = (actions: Action[]): Action[] =>
+  actions.map((a) => ({
+    ...a,
+    ...(a.targetId ? { targetId: a.targetId.replace(/-(L|R)$/, (_, s) => (s === 'L' ? '-R' : '-L')) } : {}),
+    ...(a.path ? { path: a.path.map((p) => ({ x: -p.x, y: p.y })) } : {}),
+  }))
+
+const SIDE_SWAP: Partial<Record<OffPosId, OffPosId>> = { LT: 'RT', RT: 'LT', LG: 'RG', RG: 'LG', L: 'R', R: 'L' }
+const swapPos = (pos: OffPosId): OffPosId => SIDE_SWAP[pos] ?? pos
+
+/** Flip every stroke and move it to the mirror-image player (LT ⇄ RT, L ⇄ R…). */
+const mirrorActions = (m: ActionMap): ActionMap =>
+  Object.fromEntries(Object.entries(m).map(([pos, a]) => [swapPos(pos as OffPosId), flipX(a!)]))
+
+/** Same text, mirror-image player. The words are written side-neutral. */
+const mirrorJobs = (m: AssignmentMap): AssignmentMap =>
+  Object.fromEntries(Object.entries(m).map(([pos, a]) => [swapPos(pos as OffPosId), a]))
+
+const FRONTS: FrontId[] = ['44', '43', '52']
+
+// ---------------------------------------------------------------------------
+// The line, drawn for a play going RIGHT (RT playside, LT backside). The
+// left-hand line is `mirrorActions` of this.
 // ---------------------------------------------------------------------------
 
 /**
- * Backside slot vs the 4-4's single free safety in the middle (F at 0,10):
- * release inside and work to him — a work-to path, no bar, like the base's
- * backside X. Drawn from the LEFT slot (−8.5,−1); negate for the right.
+ * Playside tackle keeps the end OUTSIDE. The end is a 5-technique on his
+ * outside shoulder at (3.55,1) on every front: step up the end's INSIDE
+ * number and drive him back and out — the bar lands a yard past the LOS,
+ * pushing away from the center. From RT (3,0).
  */
-const SLOT_BACKSIDE_TO_F_44: Action[] = [
+const PST_KEEP_DE_OUT: Action[] = [
   {
-    kind: 'run',
+    kind: 'block',
     path: [
-      { x: -8, y: 0.6 },
-      { x: -6.6, y: 2.8 },
-      { x: -5, y: 5 },
-      { x: -3.2, y: 7.2 },
-    ],
-  },
-]
-
-/** Backside slot vs the two-high fronts: work to the near safety (F-L at −6,11). */
-const SLOT_BACKSIDE_TO_F_TWO_HIGH: Action[] = [
-  {
-    kind: 'run',
-    path: [
-      { x: -8.1, y: 0.6 },
-      { x: -7.6, y: 2.8 },
-      { x: -7.1, y: 5 },
-      { x: -6.6, y: 7.4 },
+      { x: 2.85, y: 0.45 },
+      { x: 2.9, y: 1.2 },
+      { x: 3.35, y: 1.85 },
     ],
   },
 ]
 
 /**
- * Playside slot vs the 4-4: Y bases the walked-up backer, so the next man to
- * the alley is the CORNER — stalk him. Block-by-target so the stroke follows
- * the front if the corner is ever tuned.
+ * Backside tackle: one to two seconds on the end, sliding INSIDE toward the
+ * center so the end has to go outside and around him. A short stroke — step
+ * inside, hands on the end's inside shoulder, bar facing him. From LT (−3,0).
  */
-const SLOT_STALK_CORNER_LEFT: Action[] = [{ kind: 'block', targetId: 'C-L' }]
+const BST_SLIDE_DE: Action[] = [
+  {
+    kind: 'block',
+    path: [
+      { x: -2.7, y: 0.3 },
+      { x: -2.95, y: 0.6 },
+    ],
+  },
+]
+
+/** Playside guard bases the 3-technique on his outside shoulder (T-R at 1.8). */
+const PSG_BASE: Action[] = [
+  {
+    kind: 'block',
+    path: [
+      { x: 2.25, y: 0.45 },
+      { x: 2.5, y: 1.15 },
+      { x: 2.05, y: 1.75 },
+    ],
+  },
+]
 
 /**
- * Playside slot vs the two-high fronts: the near safety is the alley filler,
- * so crack down on him as he comes — climb inside the corner and set the bar
- * around 5 yards, cutting back inside. Same landmark the base's wing pinned
- * from the line, now reached from the slot at (−8.5,−1).
+ * Backside guard bases the 3-technique on his outside shoulder (T-L at
+ * −1.8): up his inside number, drive him back and away from the play. No
+ * climb. From LG (−1.5,0).
  */
-const SLOT_CRACK_SAFETY_LEFT: Action[] = [
+const BSG_BASE: Action[] = [
+  {
+    kind: 'block',
+    path: [
+      { x: -1.35, y: 0.45 },
+      { x: -1.15, y: 1.2 },
+      { x: -1.55, y: 1.85 },
+    ],
+  },
+]
+
+/** Center vs an even front: nobody on him — step playside and fill the A gap. */
+const C_FILL_A_GAP: Action[] = [
+  {
+    kind: 'block',
+    path: [
+      { x: 0.3, y: 0.6 },
+      { x: 0.55, y: 1.5 },
+    ],
+  },
+]
+
+/** Center vs the 5-2: base the nose (N at 0,1) on his playside number. No scoop. */
+const C_BASE_NOSE: Action[] = [
+  {
+    kind: 'block',
+    path: [
+      { x: 0.55, y: 0.4 },
+      { x: 0.65, y: 1.15 },
+      { x: 0.25, y: 1.8 },
+    ],
+  },
+]
+
+const lineRight = (front: FrontId): ActionMap => ({
+  RT: PST_KEEP_DE_OUT,
+  RG: PSG_BASE,
+  C: front === '52' ? C_BASE_NOSE : C_FILL_A_GAP,
+  LG: BSG_BASE,
+  LT: BST_SLIDE_DE,
+})
+const lineLeft = (front: FrontId): ActionMap => mirrorActions(lineRight(front))
+
+// ---------------------------------------------------------------------------
+// Wing-side backside (Red Right, drawn on the LEFT; Black Left mirrors it).
+// Coach Ryan, 2026-09-23: "L blocks the S alley", Y climbs to the
+// left-middle linebacker.
+// ---------------------------------------------------------------------------
+
+/**
+ * Backside slot to the "S" in the alley. Vs the 4-4 there is no strong
+ * safety — the S is the walked-up Sam (O-L, lettered S against Red) standing
+ * in the alley. Vs the 4-3 and 5-2 it is the strong safety ($, F-L against
+ * Red) coming down into the alley: climb inside the corner and meet him, bar
+ * around 5 yards. From the left slot (−8.5,−1).
+ */
+const SLOT_ALLEY: Record<FrontId, Action[]> = {
+  '44': [
+    {
+      kind: 'block',
+      targetId: 'O-L',
+      path: [
+        { x: -8.2, y: 0.6 },
+        { x: -7.5, y: 2.1 },
+        { x: -6.95, y: 2.95 },
+      ],
+    },
+  ],
+  '43': [
+    {
+      kind: 'block',
+      targetId: 'F-L',
+      path: [
+        { x: -8.3, y: 0.6 },
+        { x: -7.9, y: 2.4 },
+        { x: -7.4, y: 4.2 },
+        { x: -6.7, y: 5.4 },
+      ],
+    },
+  ],
+  '52': [
+    {
+      kind: 'block',
+      targetId: 'F-L',
+      path: [
+        { x: -8.3, y: 0.6 },
+        { x: -7.9, y: 2.4 },
+        { x: -7.4, y: 4.2 },
+        { x: -6.7, y: 5.4 },
+      ],
+    },
+  ],
+}
+
+/**
+ * Backside Y climbs to the inside backer on his side: release outside the
+ * end (the tackle has him and is forcing him wide), climb, and cut back
+ * inside to the backer. 4-4: B-L over the guard. 4-3: the backer on his side
+ * (B-L, lettered S against Red) — the Mike is left alone. 5-2: B-L. From Y
+ * (−4.5,0).
+ */
+const Y_CLIMB: Record<FrontId, Action[]> = {
+  '44': [
+    {
+      kind: 'block',
+      targetId: 'B-L',
+      path: [
+        { x: -4.6, y: 1.1 },
+        { x: -4.2, y: 2.6 },
+        { x: -3.1, y: 3.5 },
+        { x: -2.2, y: 3.75 },
+      ],
+    },
+  ],
+  '43': [
+    {
+      kind: 'block',
+      targetId: 'B-L',
+      path: [
+        { x: -4.65, y: 1.2 },
+        { x: -4.55, y: 2.6 },
+        { x: -4.2, y: 3.85 },
+      ],
+    },
+  ],
+  '52': [
+    {
+      kind: 'block',
+      targetId: 'B-L',
+      path: [
+        { x: -4.6, y: 1.1 },
+        { x: -4.25, y: 2.6 },
+        { x: -3.3, y: 3.4 },
+        { x: -2.55, y: 3.65 },
+      ],
+    },
+  ],
+}
+
+// ---------------------------------------------------------------------------
+// Tight-end-side playside slot (Red Left, drawn on the LEFT; Black Right
+// mirrors it). Not re-ruled on 2026-09-23 — same jobs as the first gun pass.
+// ---------------------------------------------------------------------------
+
+/** Vs the 4-4: Y bases the walked-up backer, so the slot stalks the corner. */
+const SLOT_STALK_CORNER: Action[] = [{ kind: 'block', targetId: 'C-L' }]
+
+/** Vs the 4-3 and 5-2: crack down on the near safety as he fills the alley. */
+const SLOT_CRACK_SAFETY: Action[] = [
   {
     kind: 'block',
     targetId: 'F-L',
@@ -219,151 +404,207 @@ const SLOT_CRACK_SAFETY_LEFT: Action[] = [
   },
 ]
 
-/**
- * Negate every x of a stroke and swap a side-suffixed target (-L ⇄ -R) —
- * turns a left-hand slot or tackle stroke into its right-hand twin.
- */
-const flipX = (actions: Action[]): Action[] =>
-  actions.map((a) => ({
-    ...a,
-    ...(a.targetId ? { targetId: a.targetId.replace(/-(L|R)$/, (_, s) => (s === 'L' ? '-R' : '-L')) } : {}),
-    ...(a.path ? { path: a.path.map((p) => ({ x: -p.x, y: p.y })) } : {}),
-  }))
-
-/**
- * Playside tackle BASES the end (Do Not Run change, 2026-09-23). The end is a
- * 5-technique on his outside shoulder at (3.55,1) on every front: up around
- * the end's inside number and drive him back off the line, bar a yard past
- * the LOS cutting back inside — the same base shape RG draws on the
- * 3-technique. Right-hand stroke from RT (3,0); flipX for LT.
- */
-const PST_BASE_DE_RIGHT: Action[] = [
-  {
-    kind: 'block',
-    path: [
-      { x: 3.95, y: 0.45 },
-      { x: 4.2, y: 1.15 },
-      { x: 3.75, y: 1.75 },
-    ],
-  },
-]
-const PST_BASE_DE_LEFT: Action[] = flipX(PST_BASE_DE_RIGHT)
+const SLOT_PLAYSIDE: Record<FrontId, Action[]> = {
+  '44': SLOT_STALK_CORNER,
+  '43': SLOT_CRACK_SAFETY,
+  '52': SLOT_CRACK_SAFETY,
+}
 
 // ---------------------------------------------------------------------------
-// Assignment text. Kid voice; the varsity words stay.
+// Assignment text. Kid voice; the varsity words stay. Written side-neutral so
+// the same words serve both directions.
 // ---------------------------------------------------------------------------
 
 const Q_GUN: Assignment = {
-  rule: 'Catch it, step playside, mesh. The end is blocked — read the first man left free.',
+  rule: 'Mesh and read the playside end. Give it unless he beats our tackle inside.',
   detail:
-    'Catch the snap clean and step toward the dive back — he is right beside you, so the mesh is quick. From the gun we BLOCK the end, so he is not your read any more: your eyes go to the first playside defender our blocking leaves free (the Read chip on the diagram). He comes down for the dive: pull it and attack his outside hip at about 45 degrees. He stays wide: give it. He takes you: press the pitch.',
+    'Catch the snap clean and step toward the dive back. He is right beside you, so the mesh is quick. Our tackle is blocking the playside end, but you still read him. Most of the time this is a handoff. If the end beats our tackle to the inside, pull it and get outside him. If you keep it and somebody takes you, press the pitch.',
 }
 
 const dive = (guard: string): Assignment => ({
-  rule: `Dive — aim at the crack of the ${guard} guard.`,
-  detail: `No motion — you are the dive back. On the snap, go: aim at the crack of the ${guard} guard, soft fold on the mesh, wave read on the ball. If it stays, it is yours — run downhill. If he pulls it, keep sprinting and take a tackler with you.`,
+  rule: `Dive — the B gap, right off the ${guard} guard's hip.`,
+  detail: `No motion. You are the dive back. On the snap, go: aim at the B gap, right off the ${guard} guard's outside hip. Soft fold on the mesh, wave read on the ball. If it stays, it is yours: sprint straight up through the hole. If he pulls it, keep sprinting and take a tackler with you.`,
 })
 
 const pitchMan = (who: string): Assignment => ({
   rule: 'Pitch man — swing behind the quarterback, five wide by one back.',
-  detail: `No motion. On the snap, cross BEHIND ${who} — never in front of him — and get to pitch relationship: about five yards outside him and a yard behind. Hold it as he attacks the end. Eyes on the ball the whole way, hands up and soft.`,
+  detail: `No motion. On the snap, cross BEHIND ${who}, never in front of him, and get to pitch relationship: about five yards outside him and a yard behind. Hold it. Eyes on the ball the whole way, hands up and soft.`,
 })
 
-const slotBackside = (side: string): Assignment => ({
-  rule: 'Backside slot — work to the safety.',
-  detail: `You are out in the ${side} slot, away from the play. Release inside and work to the safety — cut off the last man between the pitch and the end zone. Nobody loafs on the back side.`,
+const PST_JOB: Assignment = {
+  rule: 'Block the end. Keep him OUTSIDE.',
+  detail:
+    'From the gun both tackles block the ends. The end on your outside shoulder is yours: step at him, get your helmet on his inside number, and keep him outside. Never let him come down the line toward the center. The quarterback is watching him: if he beats you inside, the quarterback keeps it.',
+}
+
+const BST_JOB: Assignment = {
+  rule: 'Block the end for 1-2 seconds. Slide inside, make him go around.',
+  detail:
+    'You are away from the play, but the end on your outside shoulder is still yours. Step inside toward the center and get your hands on him. Keep him away from the center for one or two seconds, sliding inside with him so he has to go outside and around you. If he gets into the backfield late and wide, that is fine. The back is already through the line.',
+}
+
+const PSG_JOB: Assignment = {
+  rule: 'Base the tackle on your outside shoulder.',
+  detail:
+    'Their tackle is on your outside shoulder in every front. Take him and drive him back. The dive comes right off your outside hip, so do not let him slide into that hole. No climbing on this play.',
+}
+
+const BSG_JOB: Assignment = {
+  rule: 'Base the tackle on your outside shoulder.',
+  detail:
+    'Their tackle is on your outside shoulder. Get your helmet on his inside number and drive him back, away from the play. No climbing on this play.',
+}
+
+const C_GAP_JOB: Assignment = {
+  rule: 'Uncovered. Step playside and fill the gap.',
+  detail:
+    'Nobody on your nose. Step playside and block anybody who comes through the gap between you and the guard. No climbing on this play.',
+}
+
+const C_NOSE_JOB: Assignment = {
+  rule: 'Covered. Base the nose.',
+  detail:
+    'The nose is head up on you. Take him by yourself and drive him back. No scoop on this play: the guard has his own man.',
+}
+
+const lineJobsRight = (front: FrontId): AssignmentMap => ({
+  RT: PST_JOB,
+  RG: PSG_JOB,
+  C: front === '52' ? C_NOSE_JOB : C_GAP_JOB,
+  LG: BSG_JOB,
+  LT: BST_JOB,
 })
+const lineJobsLeft = (front: FrontId): AssignmentMap => mirrorJobs(lineJobsRight(front))
 
-const SLOT_BACKSIDE_44: Assignment = {
-  rule: 'Backside slot — work to the free safety.',
-  detail:
-    'One safety in the middle in this front. Release inside and go get him — cut off the last man between the pitch and the end zone.',
+/** Wing-side backside slot (Red L, Black R). */
+const SLOT_ALLEY_JOB: Record<FrontId, Assignment> = {
+  '44': {
+    rule: 'Backside slot. Block the S in the alley.',
+    detail:
+      'The S (their outside backer on your side) walks up in the alley. Come inside and block him. Keep him from chasing the play down the line.',
+  },
+  '43': {
+    rule: 'Backside slot. Block the $ in the alley.',
+    detail:
+      'The strong safety ($) comes down into the alley on your side. Climb inside the corner, meet him as he comes, and keep him from chasing the play.',
+  },
+  '52': {
+    rule: 'Backside slot. Block the $ in the alley.',
+    detail:
+      'The strong safety ($) comes down into the alley on your side. Climb inside the corner, meet him as he comes, and keep him from chasing the play.',
+  },
 }
 
-const SLOT_BACKSIDE_TWO_HIGH: Assignment = {
-  rule: 'Backside slot — work to the near safety.',
-  detail:
-    'Two safeties in this front. Release inside and work to the one on your side — cut off the deep pursuit.',
+/** Wing-side backside Y. */
+const Y_CLIMB_JOB: Record<FrontId, Assignment> = {
+  '44': {
+    rule: 'Backside. Climb to the inside backer on your side.',
+    detail:
+      'Our tackle has the end. Release outside the end, climb, and cut back inside to the inside backer on your side of the ball. Get between him and the play.',
+  },
+  '43': {
+    rule: 'Backside. Climb to the backer on your side.',
+    detail:
+      'Our tackle has the end. Release outside him and climb to the backer on your side (the S). Leave the Mike alone. Get between your man and the play.',
+  },
+  '52': {
+    rule: 'Backside. Climb to the inside backer on your side.',
+    detail:
+      'Our tackle has the end. Release outside the end, climb, and cut back inside to the backer on your side. Get between him and the play.',
+  },
 }
 
-const SLOT_PLAYSIDE: Assignment = {
-  rule: 'Playside slot — block the alley: corner in a 4-4, near safety in a 4-3 or 5-2.',
-  detail:
-    'The tight end takes the first man outside the read key, so you take the next man to the alley. One safety in the middle (4-4): stalk the corner. Two safeties (4-3, 5-2): crack down on the near safety as he fills. Rule two: hit the near color — find an opponent and block.',
+/** Tight-end-side playside Y (Red Left, Black Right): his base man, same as the first gun pass. */
+const Y_PLAYSIDE_JOB: Record<FrontId, Assignment> = {
+  '44': {
+    rule: 'Playside. Base the walked-up backer.',
+    detail:
+      'Our tackle has the end. Release outside the end and BASE the walked-up backer. Drive him out of the alley.',
+  },
+  '43': {
+    rule: 'Playside. Base the backer over you.',
+    detail:
+      'Our tackle has the end. Release outside him, climb, and base the playside backer sitting over your head. Turn him out of the lane.',
+  },
+  '52': {
+    rule: 'Playside. Pin the first filler.',
+    detail:
+      "Our tackle has the end. Release tight off the end's outside hip and pin the first jersey that fills, pushing him back inside.",
+  },
 }
 
-const SLOT_STALK_CORNER: Assignment = {
-  rule: 'Playside slot — stalk the corner.',
-  detail:
-    'Y bases the walked-up backer, so the corner is the next man to the alley. Release straight at him, break down under control, and stay on his outside number — the pitch runs off your block.',
+/** Tight-end-side playside slot (Red L, Black R). */
+const SLOT_PLAYSIDE_JOB: Record<FrontId, Assignment> = {
+  '44': {
+    rule: 'Playside slot. Stalk the corner.',
+    detail:
+      'Y bases the walked-up backer, so the corner is the next man to the alley. Release straight at him, break down under control, and stay on his outside number. The pitch runs off your block.',
+  },
+  '43': {
+    rule: 'Playside slot. Crack down on the near safety.',
+    detail:
+      'The near safety is the alley filler in this front. Climb inside the corner, get your helmet across him as he comes down, and pin him back inside. Rule two: hit the near color. Find an opponent and block.',
+  },
+  '52': {
+    rule: 'Playside slot. Crack down on the near safety.',
+    detail:
+      'The near safety is the alley filler in this front. Climb inside the corner, get your helmet across him as he comes down, and pin him back inside. Rule two: hit the near color. Find an opponent and block.',
+  },
 }
 
-const SLOT_CRACK_SAFETY: Assignment = {
-  rule: 'Playside slot — crack down on the near safety.',
-  detail:
-    'The backers inside are covered. The near safety is the alley filler in this front — climb inside the corner, get your helmet across him as he comes down, and pin him back inside. Rule two: hit the near color — find an opponent and block.',
-}
+// ---------------------------------------------------------------------------
+// Words shared by all four plays.
+// ---------------------------------------------------------------------------
 
-/** Playside tackle from the gun — every front, both sides. */
-const PST_BLOCK_DE: Assignment = {
-  rule: 'Gun change: BLOCK the end. Base him — do not let him come down.',
-  detail:
-    'Under center you leave the end alone. From the gun you do NOT: he is the man on your outside shoulder, and if nobody touches him he sprints down the line and takes the dive back and the quarterback both. Step at him, get your helmet on his inside number, and keep him from coming down. Drive him back off the line.',
-}
+const SUMMARY = 'Triple option from the gun. Uncommon: both tackles block the ends.'
 
-/** Y on the tight-end-side gun veer: the end is the tackle's now. */
-const Y_GUN_44: Assignment = {
-  rule: 'Playside — base the walked-up backer.',
-  detail:
-    'Our tackle blocks the end from the gun, so release outside the end and BASE the walked-up backer — drive him out of the alley.',
-}
-const Y_GUN_43: Assignment = {
-  rule: 'Playside — base the backer over you.',
-  detail:
-    'Our tackle blocks the end from the gun. Release outside the end, climb, and base the playside backer sitting over your head — turn him out of the lane.',
-}
-const Y_GUN_52: Assignment = {
-  rule: 'Playside — pin the first filler.',
-  detail:
-    'Our tackle blocks the end from the gun. Release tight off the end\'s outside hip and pin the first jersey that fills — the playside backer — pushing him back inside.',
-}
-
-const SUMMARY = 'Triple option from the gun. DO NOT RUN — the playside tackle blocks the DE.'
-
-/** Coach Ryan's reason, shown with the red Do Not Run badge. */
-const DO_NOT_RUN =
-  'In the gun an open defensive end can sprint down and take the running back and the quarterback both. Drawn here with the end blocked, but this play stays out of the game plan.'
+/** Coach Ryan's "when to call it", shown with the amber Uncommon Play badge. */
+const UNCOMMON =
+  'Call it only when we see a hole in the B gap, right behind one of our guards, that the back can sprint straight up through.'
 
 const GUN_CHANGE_NOTE =
-  'Gun change: we BLOCK the end. Left alone, he sprints down and takes the back AND the quarterback.'
+  'Both tackles block the ends. Keep them away from the center. Backside tackle: 1-2 seconds. Quarterback still reads the playside end.'
 
 const coachNotesRight = [
   GUN_CHANGE_NOTE,
-  "Dive back: no motion, no waiting. Straight at the guard's crack, full speed.",
+  'Dive back: no motion, no waiting. Straight up the B gap, full speed.',
   'Super: behind the quarterback, five wide, one back. Be there every time.',
 ]
 
 const coachNotesLeft = [
   GUN_CHANGE_NOTE,
-  "Super: no motion, no waiting. Straight at the guard's crack, full speed.",
+  'Super: no motion, no waiting. Straight up the B gap, full speed.',
   'Pitch man: behind the quarterback, five wide, one back. Be there every time.',
 ]
 
-const DE_BLOCK_REVIEW_NOTE = (pst: string, readKeys: string) =>
-  `DO NOT RUN + DE BLOCKED (Coach Ryan, 2026-09-23): an open end sprints down from the gun and takes the dive back and the quarterback. ${pst} now BASES the playside end on every front instead of veering inside him — he is the only blocker inside the end, so the only one who can stop him coming down. The quarterback reads the first playside defender left free instead (${readKeys}). The man ${pst} used to climb to is that read or is simply unblocked — that is why the play stays flagged Do Not Run.`
+const ENDS_REVIEW_NOTE = (pst: string, bst: string, side: string) =>
+  `UNCOMMON PLAY + BOTH ENDS BLOCKED (Coach Ryan, 2026-09-23), replacing the 2026-09-23 Do Not Run pass: "The goal of the play is to keep the defensive ends away from the center." ${pst} keeps the playside end OUTSIDE (up his inside number, bar pushing back and out). ${bst} blocks the backside end for 1–2 seconds, sliding inside toward the center so the end goes outside and around him — drawn as a short stroke to the end's inside shoulder. The quarterback reads the playside end (E-${side}) on every front: give unless he beats ${pst} inside, then keep. The corner/safety reads from the Do Not Run pass are gone.`
+
+const LINE_REVIEW_NOTE =
+  '"We are not as concerned with linemen climbing on this one." Guards base the 3-technique on their outside shoulder; the center steps playside and fills the A gap vs the 4-4 and 4-3 and bases the nose vs the 5-2 (no scoop, no Rip pull). Consequence: every inside backer except the one backside Y climbs to is unblocked — on the wing side the playside backers are free too. That is the trade Ryan described: the back is through the B gap before they matter.'
+
+const QB_PITCH_REVIEW_NOTE =
+  "Quarterback's keep and the pitch man's path are unchanged from the first gun pass: the keep still breaks at the playside end's outside hip, which is where he goes if the end beats the tackle inside, and the pitch man still holds 5-by-1 off it. No conflict found; flag if Ryan wants the pitch man to do something else on a play that is mostly a handoff."
 
 // ---------------------------------------------------------------------------
 // RED GUN VEER RIGHT — wing side. R dives, Super pitches, L is the backside
-// slot. RT bases the end; the wing's old pin and RT's old climb are both
-// gone, so the playside backers are the quarterback's read or unblocked.
+// slot. RT keeps the end out; LT slides inside on the backside end; L blocks
+// the S in the alley; Y climbs to the backer on his side.
 // ---------------------------------------------------------------------------
 
-const draftWingSide = (pst: string, slot: string, side: string) => [
-  `DRAFT — Wing side with ${pst} on the end: vs the 4-4 the read moves to the walked-up outside backer and the backer over the guard is unblocked (he used to be ${pst}'s climb). Vs the 4-3 and 5-2 the read is the playside backer ${pst} used to climb to. X still blocks the corner.`,
-  `DRAFT — Backside slot (${slot} at ${side}): given the base's backside-split-end job, 'work to the safety' — the free safety in the 4-4, the near safety in the two-high fronts. Drawn as a work-to run path, no bar. Alternative: block the backside corner.`,
-  'DRAFT — Dive back beside the quarterback: drawn tucking a hair inside to mesh in FRONT of the quarterback at about (±0.9,−2.7), then the base dive bend at the guard\'s crack, carried to 4½ yards. Quarterback rides the mesh flat to about four line-splits outside the ball and breaks at ~45°, same endpoint as the base keep.',
-  'DRAFT — Pitch man: single `pitch` stroke from his gun spot, crossing behind the quarterback (deeper than −3 until he is past him) and settling 5 wide by 1 back off the quarterback\'s break at (±11.4, 0.2). No motion, per Ryan.',
-]
+const wingBacksideActions = (front: FrontId): ActionMap => ({
+  ...lineRight(front),
+  Y: Y_CLIMB[front],
+  L: SLOT_ALLEY[front],
+})
+const wingBacksideJobs = (front: FrontId): AssignmentMap => ({
+  ...lineJobsRight(front),
+  Y: Y_CLIMB_JOB[front],
+  L: SLOT_ALLEY_JOB[front],
+})
+
+const wingSideReviewNote = (slot: string, set: string, side: 'L' | 'R') =>
+  `JUDGMENT CALL — backside "${slot} blocks the S alley" / "Y climbs to the middle linebacker on his side", per front. 4-4: there is no strong safety, so the S is the walked-up Sam (O-${side}, drawn as S against ${set}) standing in the alley; Y climbs to the inside backer over the guard (B-${side}). 4-3: ${slot} takes the strong safety ($, F-${side}) coming down into the alley and Y climbs to the backer on his side (B-${side}, drawn as S); the Mike is not blocked. 5-2: ${slot} to the $ (F-${side}), Y to the inside backer (B-${side}). Alternative for the 4-3: ${slot} on the Sam and Y on the Mike.`
 
 export const veerRightRedGun: Play = {
   ...gunPlay(veerRightRed, {
@@ -372,60 +613,59 @@ export const veerRightRedGun: Play = {
     audibleFlipId: 'veer-left-red-gun',
     summary: SUMMARY,
     description:
-      'Veer Right from the gun. No motion: R is already beside the quarterback, so he takes the dive at the crack of the right guard, the quarterback meshes with him, and Super swings behind the quarterback as the pitch man. The gun change: RT BLOCKS the end instead of leaving him to the read — from the gun an unblocked end sprints down and takes the back and the quarterback both — so the quarterback reads the first playside defender left free. L, out in the left slot, works to the safety on the back side.',
+      'Veer Right from the gun. No motion: R is already beside the quarterback, so he takes the dive up the B gap off the right guard, the quarterback meshes with him, and Super swings behind the quarterback as the pitch man. Both tackles block the ends to keep them away from the center: RT keeps his end outside, and LT holds the backside end for a second or two, sliding inside so the end has to go around. The quarterback still reads the playside end and keeps only if he beats RT inside. On the back side L blocks the S in the alley and Y climbs to the backer on his side.',
     coachNotes: coachNotesRight,
     assignments: {
       Q: Q_GUN,
       R: dive('right'),
       S: pitchMan('the quarterback'),
-      L: slotBackside('left'),
-      RT: PST_BLOCK_DE,
+      ...wingBacksideJobs('44'),
     },
     actions: {
       Q: Q_READ_RIGHT,
       R: DIVE_RIGHT,
       S: PITCH_RIGHT,
-      RT: PST_BASE_DE_RIGHT,
     },
-    vs: {
-      '44': {
-        readKey: 'O-R',
-        ignored: [],
-        actions: { L: SLOT_BACKSIDE_TO_F_44 },
-        // The base's per-front R text is the wing's pin — replace it on every front.
-        assignments: { R: dive('right'), L: SLOT_BACKSIDE_44, RT: PST_BLOCK_DE },
-      },
-      '43': {
-        readKey: 'B-R',
-        actions: { L: SLOT_BACKSIDE_TO_F_TWO_HIGH },
-        assignments: { R: dive('right'), L: SLOT_BACKSIDE_TWO_HIGH, RT: PST_BLOCK_DE },
-      },
-      '52': {
-        readKey: 'B-R',
-        actions: { L: SLOT_BACKSIDE_TO_F_TWO_HIGH },
-        assignments: { R: dive('right'), L: SLOT_BACKSIDE_TWO_HIGH, RT: PST_BLOCK_DE },
-      },
-    },
+    vs: Object.fromEntries(
+      FRONTS.map((f) => [
+        f,
+        {
+          readKey: 'E-R',
+          ignored: [],
+          actions: wingBacksideActions(f),
+          // The base's per-front R text is the wing's pin — replace it on every front.
+          assignments: { R: dive('right'), ...wingBacksideJobs(f) },
+        },
+      ]),
+    ),
     reviewNotes: [
-      DE_BLOCK_REVIEW_NOTE('RT', '4-4: the walked-up outside backer; 4-3 and 5-2: the playside backer'),
-      ...draftWingSide('RT', 'L', '(−8.5,−1)'),
+      ENDS_REVIEW_NOTE('RT', 'LT', 'R'),
+      wingSideReviewNote('L', 'Red', 'L'),
+      LINE_REVIEW_NOTE,
+      QB_PITCH_REVIEW_NOTE,
     ],
   }),
-  doNotRun: DO_NOT_RUN,
+  uncommon: UNCOMMON,
 }
 
 // ---------------------------------------------------------------------------
 // RED GUN VEER LEFT — tight-end side. Super dives, R pitches, L is the
-// PLAYSIDE slot. LT bases the end; Y keeps his base man outside the end;
-// L's job moves from the wing spot to the slot.
+// PLAYSIDE slot. LT keeps the end out; RT slides inside on the backside end;
+// Y and L keep their jobs from the first gun pass.
 // ---------------------------------------------------------------------------
 
-const draftTeSide = (slot: string, side: string, pst: string) => [
-  `DRAFT — Tight-end side with ${pst} on the end: Y keeps his base man (walked-up backer in the 4-4, playside backer in the 4-3, first filler in the 5-2). Vs the 4-4 the backer over the guard — ${pst}'s old climb — is left free and becomes the read. Vs the 4-3 and 5-2 every backer is covered and the slot has the near safety, so the only man left free is the CORNER: he is the read. Y is not the one on the end because he lines up OUTSIDE him — a down block drives the end into the dive.`,
-  `DRAFT — Playside slot (${slot} at ${side}): Y bases his base man, so the slot takes the NEXT man to the alley. Vs the 4-4 that is the corner — stalk block, aimed by target id. Vs the 4-3 and 5-2 it is the near safety filling — a crack from the slot, bar around 5 yards cutting back inside. Alternative: stalk the corner on every front and read the safety instead.`,
-  'DRAFT — Dive back (Super at (−1,−4) on the left, straight behind the crack of the guard): drawn tucking a hair inside to mesh in FRONT of the quarterback at about (∓0.9,−2.7), then the base dive bend, carried to 4½ yards. Quarterback rides the mesh flat and breaks at ~45°, same endpoint as the base keep.',
-  'DRAFT — Pitch man (the wing beside the quarterback): single `pitch` stroke from (1,−4), crossing behind the quarterback and settling 5 wide by 1 back off his break at (∓11.4, 0.2). No motion, per Ryan.',
-]
+const teSideActions = (front: FrontId): ActionMap => ({
+  ...lineLeft(front),
+  L: SLOT_PLAYSIDE[front],
+})
+const teSideJobs = (front: FrontId): AssignmentMap => ({
+  ...lineJobsLeft(front),
+  Y: Y_PLAYSIDE_JOB[front],
+  L: SLOT_PLAYSIDE_JOB[front],
+})
+
+const TE_SIDE_REVIEW_NOTE =
+  "Tight-end side, not re-ruled on 2026-09-23: Y keeps his man outside the end (walked-up backer in the 4-4, playside backer in the 4-3, first filler in the 5-2) and the playside slot keeps his (stalk the corner in the 4-4, crack the near safety in the 4-3 and 5-2). Y's strokes are the under-center play's."
 
 export const veerLeftRedGun: Play = {
   ...gunPlay(veerLeftRed, {
@@ -434,50 +674,36 @@ export const veerLeftRedGun: Play = {
     audibleFlipId: 'veer-right-red-gun',
     summary: SUMMARY,
     description:
-      'Veer Left from the gun, at the tight end. No motion: Super is the playside back, so he takes the dive at the crack of the left guard, the quarterback meshes with him, and R swings behind the quarterback as the pitch man. The gun change: LT BLOCKS the end instead of leaving him to the read — from the gun an unblocked end sprints down and takes the back and the quarterback both — so the quarterback reads the first playside defender left free. Y still bases his man outside the end, and L — out in the left slot instead of on the wing — blocks the alley from there.',
+      'Veer Left from the gun, at the tight end. No motion: Super is the playside back, so he takes the dive up the B gap off the left guard, the quarterback meshes with him, and R swings behind the quarterback as the pitch man. Both tackles block the ends to keep them away from the center: LT keeps his end outside, and RT holds the backside end for a second or two, sliding inside so the end has to go around. The quarterback still reads the playside end and keeps only if he beats LT inside. Y bases his man outside the end, and L blocks the alley from the left slot.',
     coachNotes: coachNotesLeft,
     assignments: {
       Q: Q_GUN,
       S: dive('left'),
       R: pitchMan('the quarterback'),
-      L: SLOT_PLAYSIDE,
-      LT: PST_BLOCK_DE,
+      ...teSideJobs('44'),
     },
     actions: {
       Q: Q_READ_LEFT,
       S: DIVE_LEFT,
       R: PITCH_LEFT,
-      LT: PST_BASE_DE_LEFT,
     },
-    vs: {
-      '44': {
-        readKey: 'B-L',
-        actions: { L: SLOT_STALK_CORNER_LEFT },
-        assignments: { L: SLOT_STALK_CORNER, LT: PST_BLOCK_DE, Y: Y_GUN_44 },
-      },
-      '43': {
-        readKey: 'C-L',
-        actions: { L: SLOT_CRACK_SAFETY_LEFT },
-        assignments: { L: SLOT_CRACK_SAFETY, LT: PST_BLOCK_DE, Y: Y_GUN_43 },
-      },
-      '52': {
-        readKey: 'C-L',
-        actions: { L: SLOT_CRACK_SAFETY_LEFT },
-        assignments: { L: SLOT_CRACK_SAFETY, LT: PST_BLOCK_DE, Y: Y_GUN_52 },
-      },
-    },
+    vs: Object.fromEntries(
+      FRONTS.map((f) => [f, { readKey: 'E-L', actions: teSideActions(f), assignments: teSideJobs(f) }]),
+    ),
     reviewNotes: [
-      DE_BLOCK_REVIEW_NOTE('LT', '4-4: the backer over the guard; 4-3 and 5-2: the corner'),
-      ...draftTeSide('L', '(−8.5,−1)', 'LT'),
+      ENDS_REVIEW_NOTE('LT', 'RT', 'L'),
+      TE_SIDE_REVIEW_NOTE,
+      LINE_REVIEW_NOTE,
+      QB_PITCH_REVIEW_NOTE,
     ],
   }),
-  doNotRun: DO_NOT_RUN,
+  uncommon: UNCOMMON,
 }
 
 // ---------------------------------------------------------------------------
 // BLACK GUN VEER RIGHT — tight-end side (Black puts Y right). L is beside the
 // quarterback and dives; Super pitches; R is the PLAYSIDE slot at (8.5,−1).
-// Built from its own Black base — the backfield is Red Right's, not a mirror.
+// Line, Y and slot are Red Left mirrored; the backfield is Red Right's.
 // ---------------------------------------------------------------------------
 
 export const veerRightBlackGun: Play = {
@@ -487,51 +713,40 @@ export const veerRightBlackGun: Play = {
     audibleFlipId: 'veer-left-black-gun',
     summary: SUMMARY,
     description:
-      'Veer Right from the gun out of Black — the tight end side. No motion: L is beside the quarterback in Black, so he takes the dive at the crack of the right guard, the quarterback meshes with him, and Super swings behind the quarterback as the pitch man. The gun change: RT BLOCKS the end instead of leaving him to the read — from the gun an unblocked end sprints down and takes the back and the quarterback both — so the quarterback reads the first playside defender left free. Y still bases his man outside the end, and R — out in the right slot instead of on the wing — blocks the alley from there.',
+      'Veer Right from the gun out of Black, the tight end side. No motion: L is beside the quarterback in Black, so he takes the dive up the B gap off the right guard, the quarterback meshes with him, and Super swings behind the quarterback as the pitch man. Both tackles block the ends to keep them away from the center: RT keeps his end outside, and LT holds the backside end for a second or two, sliding inside so the end has to go around. The quarterback still reads the playside end and keeps only if he beats RT inside. Y bases his man outside the end, and R blocks the alley from the right slot.',
     coachNotes: coachNotesRight,
     assignments: {
       Q: Q_GUN,
       L: dive('right'),
       S: pitchMan('the quarterback'),
-      R: SLOT_PLAYSIDE,
-      RT: PST_BLOCK_DE,
+      ...mirrorJobs(teSideJobs('44')),
     },
     actions: {
       Q: Q_READ_RIGHT,
       L: DIVE_RIGHT,
       S: PITCH_RIGHT,
-      RT: PST_BASE_DE_RIGHT,
     },
-    vs: {
-      '44': {
-        readKey: 'B-R',
-        actions: { R: flipX(SLOT_STALK_CORNER_LEFT) },
-        assignments: { R: SLOT_STALK_CORNER, RT: PST_BLOCK_DE, Y: Y_GUN_44 },
-      },
-      '43': {
-        readKey: 'C-R',
-        actions: { R: flipX(SLOT_CRACK_SAFETY_LEFT) },
-        assignments: { R: SLOT_CRACK_SAFETY, RT: PST_BLOCK_DE, Y: Y_GUN_43 },
-      },
-      '52': {
-        readKey: 'C-R',
-        actions: { R: flipX(SLOT_CRACK_SAFETY_LEFT) },
-        assignments: { R: SLOT_CRACK_SAFETY, RT: PST_BLOCK_DE, Y: Y_GUN_52 },
-      },
-    },
+    vs: Object.fromEntries(
+      FRONTS.map((f) => [
+        f,
+        { readKey: 'E-R', actions: mirrorActions(teSideActions(f)), assignments: mirrorJobs(teSideJobs(f)) },
+      ]),
+    ),
     reviewNotes: [
-      DE_BLOCK_REVIEW_NOTE('RT', '4-4: the backer over the guard; 4-3 and 5-2: the corner'),
-      ...draftTeSide('R', '(8.5,−1)', 'RT'),
-      'DRAFT — Black Gun is not Red Gun mirrored: the backfield strokes here are Red Gun Veer Right\'s verbatim (the wing beside the quarterback is L instead of R, same spot); only the slot strokes are the Red-left ones negated in x.',
+      ENDS_REVIEW_NOTE('RT', 'LT', 'R'),
+      TE_SIDE_REVIEW_NOTE,
+      LINE_REVIEW_NOTE,
+      QB_PITCH_REVIEW_NOTE,
+      "Black Gun is not Red Gun mirrored in the backfield: the backfield strokes here are Red Gun Veer Right's verbatim (the wing beside the quarterback is L instead of R, same spot); the line, Y and slot are Red Gun Veer Left's mirrored.",
     ],
   }),
-  doNotRun: DO_NOT_RUN,
+  uncommon: UNCOMMON,
 }
 
 // ---------------------------------------------------------------------------
-// BLACK GUN VEER LEFT — wing side (Y is right, X split left). Super dives at
-// the crack of LG; L, beside the quarterback, is the pitch man; R is the
-// BACKSIDE slot at (8.5,−1). LT bases the end.
+// BLACK GUN VEER LEFT — wing side (Y is right, X split left). Super dives up
+// the B gap off LG; L, beside the quarterback, is the pitch man; R is the
+// BACKSIDE slot at (8.5,−1). Line, Y and slot are Red Right mirrored.
 // ---------------------------------------------------------------------------
 
 export const veerLeftBlackGun: Play = {
@@ -541,47 +756,40 @@ export const veerLeftBlackGun: Play = {
     audibleFlipId: 'veer-right-black-gun',
     summary: SUMMARY,
     description:
-      'Veer Left from the gun out of Black — the wing side. No motion: Super is the playside back, so he takes the dive at the crack of the left guard, the quarterback meshes with him, and L swings behind the quarterback as the pitch man. The gun change: LT BLOCKS the end instead of leaving him to the read — from the gun an unblocked end sprints down and takes the back and the quarterback both — so the quarterback reads the first playside defender left free. R, out in the right slot, works to the safety on the back side.',
+      'Veer Left from the gun out of Black, the wing side. No motion: Super is the playside back, so he takes the dive up the B gap off the left guard, the quarterback meshes with him, and L swings behind the quarterback as the pitch man. Both tackles block the ends to keep them away from the center: LT keeps his end outside, and RT holds the backside end for a second or two, sliding inside so the end has to go around. The quarterback still reads the playside end and keeps only if he beats LT inside. On the back side R blocks the S in the alley and Y climbs to the backer on his side.',
     coachNotes: coachNotesLeft,
     assignments: {
       Q: Q_GUN,
       S: dive('left'),
       L: pitchMan('the quarterback'),
-      R: slotBackside('right'),
-      LT: PST_BLOCK_DE,
+      ...mirrorJobs(wingBacksideJobs('44')),
     },
     actions: {
       Q: Q_READ_LEFT,
       S: DIVE_LEFT,
       L: PITCH_LEFT,
-      LT: PST_BASE_DE_LEFT,
     },
-    vs: {
-      '44': {
-        readKey: 'O-L',
-        ignored: [],
-        actions: { R: flipX(SLOT_BACKSIDE_TO_F_44) },
-        // The base's per-front L text is the wing's pin — replace it on every front.
-        assignments: { L: pitchMan('the quarterback'), R: SLOT_BACKSIDE_44, LT: PST_BLOCK_DE },
-      },
-      '43': {
-        readKey: 'B-L',
-        actions: { R: flipX(SLOT_BACKSIDE_TO_F_TWO_HIGH) },
-        assignments: { L: pitchMan('the quarterback'), R: SLOT_BACKSIDE_TWO_HIGH, LT: PST_BLOCK_DE },
-      },
-      '52': {
-        readKey: 'B-L',
-        actions: { R: flipX(SLOT_BACKSIDE_TO_F_TWO_HIGH) },
-        assignments: { L: pitchMan('the quarterback'), R: SLOT_BACKSIDE_TWO_HIGH, LT: PST_BLOCK_DE },
-      },
-    },
+    vs: Object.fromEntries(
+      FRONTS.map((f) => [
+        f,
+        {
+          readKey: 'E-L',
+          ignored: [],
+          actions: mirrorActions(wingBacksideActions(f)),
+          // The base's per-front L text is the wing's pin — replace it on every front.
+          assignments: { L: pitchMan('the quarterback'), ...mirrorJobs(wingBacksideJobs(f)) },
+        },
+      ]),
+    ),
     reviewNotes: [
-      DE_BLOCK_REVIEW_NOTE('LT', '4-4: the walked-up outside backer; 4-3 and 5-2: the playside backer'),
-      ...draftWingSide('LT', 'R', '(8.5,−1)'),
-      'DRAFT — Black Gun is not Red Gun mirrored: the backfield strokes here are Red Gun Veer Left\'s verbatim (the pitch man is L instead of R, same spot beside the quarterback); only the slot and tackle strokes are the Red-right ones negated in x.',
+      ENDS_REVIEW_NOTE('LT', 'RT', 'L'),
+      wingSideReviewNote('R', 'Black', 'R'),
+      LINE_REVIEW_NOTE,
+      QB_PITCH_REVIEW_NOTE,
+      "Black Gun is not Red Gun mirrored in the backfield: the backfield strokes here are Red Gun Veer Left's verbatim (the pitch man is L instead of R, same spot beside the quarterback); the line, Y and slot are Red Gun Veer Right's mirrored.",
     ],
   }),
-  doNotRun: DO_NOT_RUN,
+  uncommon: UNCOMMON,
 }
 
 export const veerGunPlays: Play[] = [
