@@ -48,17 +48,29 @@
  * on his own side of the quarterback in every play. Every Black play is
  * still built from its own Black base.
  *
+ * RYAN (2026-09-23) — THE TIGHT-END SIDE, X ON A JET: "For Black Gun Buck
+ * Sweep Right, the spirit of the play is to fake a run to the left and then
+ * run with the motion player to the right. The fake handoff goes to the Super
+ * like you already have it. That part is good. The X in this play would go in
+ * motion and take the handoff and sweep to the right. The R wing then blocks
+ * the S alley linebacker. Then of course the opposite is true." He also
+ * confirmed the wing beside the quarterback LEADS the sweep: out around the
+ * playside tackle ahead of the carrier, and he takes the corner (X is not out
+ * there to block him any more).
+ *
  * THE FOUR PLAYS:
- *   Black Gun Left  (split-end side, toward X) — Ryan's words above.
+ *   Black Gun Left  (split-end side, toward X) — Ryan's 09-21 words above:
+ *                   R motions in from the slot and carries, L fakes right,
+ *                   Super leads to the left alley, X has the corner.
  *   Red Gun Right   (split-end side, toward X) — Ryan 09-23: L motions across
  *                   and carries, SUPER fakes left, R leads to the right alley.
- *   Red Gun Left    (tight-end side) — NOT described by Ryan. Same structure
- *                   applied: the slot wing L motions in and takes the sweep
- *                   back toward his own side; Y, the widest man there, has
- *                   the corner. Every choice is DRAFT in reviewNotes.
- *   Black Gun Right (tight-end side) — same as Red Gun Right for the backs
- *                   (Super fakes left, L leads right); R, the slot wing,
- *                   motions in and hairpins back right. DRAFT.
+ *   Black Gun Right (tight-end side) — Ryan 09-23, the jet: X jets across from
+ *                   wide left and carries right, SUPER fakes left, L (beside the
+ *                   QB) leads around RT to the corner, R (right slot) blocks
+ *                   the S in the alley.
+ *   Red Gun Left    (tight-end side) — "the opposite is true": X jets across
+ *                   from wide right and carries left, R fakes right, SUPER
+ *                   leads around LT to the corner, L (left slot) blocks the S.
  *
  * Action paths are ABSOLUTE yards EXCLUDING the player's start; every Q, S
  * and wing path below is drawn from the GUN spots, not offset from the base.
@@ -81,16 +93,12 @@ const flip = (actions: Action[]): Action[] =>
   actions.map((a) => ({ ...a, path: a.path?.map((p) => ({ x: -p.x, y: p.y })) }))
 
 // ---------------------------------------------------------------------------
-// The motion wing. Pre-snap he comes in from the slot, flat and behind the
-// quarterback, and is still moving at the snap: the motion ends at (±2.4,−5.2),
-// a couple of yards short of the quarterback's heels. Two carries follow it:
-//   THROUGH — the sweep keeps going the way the motion was going (Black Left,
-//             Red Right: the split-end side). Mesh at about (∓0.4,−5.4).
-//   RETURN  — the sweep goes back the way he came (Red Left, Black Right: the
-//             tight-end side). He takes the ball at about (∓0.9,−5.5) and
-//             hairpins back. See the DRAFT note on those plays.
-// The ball turns up OUTSIDE everything — where the split end (x ±12) or the
-// slot (x ±8.5) lined up — because nobody kicks anybody out on this version.
+// The motion wing (the split-end-side plays: Black Left, Red Right). Pre-snap
+// he comes in from the slot, flat and behind the quarterback, and is still
+// moving at the snap: the motion ends at (±2.4,−5.2), a couple of yards short
+// of the quarterback's heels. The sweep keeps going the way the motion was
+// going; mesh at about (∓0.4,−5.4). The ball turns up OUTSIDE everything —
+// where the split end (x ±12) lined up — because nobody kicks anybody out.
 // ---------------------------------------------------------------------------
 
 /** R in Black Gun, from the right slot (8.5,−1), motioning left. */
@@ -121,21 +129,46 @@ const SWEEP_LEFT_THROUGH: Action = {
 }
 const SWEEP_RIGHT_THROUGH: Action = flip([SWEEP_LEFT_THROUGH])[0]!
 
-/** Sweep LEFT after motioning in from the LEFT: take it, hairpin, go. */
-const SWEEP_LEFT_RETURN: Action = {
-  kind: 'carry',
+// ---------------------------------------------------------------------------
+// X's jet (the tight-end-side plays: Red Left, Black Right). Ryan (09-23):
+// "The X in this play would go in motion and take the handoff and sweep." X
+// starts split wide on the far side (±12,0) and comes in jet motion flat
+// across, behind the quarterback. The motion ends at the same spot the slot
+// wing's does on the other two plays, (±2.4,−5.2), so X is at full speed at
+// the snap and meets the quarterback just after it at the same 5.4-deep mesh
+// — the quarterback's footwork is identical on all four plays. He keeps going
+// and sweeps OUTSIDE everything, outside the lead back's block on the corner,
+// so his path never crosses the lead's.
+// ---------------------------------------------------------------------------
+
+/** X in Red Gun, from (12,0), jet motion left across the formation. */
+const JET_FROM_RIGHT: Action = {
+  kind: 'motion',
   path: [
-    { x: -0.9, y: -5.5 },
-    { x: -2.4, y: -6 },
-    { x: -4.6, y: -5.6 },
-    { x: -6.6, y: -4.6 },
-    { x: -8.4, y: -3 },
-    { x: -9.6, y: -1 },
-    { x: -9.8, y: 1.4 },
-    { x: -9.2, y: 4.8 },
+    { x: 10.6, y: -1.4 },
+    { x: 8, y: -3 },
+    { x: 5.2, y: -4.4 },
+    { x: 2.4, y: -5.2 },
   ],
 }
-const SWEEP_RIGHT_RETURN: Action = flip([SWEEP_LEFT_RETURN])[0]!
+/** X in Black Gun, from (−12,0), jet motion right. */
+const JET_FROM_LEFT: Action = flip([JET_FROM_RIGHT])[0]!
+
+/** X's carry LEFT off the jet: mesh behind the QB, around the lead, up the sideline side. */
+const JET_SWEEP_LEFT: Action = {
+  kind: 'carry',
+  path: [
+    { x: 0.6, y: -5.4 },
+    { x: -1.6, y: -5.4 },
+    { x: -4, y: -5.3 },
+    { x: -6.6, y: -4.6 },
+    { x: -9, y: -3.4 },
+    { x: -10.8, y: -1.4 },
+    { x: -11.8, y: 1.2 },
+    { x: -12.2, y: 4.4 },
+  ],
+}
+const JET_SWEEP_RIGHT: Action = flip([JET_SWEEP_LEFT])[0]!
 
 // ---------------------------------------------------------------------------
 // The buck fake — the wing beside the quarterback at (1,−4).
@@ -200,6 +233,42 @@ const S_LEFT_ALLEY: Action = {
 
 /** The wing beside the quarterback, from (1,−4), to the RIGHT alley. */
 const WING_RIGHT_ALLEY: Action = flip([S_LEFT_ALLEY])[0]!
+
+/**
+ * The jet plays: the lead back goes out around the playside tackle, stays
+ * OUTSIDE the slot's crack block (he passes under the slot's spot after the
+ * slot has left it), and climbs to the corner. X runs outside him. Going left
+ * it is Super from (−1,−4); going right the wing beside the QB from (1,−4).
+ */
+const LEAD_LEFT_CORNER: Action = {
+  kind: 'run',
+  path: [
+    { x: -2.8, y: -4.2 },
+    { x: -5, y: -3.4 },
+    { x: -7.4, y: -2.6 },
+    { x: -9.4, y: -1.2 },
+    { x: -10.2, y: 1.4 },
+    { x: -10.4, y: 3.6 },
+  ],
+}
+const LEAD_RIGHT_CORNER: Action = flip([LEAD_LEFT_CORNER])[0]!
+
+/**
+ * The jet plays: the slot wing cracks inside on the S — the alley linebacker
+ * (Ryan: "blocks the S alley linebacker"). From the left slot (−8.5,−1); the
+ * target is set per front by the caller. 4-4: the walked-up S at (−6.5,3.5).
+ * 4-3: the Sam at (−4,4.5). 5-2: no S — the inside backer at (−2,4).
+ */
+const SLOT_CRACK_LEFT: Record<'44' | '43' | '52', Action[]> = {
+  '44': [{ kind: 'block', targetId: 'O-L', path: [{ x: -8.2, y: 0.6 }, { x: -7.5, y: 2.1 }, { x: -6.95, y: 2.95 }] }],
+  '43': [{ kind: 'block', targetId: 'B-L', path: [{ x: -8.1, y: 0.8 }, { x: -6.5, y: 2.7 }, { x: -4.6, y: 4 }] }],
+  '52': [{ kind: 'block', targetId: 'B-L', path: [{ x: -8.1, y: 0.8 }, { x: -6.2, y: 2.4 }, { x: -2.7, y: 3.6 }] }],
+}
+const SLOT_CRACK_RIGHT: Record<'44' | '43' | '52', Action[]> = {
+  '44': [{ ...flip(SLOT_CRACK_LEFT['44'])[0]!, targetId: 'O-R' }],
+  '43': [{ ...flip(SLOT_CRACK_LEFT['43'])[0]!, targetId: 'B-R' }],
+  '52': [{ ...flip(SLOT_CRACK_LEFT['52'])[0]!, targetId: 'B-R' }],
+}
 
 // ---------------------------------------------------------------------------
 // The playside tackle CONTAINS the end: a short reach that ends OUTSIDE the
@@ -311,12 +380,6 @@ const PLAYSIDE_GUARD = (side: Side): Assignment => ({
 const BACKSIDE_GUARD = (side: Side): Assignment => ({
   rule: 'One push, then pull. Around our tackle, upfield, block any jersey.',
   detail: `Give the tackle over you one hard shove — one — then pull flat down the line. Get around our ${side} tackle, turn upfield, and block the first jersey you see. Do not stop to look for a certain man: run and hit somebody.`,
-})
-
-/** Y on the tight-end side: he is the widest man there, so the corner is his. */
-const Y_CORNER = (side: Side): Assignment => ({
-  rule: 'Climb — block the corner.',
-  detail: `The tackle has the end and ${lead(side)} has the alley, so you are free. You are the widest man on our side, and the ball is coming all the way outside — the corner is yours. Release, get to him fast, and stay on him.`,
 })
 
 /** Per-front words for the three men whose target changes with the front. */
@@ -640,250 +703,290 @@ const redGunRight = gunPlay(buckSweepRightRed, {
 })
 
 // ===========================================================================
-// RED GUN — Buck Sweep LEFT (tight-end side). NOT DESCRIBED BY RYAN. Same
-// structure: L motions in from the left slot and takes the sweep back toward
-// his own side; R fakes the buck right; S leads to the left alley; LT
-// contains; LG engages then pulls; RG pushes once then pulls around LT; Y,
-// the widest man on the play side, has the corner. Every decision is DRAFT.
+// THE JET PLAYS — the tight-end side (Red Gun Left, Black Gun Right). Ryan
+// (09-23): X jets across and carries, the back AWAY from the sweep fakes the
+// buck, the wing beside the QB / Super leads around the playside tackle to
+// the corner, and the slot wing blocks the S in the alley. The line keeps the
+// split-end-side plays' jobs (tackle contains, guards engage-then-pull).
 // ===========================================================================
 
-const tightEndSideNotes = (p: {
-  side: Side
-  carrier: OffPosId
-  faker: OffPosId
-  lead: OffPosId
-  slotX: number
-  corner: string
-  playsideTackle: OffPosId
-  playsideDT: string
-  backsideEnd: string
-}): string[] => [
-  `DRAFT — RYAN DID NOT DESCRIBE THIS ONE. It is the split-end-side play's structure applied to the tight-end side: the slot wing ${p.carrier} motions back toward the quarterback and takes the sweep BACK toward his own side, ${p.faker} fakes the buck the other way (Ryan 09-23: the wing going left, Super going right), ${p.lead} leads around the ${p.side} tackle, the guards engage-then-pull the same way, ${p.playsideTackle} contains, and the widest man on the play side — Y — has the corner. Ryan: "I can always change it."`,
-  `DRAFT — THE RETURN MOTION IS THE THING TO LOOK AT. ${p.carrier} motions IN toward the quarterback (the only direction "back towards the quarterback" can mean from his slot) and then has to take the handoff and go BACK the way he came. It is drawn as a hairpin: motion arrives at (${p.side === 'left' ? '−' : ''}2.4, −5.2), he takes the ball at about (${p.side === 'left' ? '−' : ''}0.9, −5.5) and bends back ${p.side}. That is a full stop and turn at the mesh. Two cleaner alternatives if you do not like it: (a) NO motion on the tight-end side — the slot wing blocks down as usual and the wing beside the quarterback takes the sweep from his gun spot, Super still leads; or (b) the slot wing motions in, and the play goes the OTHER way (which is just the split-end-side play out of the same set). Say which.`,
-  `DRAFT — Y BLOCKS THE CORNER (${p.corner}) on every front. Under center Y blocks down / climbs to a backer; here ${p.playsideTackle} has the end, ${p.lead} has the alley, the playside guard has the nearest backer, and the ball is going all the way outside, so the corner is the man nobody else reaches. Y is 6½ yards from him, which is a stalk, not a crack. The alternative is Y climbs to the backer as under center and the corner is left for the runner.`,
-  `DRAFT — THE SWEEP TURNS UP at about x = ${p.side === 'left' ? '−' : ''}9.7 — where the slot lined up (${p.slotX}) — rather than out at the split end, because there is no split end on this side and Y is stalking the corner from 4½ yards.`,
-  `DRAFT — THE BACKSIDE END (${p.backsideEnd}) is left alone, exactly as the under-center tight-end-side play leaves him (the backside wing who might have barred him is now the buck faker). X runs the corner off on the back side, as under center.`,
+/** Kid-voice names for the three backs on a jet play. */
+interface JetCast {
+  /** The buck faker, away from the sweep. */
+  faker: string
+  /** The lead back (to the corner). */
+  lead: string
+  Lead: string
+  /** The slot wing (on the S). */
+  slot: string
+}
+
+/** Red Gun Left: R fakes right, Super leads left, L is the slot. */
+const RED_LEFT_CAST: JetCast = { faker: 'the right wing', lead: 'Super', Lead: 'Super', slot: 'the left wing' }
+/** Black Gun Right: Super fakes left, L (beside the QB) leads right, R is the slot. */
+const BLACK_RIGHT_CAST: JetCast = { faker: 'Super', lead: 'the left wing', Lead: 'The left wing', slot: 'the right wing' }
+
+const JET_CARRIER = (side: Side, c: JetCast): Assignment => ({
+  rule: 'Jet motion across. Take the handoff at full speed, sweep it wide.',
+  detail: `Before the snap, come in jet motion from your split — flat across the field, behind the quarterback. Time it so you reach him just after HUT, at full speed; never slow down for the ball. He fakes the buck to ${c.faker} going ${other(side)} first, then puts the ball in your belly behind him. Keep going ${side} and get ALL the way outside — outside ${c.lead}, who has the corner. ${c.slot[0]!.toUpperCase() + c.slot.slice(1)} has the S and both guards are pulling in front of you. Get to the edge first, then turn it up.`,
+})
+
+const Q_JET = (side: Side, c: JetCast): Assignment => ({
+  rule: 'Ride the buck fake. Hand to X behind you. Boot away.',
+  detail: `X is coming across in jet motion — do not wait for him, he times it to you. Catch the snap, put the ball in ${c.faker === 'Super' ? "Super's" : "the right wing's"} belly going ${other(side)} and ride him one step — sell it with your eyes. Pull it out, drop back and turn to X coming behind you. Hand it to him going ${side} with your chest square to him, then boot ${other(side)} like you kept it. That fake is worth a defender.`,
+})
+
+const LEAD_CORNER = (side: Side, c: JetCast): Assignment => ({
+  rule: 'Lead the sweep. Out around the tackle — block the corner.',
+  detail: `No fake for you on this one. At HUT you go — out around our ${side} tackle, outside ${c.slot}'s block, ahead of X. X is running the ball, so nobody else is out there for the corner: he is yours. Get to him fast, get on him and keep him inside you. X is coming around outside your block.`,
+})
+
+const Y_HELP_END = (side: Side): Assignment => ({
+  rule: 'Help the tackle on the end.',
+  detail: `Our ${side} tackle has the end and he must keep him inside. Step down and help him — the two of you make sure the end NEVER gets outside. The sweep is going around both of you; if the end gets loose, he runs into the whole play.`,
+})
+
+/** The slot wing on the S / alley linebacker, per front. */
+const SLOT_S_WORDS = (c: JetCast): Record<'44' | '43' | '52', Assignment> => ({
+  '44': {
+    rule: 'Crack down on the S — the walked-up backer in the alley.',
+    detail: `The S (their outside backer on your side) is walked up in the alley. Come inside and block him — get your helmet in front of him so he cannot run outside to the sweep. ${c.Lead} is coming around behind you for the corner.`,
+  },
+  '43': {
+    rule: 'Crack down on the S — the outside backer.',
+    detail: `In a 4-3 the S is the outside backer on your side, a few yards off the ball. He is the alley linebacker. Come inside and get in front of him before he can run to the sweep. ${c.Lead} is coming around behind you for the corner.`,
+  },
+  '52': {
+    rule: 'Crack down on the backer on your side.',
+    detail: `The 5-2 has no S standing in the alley. The inside backer on your side is the first linebacker who will run to the sweep — come inside and cut him off. ${c.Lead} is coming around behind you for the corner.`,
+  },
+})
+
+/** The playside guard, per front — the slot has the S now, the lead back the corner. */
+const JET_PSG_WORDS = (side: Side): Record<'44' | '43' | '52', Assignment> => ({
+  '44': {
+    rule: 'Engage the tackle for a count, then pull — take the inside backer.',
+    detail: `Hit the tackle over you and stay on him a second or two. Then pull flat around our ${side} tackle. The slot wing has the walked-up backer, so you take the inside backer on our side as he scrapes to the alley — he is the linebacker closest to the ball.`,
+  },
+  '43': {
+    rule: 'Engage the tackle for a count, then pull — take the Mike.',
+    detail: `Hit the tackle over you and stay on him a second or two. Then pull flat around our ${side} tackle. The slot wing has the outside backer, so the linebacker closest to the ball — the Mike — is yours as he comes over the top.`,
+  },
+  '52': {
+    rule: 'Engage the tackle for a count, then pull — take the far backer.',
+    detail: `Hit the tackle over you and stay on him a second or two. Then pull flat around our ${side} tackle. The slot wing has the backer on our side, so the other inside backer coming over the top is the linebacker closest to the ball — he is yours.`,
+  },
+})
+
+const JET_PLAYSIDE_GUARD = (side: Side): Assignment => ({
+  rule: 'Engage the tackle over you for a count, THEN pull. Take the nearest backer.',
+  detail: `Hit the tackle over you and stay on him for a second or two — long enough that he cannot chase the sweep. Then come off, pull flat around our ${side} tackle and take the linebacker closest to the ball that the slot wing does not have. Nobody has to be kicked out — the ball is going all the way outside.`,
+})
+
+const jetCoachNotes = (side: Side, c: JetCast): string[] => [
+  `Fake ${other(side)}, sweep ${side} - sell the buck, then X takes it at full speed.`,
+  `${c.Lead}: out around the tackle at HUT. Take the corner.`,
+  'Guards: engage, THEN pull. Nobody kicks - get outside and run.',
 ]
 
+/**
+ * Per-front targets on the jet plays, playside LEFT (the RIGHT play uses the
+ * -R ids and, in the 5-2, B-L for the playside guard). The slot inherits the
+ * man the lead back used to have (the S / alley backer); the lead back takes
+ * the corner; the guards are unchanged from the split-end-side plays.
+ */
+const JET_LEFT_TARGETS = {
+  '44': { lead: 'C-L', slot: 'O-L', playsideGuard: 'B-L', backsideGuard: 'F' },
+  '43': { lead: 'C-L', slot: 'B-L', playsideGuard: 'M', backsideGuard: 'F-L' },
+  '52': { lead: 'C-L', slot: 'B-L', playsideGuard: 'B-R', backsideGuard: 'F-L' },
+} as const
+const JET_RIGHT_TARGETS = {
+  '44': { lead: 'C-R', slot: 'O-R', playsideGuard: 'B-R', backsideGuard: 'F' },
+  '43': { lead: 'C-R', slot: 'B-R', playsideGuard: 'M', backsideGuard: 'F-R' },
+  '52': { lead: 'C-R', slot: 'B-R', playsideGuard: 'B-L', backsideGuard: 'F-R' },
+} as const
+
+const jetNotes = (p: {
+  side: Side
+  set: 'Red' | 'Black'
+  faker: OffPosId
+  lead: OffPosId
+  slot: OffPosId
+  playsideTackle: OffPosId
+  playsideGuard: OffPosId
+  backsideGuard: OffPosId
+  playsideDT: string
+  backsideEnd: string
+  targets: typeof JET_LEFT_TARGETS | typeof JET_RIGHT_TARGETS
+}): string[] => {
+  const t = p.targets
+  const sx = p.side === 'left' ? '−' : ''
+  return [
+    `DRAFT — THE JET TIMING. X starts split wide at (${p.side === 'left' ? '' : '−'}12, 0) and is drawn in motion across the formation, still at full speed at the snap, ending at (${p.side === 'left' ? '' : '−'}2.4, −5.2) — the same spot the slot wing's motion ends on the other two plays. So the mesh is the same: about 5.4 yards deep, right behind the quarterback, just after the snap, and the quarterback's footwork is identical on all four. That is about ten yards of motion before the snap; the snap has to come when X is roughly over the ${other(p.side)} tackle. If you want him meshing IN FRONT of the quarterback (a classic jet at about 2 yards), his path crosses the buck faker's, so we kept it behind.`,
+    `DRAFT — X RUNS OUTSIDE THE LEAD. ${p.lead} gets to the corner first and walls him inside; X turns up outside that block at about x = ${sx}12, near where the corner lined up. That keeps X's path from crossing ${p.lead}'s. The alternative is ${p.lead} kicks the corner OUT and X cuts up inside him — say so if that is how you teach it (the lines will cross on the diagram).`,
+    `THE SLOT ON THE S (Ryan: "The R wing then blocks the S alley linebacker" — here ${p.slot}). Per front: 4-4 the walked-up backer ${t['44'].slot} (drawn S against ${p.set}); 4-3 the Sam ${t['43'].slot} (drawn S); 5-2 there is no S, so the inside backer on our side ${t['52'].slot}, the first linebacker to the alley. DRAFT: this differs from Gun Veer, where the backside slot takes the $ (strong safety) in the 4-3 and 5-2 — here Ryan said "linebacker", so the slot cracks the backer and the backside guard keeps the safety.`,
+    `DRAFT — Y IS THE EXTRA MAN. With the slot on the S, ${p.lead} on the corner and the guards on the backer and the safety, every playside defender has a blocker, so Y (whose under-center job is to climb to a backer — now taken) helps ${p.playsideTackle} keep the end inside. The end is the man who kills a sweep. Alternative: Y climbs to the inside backer and the playside guard goes one level up to the safety.`,
+    `THE BUCK FAKE (Ryan, 09-23: "The fake handoff goes to the Super like you already have it"): ${p.faker} fakes ${other(p.side)} from his own spot, straight up into the B gap outside the ${other(p.side)} guard, arms out — drawn as a fake, not a carry. Neither back crosses the quarterback's face.`,
+    `DRAFT — THE QUARTERBACK BOOTS AWAY after the handoff (${other(p.side)}, following the fake), the same short flat fake as the other three plays. Say the word to drop it.`,
+    `DRAFT — THE LINE IS UNCHANGED from the split-end-side plays: ${p.playsideTackle} contains the end, ${p.playsideGuard} engages the tackle over him for a count then pulls (4-4 inside backer ${t['44'].playsideGuard}, 4-3 the Mike, 5-2 the OTHER inside backer ${t['52'].playsideGuard}), ${p.backsideGuard} gives one push, pulls around ${p.playsideTackle} and takes the safety (F in the 4-4, ${t['43'].backsideGuard} in the 4-3 and 5-2). C and the backside tackle keep their under-center jobs. The tackle over ${p.playsideGuard} (${p.playsideDT}) is still the one man deliberately left after the engage — delayed, not ignored.`,
+    `DRAFT — BACKSIDE. The backside end (${p.backsideEnd}) is left alone, as under center; the buck fake is what holds him. X is no longer the backside free route — he is the ball carrier — so nobody runs the backside corner off.`,
+    'DRAFT — no read key on this play, and nothing in `ignored`.',
+  ]
+}
+
+const jetFront = (
+  front: '44' | '43' | '52',
+  side: Side,
+  c: JetCast,
+  pos: { lead: OffPosId; slot: OffPosId; tackle: OffPosId; psg: OffPosId; bsg: OffPosId },
+) => {
+  const t = (side === 'left' ? JET_LEFT_TARGETS : JET_RIGHT_TARGETS)[front]
+  const lead = side === 'left' ? LEAD_LEFT_CORNER : LEAD_RIGHT_CORNER
+  const slot = (side === 'left' ? SLOT_CRACK_LEFT : SLOT_CRACK_RIGHT)[front]
+  const psg = side === 'left' ? LG_ENGAGE_PULL_LEFT : RG_ENGAGE_PULL_RIGHT
+  const bsg = side === 'left' ? RG_PUSH_PULL_LEFT : LG_PUSH_PULL_RIGHT
+  const words = (side === 'left' ? wordsLeft : wordsRight)[front]
+  return {
+    actions: {
+      [pos.lead]: [lead, ...block(t.lead)],
+      [pos.slot]: slot,
+      [pos.psg]: [...psg, ...block(t.playsideGuard)],
+      [pos.bsg]: [...bsg, ...block(t.backsideGuard)],
+    },
+    assignments: {
+      X: JET_CARRIER(side, c),
+      Q: Q_JET(side, c),
+      [pos.lead]: LEAD_CORNER(side, c),
+      [pos.slot]: SLOT_S_WORDS(c)[front],
+      [pos.tackle]: CONTAIN(side),
+      Y: Y_HELP_END(side),
+      [pos.psg]: JET_PSG_WORDS(side)[front],
+      [pos.bsg]: words.backsideGuard,
+    },
+  }
+}
+
+// ===========================================================================
+// RED GUN — Buck Sweep LEFT (tight-end side). "The opposite is true" of
+// Ryan's Black Gun Right: X jets across from wide right and carries left; R
+// (beside the QB) fakes the buck right; SUPER leads around LT to the corner; L
+// (left slot) blocks the S; LT contains, Y helps him; LG engages then pulls;
+// RG pushes once then pulls around LT.
+// ===========================================================================
+
+const redLeftPos = { lead: 'S', slot: 'L', tackle: 'LT', psg: 'LG', bsg: 'RG' } as const
+
 const redGunLeft = gunPlay(buckSweepLeftRed, {
-  ballCarrier: 'L',
+  ballCarrier: 'X',
   formationTwinId: 'buck-sweep-left-black-gun',
   audibleFlipId: 'buck-sweep-right-red-gun',
-  summary: 'Buck fake inside, then the motion wing takes the handoff and sweeps it all the way outside.',
+  summary: 'Buck fake one way, then X comes across on a jet, takes the handoff and sweeps it all the way outside.',
   description:
-    'Buck Sweep to the left out of Red Gun — at the tight end. The left wing comes in motion from the slot back toward the quarterback before the snap. At HUT the quarterback fakes the buck to the right wing going right at the right guard, then hands to the motion wing, who takes it back left and sweeps all the way outside to where he lined up. Super runs out around the left tackle to block the alley, the left tackle contains the end, the left guard engages then pulls to help in the alley, the right guard pushes once, pulls around the left tackle and blocks any jersey upfield, and Y blocks the corner.',
-  coachNotes: coachNotes('left'),
+    'Buck Sweep to the left out of Red Gun — at the tight end. X comes in jet motion from wide right, across the formation behind the quarterback. At HUT the quarterback fakes the buck to the right wing going right at the right guard, then hands to X going by behind him, who sweeps all the way outside to the left. Super runs out around the left tackle ahead of him and blocks the corner. The left wing, in the slot, blocks the S in the alley. The left tackle contains the end with Y helping, the left guard engages then pulls to the nearest backer, and the right guard pushes once, pulls around the left tackle and blocks any jersey upfield.',
+  coachNotes: jetCoachNotes('left', RED_LEFT_CAST),
   assignments: {
-    L: CARRIER('left', 'out where you lined up'),
+    X: JET_CARRIER('left', RED_LEFT_CAST),
     R: BUCK('right'),
-    Q: Q_GUN('left'),
-    S: LEAD('left'),
+    Q: Q_JET('left', RED_LEFT_CAST),
+    S: LEAD_CORNER('left', RED_LEFT_CAST),
+    L: {
+      rule: 'Crack down on the S — the alley linebacker.',
+      detail: 'From the slot, come inside and block the S, the linebacker in the alley on your side. Get in front of him so he cannot run outside to the sweep. Super is coming around behind you for the corner.',
+    },
     LT: CONTAIN('left'),
-    LG: PLAYSIDE_GUARD('left'),
+    Y: Y_HELP_END('left'),
+    LG: JET_PLAYSIDE_GUARD('left'),
     RG: BACKSIDE_GUARD('left'),
-    Y: Y_CORNER('left'),
   },
   actions: {
-    L: [MOTION_FROM_LEFT, SWEEP_LEFT_RETURN],
+    X: [JET_FROM_RIGHT, JET_SWEEP_LEFT],
     R: FAKE_RIGHT,
     Q: Q_LEFT,
     LT: CONTAIN_LT,
-    Y: block('C-L'),
+    Y: block('E-L'),
   },
   vs: {
-    '44': {
-      actions: {
-        S: [S_LEFT_ALLEY, ...block(LEFT_TARGETS['44'].lead)],
-        LG: [...LG_ENGAGE_PULL_LEFT, ...block(LEFT_TARGETS['44'].playsideGuard)],
-        RG: [...RG_PUSH_PULL_LEFT, ...block(LEFT_TARGETS['44'].backsideGuard)],
-      },
-      assignments: {
-        L: CARRIER('left', 'out where you lined up'),
-        R: BUCK('right'),
-        Q: Q_GUN('left'),
-        LT: CONTAIN('left'),
-        Y: Y_CORNER('left'),
-        S: wordsLeft['44'].lead,
-        LG: wordsLeft['44'].playsideGuard,
-        RG: wordsLeft['44'].backsideGuard,
-      },
-    },
-    '43': {
-      actions: {
-        S: [S_LEFT_ALLEY, ...block(LEFT_TARGETS['43'].lead)],
-        LG: [...LG_ENGAGE_PULL_LEFT, ...block(LEFT_TARGETS['43'].playsideGuard)],
-        RG: [...RG_PUSH_PULL_LEFT, ...block(LEFT_TARGETS['43'].backsideGuard)],
-      },
-      assignments: {
-        L: CARRIER('left', 'out where you lined up'),
-        R: BUCK('right'),
-        Q: Q_GUN('left'),
-        LT: CONTAIN('left'),
-        Y: Y_CORNER('left'),
-        S: wordsLeft['43'].lead,
-        LG: wordsLeft['43'].playsideGuard,
-        RG: wordsLeft['43'].backsideGuard,
-      },
-    },
-    '52': {
-      actions: {
-        S: [S_LEFT_ALLEY, ...block(LEFT_TARGETS['52'].lead)],
-        LG: [...LG_ENGAGE_PULL_LEFT, ...block(LEFT_TARGETS['52'].playsideGuard)],
-        RG: [...RG_PUSH_PULL_LEFT, ...block(LEFT_TARGETS['52'].backsideGuard)],
-      },
-      assignments: {
-        L: CARRIER('left', 'out where you lined up'),
-        R: BUCK('right'),
-        Q: Q_GUN('left'),
-        LT: CONTAIN('left'),
-        Y: Y_CORNER('left'),
-        S: wordsLeft['52'].lead,
-        LG: wordsLeft['52'].playsideGuard,
-        RG: wordsLeft['52'].backsideGuard,
-      },
-    },
+    '44': jetFront('44', 'left', RED_LEFT_CAST, redLeftPos),
+    '43': jetFront('43', 'left', RED_LEFT_CAST, redLeftPos),
+    '52': jetFront('52', 'left', RED_LEFT_CAST, redLeftPos),
   },
   reviewNotes: [
-    ...tightEndSideNotes({
+    'Ryan (2026-09-23), on Black Gun Right: "The X in this play would go in motion and take the handoff and sweep to the right. The R wing then blocks the S alley linebacker. Then of course the opposite is true." This is the opposite: X jets across from wide right and carries left, R (beside the quarterback) fakes the buck right, SUPER leads out around LT and takes the corner, L (left slot) cracks the S. Replaces the 09-21 draft where L motioned in from the slot and hairpinned back left and Y had the corner. Built from buck-sweep-left-red with gunPlay.',
+    ...jetNotes({
       side: 'left',
-      carrier: 'L',
+      set: 'Red',
       faker: 'R',
       lead: 'S',
-      slotX: -8.5,
-      corner: 'C-L',
-      playsideTackle: 'LT',
-      playsideDT: 'T-L',
-      backsideEnd: 'E-R',
-    }),
-    ...sharedNotes({
-      side: 'left',
-      carrier: 'L',
-      faker: 'R',
-      lead: 'S',
+      slot: 'L',
       playsideTackle: 'LT',
       playsideGuard: 'LG',
       backsideGuard: 'RG',
       playsideDT: 'T-L',
-      backsideDT: 'T-R',
-      targets: LEFT_TARGETS,
+      backsideEnd: 'E-R',
+      targets: JET_LEFT_TARGETS,
     }),
-    'DRAFT — C and RT keep their under-center jobs on every front: C blocks back on T-R in the even fronts (after RG\'s push) and takes the nose in the 5-2; RT climbs to B-R in the even fronts and cuts off T-R in the 5-2. Y CHANGED (corner, above). X is backside and runs his free route as under center.',
   ],
 })
 
 // ===========================================================================
-// BLACK GUN — Buck Sweep RIGHT (tight-end side). Backs per Ryan (09-23):
-// SUPER fakes the buck LEFT; L (beside the QB) leads to the right alley. R
-// motions in from the right slot and takes the sweep back right (DRAFT); RT
-// contains; RG engages then pulls; LG pushes once then pulls around RT; Y has
-// the corner. Built from the Black base, not mirrored.
+// BLACK GUN — Buck Sweep RIGHT (tight-end side). Ryan's jet play (09-23): X
+// jets across from wide left and carries right; SUPER fakes the buck left; L
+// (beside the QB) leads around RT to the corner; R (right slot) blocks the S;
+// RT contains, Y helps him; RG engages then pulls; LG pushes once then pulls
+// around RT. Built from the Black base, not mirrored.
 // ===========================================================================
 
+const blackRightPos = { lead: 'L', slot: 'R', tackle: 'RT', psg: 'RG', bsg: 'LG' } as const
+
 const blackGunRight = gunPlay(buckSweepRightBlack, {
-  ballCarrier: 'R',
+  ballCarrier: 'X',
   formationTwinId: 'buck-sweep-right-red-gun',
   audibleFlipId: 'buck-sweep-left-black-gun',
-  summary: 'Buck fake inside, then the motion wing takes the handoff and sweeps it all the way outside.',
+  summary: 'Buck fake one way, then X comes across on a jet, takes the handoff and sweeps it all the way outside.',
   description:
-    'Buck Sweep to the right out of Black Gun — at the tight end. The right wing comes in motion from the slot back toward the quarterback before the snap. At HUT the quarterback fakes the buck to Super going left at the left guard, then hands to the motion wing, who takes it back right and sweeps all the way outside to where he lined up. The left wing, beside the quarterback, runs out around the right tackle to block the alley, the right tackle contains the end, the right guard engages then pulls to help in the alley, the left guard pushes once, pulls around the right tackle and blocks any jersey upfield, and Y blocks the corner.',
-  coachNotes: coachNotes('right'),
+    'Buck Sweep to the right out of Black Gun — at the tight end. Fake a run to the left, then run with the motion man to the right. X comes in jet motion from wide left, across the formation behind the quarterback. At HUT the quarterback fakes the buck to Super going left at the left guard, then hands to X going by behind him, who sweeps all the way outside to the right. The left wing, beside the quarterback, runs out around the right tackle ahead of him and blocks the corner. The right wing, in the slot, blocks the S in the alley. The right tackle contains the end with Y helping, the right guard engages then pulls to the nearest backer, and the left guard pushes once, pulls around the right tackle and blocks any jersey upfield.',
+  coachNotes: jetCoachNotes('right', BLACK_RIGHT_CAST),
   assignments: {
-    R: CARRIER('right', 'out where you lined up'),
+    X: JET_CARRIER('right', BLACK_RIGHT_CAST),
     S: BUCK('left'),
-    Q: Q_GUN('right'),
-    L: LEAD('right'),
+    Q: Q_JET('right', BLACK_RIGHT_CAST),
+    L: LEAD_CORNER('right', BLACK_RIGHT_CAST),
+    R: {
+      rule: 'Crack down on the S — the alley linebacker.',
+      detail: 'From the slot, come inside and block the S, the linebacker in the alley on your side. Get in front of him so he cannot run outside to the sweep. The left wing is coming around behind you for the corner.',
+    },
     RT: CONTAIN('right'),
-    RG: PLAYSIDE_GUARD('right'),
+    Y: Y_HELP_END('right'),
+    RG: JET_PLAYSIDE_GUARD('right'),
     LG: BACKSIDE_GUARD('right'),
-    Y: Y_CORNER('right'),
   },
   actions: {
-    R: [MOTION_FROM_RIGHT, SWEEP_RIGHT_RETURN],
+    X: [JET_FROM_LEFT, JET_SWEEP_RIGHT],
     S: FAKE_LEFT_SUPER,
     Q: Q_RIGHT,
     RT: CONTAIN_RT,
-    Y: block('C-R'),
+    Y: block('E-R'),
   },
   vs: {
-    '44': {
-      actions: {
-        L: [WING_RIGHT_ALLEY, ...block(RIGHT_TARGETS['44'].lead)],
-        RG: [...RG_ENGAGE_PULL_RIGHT, ...block(RIGHT_TARGETS['44'].playsideGuard)],
-        LG: [...LG_PUSH_PULL_RIGHT, ...block(RIGHT_TARGETS['44'].backsideGuard)],
-      },
-      assignments: {
-        R: CARRIER('right', 'out where you lined up'),
-        S: BUCK('left'),
-        Q: Q_GUN('right'),
-        RT: CONTAIN('right'),
-        Y: Y_CORNER('right'),
-        L: wordsRight['44'].lead,
-        RG: wordsRight['44'].playsideGuard,
-        LG: wordsRight['44'].backsideGuard,
-      },
-    },
-    '43': {
-      actions: {
-        L: [WING_RIGHT_ALLEY, ...block(RIGHT_TARGETS['43'].lead)],
-        RG: [...RG_ENGAGE_PULL_RIGHT, ...block(RIGHT_TARGETS['43'].playsideGuard)],
-        LG: [...LG_PUSH_PULL_RIGHT, ...block(RIGHT_TARGETS['43'].backsideGuard)],
-      },
-      assignments: {
-        R: CARRIER('right', 'out where you lined up'),
-        S: BUCK('left'),
-        Q: Q_GUN('right'),
-        RT: CONTAIN('right'),
-        Y: Y_CORNER('right'),
-        L: wordsRight['43'].lead,
-        RG: wordsRight['43'].playsideGuard,
-        LG: wordsRight['43'].backsideGuard,
-      },
-    },
-    '52': {
-      actions: {
-        L: [WING_RIGHT_ALLEY, ...block(RIGHT_TARGETS['52'].lead)],
-        RG: [...RG_ENGAGE_PULL_RIGHT, ...block(RIGHT_TARGETS['52'].playsideGuard)],
-        LG: [...LG_PUSH_PULL_RIGHT, ...block(RIGHT_TARGETS['52'].backsideGuard)],
-      },
-      assignments: {
-        R: CARRIER('right', 'out where you lined up'),
-        S: BUCK('left'),
-        Q: Q_GUN('right'),
-        RT: CONTAIN('right'),
-        Y: Y_CORNER('right'),
-        L: wordsRight['52'].lead,
-        RG: wordsRight['52'].playsideGuard,
-        LG: wordsRight['52'].backsideGuard,
-      },
-    },
+    '44': jetFront('44', 'right', BLACK_RIGHT_CAST, blackRightPos),
+    '43': jetFront('43', 'right', BLACK_RIGHT_CAST, blackRightPos),
+    '52': jetFront('52', 'right', BLACK_RIGHT_CAST, blackRightPos),
   },
   reviewNotes: [
-    ...tightEndSideNotes({
+    'Ryan (2026-09-23): "For Black Gun Buck Sweep Right, the spirit of the play is to fake a run to the left and then run with the motion player to the right. The fake handoff goes to the Super like you already have it. That part is good. The X in this play would go in motion and take the handoff and sweep to the right. The R wing then blocks the S alley linebacker." He also confirmed L, beside the quarterback, leads out around RT ahead of X and takes the corner. Replaces the 09-21 draft where R motioned in from the slot and hairpinned back right and Y had the corner. Built from buck-sweep-right-black with gunPlay, not by mirroring Red Gun Left.',
+    ...jetNotes({
       side: 'right',
-      carrier: 'R',
+      set: 'Black',
       faker: 'S',
       lead: 'L',
-      slotX: 8.5,
-      corner: 'C-R',
-      playsideTackle: 'RT',
-      playsideDT: 'T-R',
-      backsideEnd: 'E-L',
-    }),
-    'Ryan (2026-09-23): "On Buck Sweep Right, we fake to the superback on the left." So SUPER fakes the buck LEFT and L (beside the quarterback, on his right) leads to the right alley — same backs as Red Gun Right; nobody crosses the quarterback\'s face any more. Built from buck-sweep-right-black with gunPlay, not by mirroring Red Gun Left.',
-    'DRAFT — "THE RECEIVER COMING ACROSS TO THE RIGHT." In Black Gun the slot wing R is already on the right, so he cannot come across; he still motions in and hairpins back right (see the return-motion note). If Ryan meant somebody who actually comes across from the left in Black Gun (X on a jet, say), that is a different carrier — ask.',
-    ...sharedNotes({
-      side: 'right',
-      carrier: 'R',
-      faker: 'S',
-      lead: 'L',
+      slot: 'R',
       playsideTackle: 'RT',
       playsideGuard: 'RG',
       backsideGuard: 'LG',
       playsideDT: 'T-R',
-      backsideDT: 'T-L',
-      targets: RIGHT_TARGETS,
+      backsideEnd: 'E-L',
+      targets: JET_RIGHT_TARGETS,
     }),
-    'DRAFT — C and LT keep their under-center jobs on every front: C blocks back on T-L in the even fronts (after LG\'s push) and takes the nose in the 5-2; LT climbs to B-L in the even fronts and cuts off T-L in the 5-2. Y CHANGED (corner, above). X is backside and runs his free route as under center.',
   ],
 })
 
