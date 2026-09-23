@@ -175,6 +175,13 @@ useHead(() => {
         <div class="head-titles">
           <h1 class="title">{{ play.name }}</h1>
           <PlayCallStamp :parts="callParts" />
+          <!-- Coach has pulled this play: say so before anything else. -->
+          <div v-if="play.doNotRun" class="do-not-run" role="alert">
+            <span class="dnr-badge">
+              <Icon name="lucide:octagon-x" aria-hidden="true" /> Do not run
+            </span>
+            <p class="dnr-reason">{{ play.doNotRun }}</p>
+          </div>
           <!-- The call stamp already says the direction on variant plays, so
                the subtitle only earns its place on the legacy two-play shape. -->
           <p v-if="!hasVariantControls" class="subtitle muted">
@@ -196,9 +203,18 @@ useHead(() => {
                 :aria-current="opt.active ? 'page' : undefined"
               >
                 {{ opt.label }}
+                <Icon
+                  v-if="opt.value === 'gun' && gunTwin?.doNotRun"
+                  name="lucide:octagon-x"
+                  class="dnr-mark"
+                  aria-label="Do not run"
+                />
               </NuxtLink>
             </nav>
-            <p v-if="isGun" class="gun-note muted">
+            <p v-if="isGun && play.doNotRun" class="gun-note muted">
+              From the gun the playside tackle blocks the end.
+            </p>
+            <p v-else-if="isGun" class="gun-note muted">
               Same play, from the gun. The line's job does not change.
             </p>
           </div>
@@ -366,6 +382,40 @@ useHead(() => {
 .gun-note {
   font-size: 0.9rem;
   line-height: 1.4;
+}
+
+.do-not-run {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+  padding: 10px 12px;
+  border: 1px solid var(--red);
+  border-radius: var(--r-ctl);
+  background: var(--red-glow);
+}
+.dnr-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--red);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.dnr-reason {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.dnr-mark {
+  color: var(--red);
+  margin-left: 4px;
+  vertical-align: -2px;
 }
 
 .dir-toggle {

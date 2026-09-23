@@ -207,6 +207,11 @@ export interface Play {
    */
   coachNotes?: string[]
   /**
+   * Set when Coach Ryan has pulled the play: the app shows a red DO NOT RUN
+   * badge with this reason. The play stays drawn so it can still be taught.
+   */
+  doNotRun?: string
+  /**
    * Flags for Ryan's review, e.g. unverifiable call-name mapping. Authoring
    * history — NEVER rendered to players.
    */
