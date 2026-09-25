@@ -15,6 +15,7 @@ import { crushTightPlays } from './plays/crush-tight'
 import { audiblePlays } from './plays/audible'
 import { splitWidePlays } from './plays/split-wide'
 import { splitWideGunPlays } from './plays/split-wide-gun'
+import { speedOptionGunPlays } from './plays/speed-option-gun'
 import { stretchPlays } from './plays/stretch'
 import { stretchGunPlays } from './plays/stretch-gun'
 import { stretchTightPlays } from './plays/stretch-tight'
@@ -55,6 +56,7 @@ export {
 export type { TightCall } from './plays/audible-tight'
 export { splitWidePlays } from './plays/split-wide'
 export { splitWide9559 } from './plays/split-wide-9559'
+export { speedOptionGunPlays } from './plays/speed-option-gun'
 export { stretchPlays } from './plays/stretch'
 export { stretchLeftTight, stretchRightTight, stretchTightPlays } from './plays/stretch-tight'
 export { stretchBootBlack, stretchBootPlays, stretchBootRed } from './plays/stretch-boot'
@@ -112,6 +114,7 @@ export const gunPlayList: Play[] = [
   ...crushGunPlays,
   ...buckSweepGunPlays,
   ...stretchGunPlays,
+  ...speedOptionGunPlays,
   ...splitWideGunPlays,
 ]
 

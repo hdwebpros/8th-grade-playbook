@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Play } from '~/types/football'
-import { audiblePlays, plays, formations, gunIdOf, isGunPlay } from '~/data'
+import { audiblePlays, plays, baseIdOf, formationFor, gunIdOf, isGunPlay } from '~/data'
 import { filmPlayIds } from '~/data/film'
 import { DIRECTION_AUDIBLES } from '~/utils/playbook'
 
@@ -65,8 +65,9 @@ const concepts = computed<Concept[]>(() => {
   for (const play of Object.values(plays) as Play[]) {
     if (audibleIds.has(play.id)) continue
     // Gun plays are the same concepts, reached by the toggle on the play page —
-    // never their own card or their own door.
-    if (isGunPlay(play)) continue
+    // never their own card or their own door. A gun-only concept (Speed
+    // Option) has no under-center play to hang off, so it gets its own card.
+    if (isGunPlay(play) && plays[baseIdOf(play.id)]) continue
     const list = byName.get(play.name) ?? []
     list.push(play)
     byName.set(play.name, list)
@@ -94,7 +95,7 @@ const concepts = computed<Concept[]>(() => {
             .filter((p) => p.direction === direction)
             .map((p) => ({
               id: p.id,
-              formationName: formations[p.formation]?.name ?? p.formation,
+              formationName: formationFor(p).name,
               hasFilm: filmPlayIds.has(p.id),
             })),
         })),
@@ -114,7 +115,7 @@ const concepts = computed<Concept[]>(() => {
       gun: hasGunTwin(group),
       directions: group.map((p) => ({
         id: p.id,
-        formationName: formations[p.formation]?.name ?? p.formation,
+        formationName: formationFor(p).name,
         callName: shared ? undefined : p.callName,
         hasFilm: filmPlayIds.has(p.id),
       })),
