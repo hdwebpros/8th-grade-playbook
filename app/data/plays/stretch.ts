@@ -120,14 +120,11 @@ const block = (targetId: string): Action[] => [{ kind: 'block', targetId }]
 // ---------------------------------------------------------------------------
 
 /**
- * S: slow bucket step back and away, through the mesh, to an aiming point
- * OUTSIDE the playside tackle — x = −3.8, between LT (−3.0) and Y (−4.5),
- * which is where page-12 puts it. Then he keys the end man on the line and
- * this path shows the BEND-UP. Since 2026-09-17 the end stands at −3.55, right
- * on LT's outside shoulder, so "bend up INSIDE him" is the C-gap lane over the
- * tackle: squeeze through at x ≈ −2.7 a yard past the line, then widen back out
- * to −3.2 once you are past him. The scan's second arrow (bounce outside the
- * end) lives in the assignment text.
+ * S: slow bucket step back and away, through the mesh, eyes on the OUTSIDE
+ * SHOULDER of the playside tackle (LT at −3.0). Stretch is an outside run, so
+ * he never cuts up inside the tackle (Ryan, 2026-09-25): he presses to about
+ * −3.5 at the line, then either climbs the C gap (drawn, x ≈ −3.8) or bounces
+ * it to the sideline (assignment text — the diagram draws one carry path).
  */
 const S_STRETCH: Action[] = [
   {
@@ -136,10 +133,10 @@ const S_STRETCH: Action[] = [
       { x: 0.3, y: -4.9 },
       { x: -1.2, y: -3.9 },
       { x: -2.5, y: -2.9 },
-      { x: -3.8, y: -1.9 },
-      { x: -2.6, y: 0.5 },
-      { x: -2.75, y: 1.6 },
-      { x: -3.2, y: 3.2 },
+      { x: -3.35, y: -1.8 },
+      { x: -3.5, y: -0.7 },
+      { x: -3.75, y: 0.8 },
+      { x: -3.9, y: 3.2 },
     ],
   },
 ]
@@ -381,9 +378,9 @@ const assignments: Record<OffPosId, Assignment> = {
       'Climb straight up and cut off the backside backer before he can run the ball down from behind. Take the shortest line to his outside shoulder.',
   },
   S: {
-    rule: 'Slow bucket step. Aim outside the tackle, then hit the hole hard.',
+    rule: 'Slow bucket step. Eyes on the tackle\'s outside shoulder — cut up the C gap or bounce it.',
     detail:
-      'Bucket step — first step back and away, slow, let the line move. Take the handoff and press flat at a point OUTSIDE the playside tackle, then hit whatever hole opens up HARD — left, right, or all the way to the sideline. Same aiming point every time; find your crease and go, no dancing back there.',
+      'Bucket step — first step back and away, slow, let the line move. Take the handoff with your eyes on the OUTSIDE SHOULDER of the playside tackle and press right at it. This is an outside run — never cut up inside the tackle. If the edge is sealed, cut up into the C gap, between the tackle and the man outside him. If the edge runs wide, bounce it to the sideline. One cut and go HARD, no dancing back there.',
   },
   Q: {
     rule: 'Open to the mesh. Work 45 for depth behind the inside leg of the tackle.',
@@ -418,6 +415,7 @@ const reviewNotes = [
   "RG vs the 4-4 and 4-3: 'gap to climb, 45 INSIDE step' with a tackle on his outside shoulder resolves to cutting that man off, which is what we coded. The RT then also steps down onto that same man rather than fanning out to the end behind him — that is the backside rule you called out on Veer, applied here. Confirm the double is what you want, or tell us where the tackle should end up instead.",
   'ALIGNMENT RETUNE (2026-09-17). Ryan: "N is directly over C. DT should be directly over the last letter on the guard (either the L or the G in RG). DE should be directly over the edge of the circle on the OT." Every front now aligns the ends at ±3.55 (our tackle\'s outside shoulder) and the tackles at ±1.8 (our guard\'s outside shoulder) — the 5-2 included, where their tackle is NO LONGER head up on our tackle. Two 5-2 jobs changed on this play. LG is now the covered guard and reaches that tackle BY HIMSELF (he used to be the free man who comboed and climbed). LT is now covered by the END, the same man Y is reaching, so the playside double-team is LT + Y on the end and LT — the inside man — is the one who comes off it to the backer. That is still page-12\'s dotted climb, just off a different combo. Nobody was left unblocked by the swap. Confirm you want the tackle, not the tight end, coming off that combo.',
   "SUPER'S READ, SIMPLIFIED (Ryan, 2026-09-17): dropped the 'read the end man, bend it up or bounce it' language. Super now just aims outside the playside tackle and hits whatever hole opens up hard — left, right, or all the way to the sideline. Same footwork and aiming point, just a simpler decision for an 8th grader. Applied across the whole Stretch family, Tight formation included.",
+  "SUPER'S AIMING POINT (Ryan, 2026-09-25): Stretch is an outside run, so Super's eyes go to the OUTSIDE SHOULDER of the playside tackle and he never cuts up inside the tackle. From there he has two answers: cut up the C gap (between the tackle and the man outside him) or bounce it to the sideline. The old drawn path squeezed back in over the tackle at about x ±2.7, which read as the B gap — it now presses to the tackle's outside shoulder (±3.5) and climbs the C gap at about ±3.8. The bounce still lives in the assignment text, since the diagram draws one carry path.",
 ]
 
 export const stretchLeftRed: Play = {
@@ -436,7 +434,7 @@ export const stretchLeftRed: Play = {
   audibleFlipId: 'stretch-right-red',
   summary: 'Direct handoff to Super, who runs outside the tackle.',
   description:
-    'Outside zone at the tight end and wing. Everybody up front takes a 45-degree step to the play side and runs the defense sideways; Super takes a slow bucket step, aims OUTSIDE the playside tackle, then hits whatever hole opens up hard — left, right, or all the way to the sideline. We are not blocking a hole, we are moving a wall and letting the back pick the crack.',
+    'Outside zone at the tight end and wing. Everybody up front takes a 45-degree step to the play side and runs the defense sideways; Super takes a slow bucket step, eyes the playside tackle\'s outside shoulder, then cuts up the C gap or bounces it to the sideline. We are not blocking a hole, we are moving a wall and letting the back pick the crack.',
   assignments,
   vs: { '44': vs44, '43': vs43, '52': vs52 } satisfies Record<FrontId, FrontPlan>,
   coachNotes,
@@ -477,10 +475,10 @@ const S_STRETCH_RIGHT: Action[] = [
       { x: -0.3, y: -4.9 },
       { x: 1.2, y: -3.9 },
       { x: 2.5, y: -2.9 },
-      { x: 3.8, y: -1.9 },
-      { x: 2.6, y: 0.5 },
-      { x: 2.75, y: 1.6 },
-      { x: 3.2, y: 3.2 },
+      { x: 3.35, y: -1.8 },
+      { x: 3.5, y: -0.7 },
+      { x: 3.75, y: 0.8 },
+      { x: 3.9, y: 3.2 },
     ],
   },
 ]
@@ -771,9 +769,9 @@ const assignmentsRight: Record<OffPosId, Assignment> = {
       'Step down and bar the edge man next to you before he can chase the play from behind. Nothing crosses your face.',
   },
   S: {
-    rule: 'Slow bucket step. Aim outside the tackle, then hit the hole hard.',
+    rule: 'Slow bucket step. Eyes on the tackle\'s outside shoulder — cut up the C gap or bounce it.',
     detail:
-      'Bucket step — first step back and away, slow, let the line move. Take the handoff and press flat at a point OUTSIDE the playside tackle, then hit whatever hole opens up HARD — left, right, or all the way to the sideline. Same aiming point every time; find your crease and go, no dancing back there.',
+      'Bucket step — first step back and away, slow, let the line move. Take the handoff with your eyes on the OUTSIDE SHOULDER of the playside tackle and press right at it. This is an outside run — never cut up inside the tackle. If the edge is sealed, cut up into the C gap, between the tackle and the man outside him. If the edge runs wide, bounce it to the sideline. One cut and go HARD, no dancing back there.',
   },
   Q: {
     rule: 'Open to the mesh. Work 45 for depth behind the inside leg of the tackle.',
@@ -800,6 +798,7 @@ const reviewNotesRight = [
   "Unblocked defenders, by front — 4-4: B-L, O-L, both corners; 4-3: B-L, C-L, C-R, F-L; 5-2: E-R is covered but C-L, C-R, F-L are not. None are listed in `ignored` because Stretch has no option to 'handle' them — they are simply men the zone outruns. Say the word if you want dashed rings on any of them.",
   'ALIGNMENT RETUNE (2026-09-17). Ryan: "N is directly over C. DT should be directly over the last letter on the guard (either the L or the G in RG). DE should be directly over the edge of the circle on the OT." In the 5-2 their tackle now sits on the GUARD\'s outside shoulder (±1.8) instead of head up on our tackle, and the end on our tackle\'s outside shoulder (±3.55). Two 5-2 jobs swapped: RG reaches the tackle alone (he is the covered guard) and RT combos the END with the R wing, then climbs to M — the panel\'s playside climb, now coming off the tackle instead of the guard. Geometry moved with it: Super\'s bend-up threads the C-gap lane over RT (x ≈ +2.7) instead of the old dead-vertical at +3.6, which the end now stands on, and Y\'s backside cutoff scramble was re-routed INSIDE the backside end (over LT, x ≈ −2.7). Y is climbing PAST that end, not blocking him — the L wing bars him — so the stroke had to give him room.',
   "SUPER'S READ, SIMPLIFIED (Ryan, 2026-09-17): dropped the 'read the end man, bend it up or bounce it' language. Super now just aims outside the playside tackle and hits whatever hole opens up hard — left, right, or all the way to the sideline. Same footwork and aiming point, just a simpler decision for an 8th grader. Applied across the whole Stretch family, Tight formation included.",
+  "SUPER'S AIMING POINT (Ryan, 2026-09-25): Stretch is an outside run, so Super's eyes go to the OUTSIDE SHOULDER of the playside tackle and he never cuts up inside the tackle. From there he has two answers: cut up the C gap (between the tackle and the man outside him) or bounce it to the sideline. The old drawn path squeezed back in over the tackle at about x ±2.7, which read as the B gap — it now presses to the tackle's outside shoulder (±3.5) and climbs the C gap at about ±3.8. The bounce still lives in the assignment text, since the diagram draws one carry path.",
   "X RESOLVED (Ryan, 2026-09-17): the open question above about X playing MDM even though he is playside is settled — X now blocks the CORNER in front of him (C-R) on every front, the same call the wing makes on Veer's X. Nobody plays MDM/safety on this play anymore; if you want a body on the safety, that has to come from somewhere else.",
 ]
 
@@ -819,7 +818,7 @@ export const stretchRightRed: Play = {
   audibleFlipId: 'stretch-left-red',
   summary: 'Direct handoff to Super, who runs outside the tackle.',
   description:
-    'Outside zone away from the tight end — the weak-side stretch. Same 45-degree steps, same slow bucket step and mesh, but the split-end side has fewer bodies: the right wing sets the edge, X blocks the corner in front of him, and Y and the left wing cut off the chase. Super still aims outside the playside tackle and hits whatever hole opens up hard.',
+    'Outside zone away from the tight end — the weak-side stretch. Same 45-degree steps, same slow bucket step and mesh, but the split-end side has fewer bodies: the right wing sets the edge, X blocks the corner in front of him, and Y and the left wing cut off the chase. Super still eyes the playside tackle\'s outside shoulder, then cuts up the C gap or bounces it.',
   assignments: assignmentsRight,
   vs: { '44': vs44Right, '43': vs43Right, '52': vs52Right } satisfies Record<FrontId, FrontPlan>,
   coachNotes,

@@ -70,9 +70,8 @@ const block = (targetId: string): Action[] => [{ kind: 'block', targetId }]
 
 /**
  * Super going LEFT, from (−1, −4): he is already on the play side. Open left,
- * take the ball at the mesh (−1.8, −3.4), press flat to the aiming point
- * OUTSIDE the playside tackle (−3.8, −1.9), then the base's measured bend-up
- * through the C-gap lane over the tackle.
+ * take the ball at the mesh (−1.8, −3.4), press to the playside tackle's
+ * outside shoulder (−3.5, −0.7), then climb the C gap — same as under center.
  */
 const CARRY_LEFT: Action[] = [
   {
@@ -80,10 +79,10 @@ const CARRY_LEFT: Action[] = [
     path: [
       { x: -1.8, y: -3.4 },
       { x: -3, y: -2.6 },
-      { x: -3.8, y: -1.9 },
-      { x: -2.6, y: 0.5 },
-      { x: -2.75, y: 1.6 },
-      { x: -3.2, y: 3.2 },
+      { x: -3.35, y: -1.8 },
+      { x: -3.5, y: -0.7 },
+      { x: -3.75, y: 0.8 },
+      { x: -3.9, y: 3.2 },
     ],
   },
 ]
@@ -92,8 +91,8 @@ const CARRY_LEFT: Action[] = [
  * Super going RIGHT, from (−1, −4): he CROSSES BEHIND THE QUARTERBACK. Flat
  * along his own depth (about 4½ deep, under the quarterback's heels and under
  * the other back's spot at (1, −4)), takes the ball on the move at the mesh
- * (2.4, −3.6) behind the right tackle's inside leg, presses to the aiming
- * point OUTSIDE the playside tackle (3.8, −1.9), then the base's bend-up.
+ * (2.4, −3.6) behind the right tackle's inside leg, presses to
+ * RT's outside shoulder (3.5, −0.7), then climbs the C gap.
  */
 const CARRY_RIGHT_CROSS: Action[] = [
   {
@@ -103,10 +102,10 @@ const CARRY_RIGHT_CROSS: Action[] = [
       { x: 1.5, y: -4.4 },
       { x: 2.4, y: -3.6 },
       { x: 3.2, y: -2.6 },
-      { x: 3.8, y: -1.9 },
-      { x: 2.6, y: 0.5 },
-      { x: 2.75, y: 1.6 },
-      { x: 3.2, y: 3.2 },
+      { x: 3.35, y: -1.8 },
+      { x: 3.5, y: -0.7 },
+      { x: 3.75, y: 0.8 },
+      { x: 3.9, y: 3.2 },
     ],
   },
 ]
@@ -200,16 +199,16 @@ const LEAD_LEFT = (targetId: string): Action[] => [
 
 /** Super going LEFT — he is already on the play side. */
 const CARRIER_LEFT: Assignment = {
-  rule: 'Take the direct handoff. Aim outside the playside tackle, then hit the hole hard.',
+  rule: 'Take the direct handoff. Eyes on the tackle\'s outside shoulder — cut up the C gap or bounce it.',
   detail:
-    'From the gun there is no bucket step — you are already 4 yards deep and already on the play side. Open play side, take the ball off the quarterback right now, and press flat at a point OUTSIDE the playside tackle. Then hit whatever hole opens up HARD — up inside, around the edge, all the way to the sideline. Same aiming point every time; find your crease and go, no dancing back there.',
+    'From the gun there is no bucket step — you are already 4 yards deep and already on the play side. Open play side, take the ball off the quarterback right now, and press right at the OUTSIDE SHOULDER of the playside tackle. This is an outside run — never cut up inside the tackle. If the edge is sealed, cut up into the C gap, between the tackle and the man outside him. If the edge runs wide, bounce it to the sideline. One cut and go HARD, no dancing back there.',
 }
 
 /** Super going RIGHT — he crosses behind the quarterback to get there. */
 const CARRIER_RIGHT: Assignment = {
-  rule: 'Cross behind the quarterback. Take the handoff, aim outside the playside tackle, hit the hole hard.',
+  rule: 'Cross behind the quarterback. Take the handoff, eyes on the tackle\'s outside shoulder — cut up the C gap or bounce it.',
   detail:
-    'The ball is going RIGHT and you are on the quarterback\'s left, so you cross behind him — flat, at your own depth, right under his heels. The other back is already gone. The quarterback opens right and meets you behind the right tackle; take the ball on the move and press flat at a point OUTSIDE the playside tackle. Then hit whatever hole opens up HARD — up inside, around the edge, all the way to the sideline. Same aiming point every time; find your crease and go, no dancing back there.',
+    'The ball is going RIGHT and you are on the quarterback\'s left, so you cross behind him — flat, at your own depth, right under his heels. The other back is already gone. The quarterback opens right and meets you behind the right tackle; take the ball on the move and press right at the OUTSIDE SHOULDER of the playside tackle. This is an outside run — never cut up inside the tackle. If the edge is sealed, cut up into the C gap, between the tackle and the man outside him. If the edge runs wide, bounce it to the sideline. One cut and go HARD, no dancing back there.',
 }
 
 const QB_GUN_LEFT: Assignment = {
@@ -280,10 +279,10 @@ const SUPER_ALWAYS_NOTE =
   "COACH-CONFIRMED (Ryan, 2026-09-21): \"Stretch in the gun should always go to the super.\" Super carries on all four gun Stretch plays, both directions, both sets. This replaced the earlier draft where the playside back (R in Red Gun Right, L in Black Gun Right) took the give. ballCarrier is 'S' on every play in this file."
 
 const GEOMETRY_LEFT_NOTE =
-  'DRAFT — backfield geometry, LEFT: the mesh is drawn at about (−1.8, −3.4), a yard play side of the quarterback and a half-yard in front of Super, and the handoff happens right there. No bucket step and no deep mesh from the gun. Everything from the aiming point OUTSIDE the playside tackle (−3.8, −1.9) downfield is the under-center path verbatim, so the hole and the read are unchanged.'
+  'DRAFT — backfield geometry, LEFT: the mesh is drawn at about (−1.8, −3.4), a yard play side of the quarterback and a half-yard in front of Super, and the handoff happens right there. No bucket step and no deep mesh from the gun. Super presses to the playside tackle\'s outside shoulder (−3.5, −0.7) and climbs the C gap, the same as under center — never inside the tackle (Ryan, 2026-09-25).'
 
 const GEOMETRY_RIGHT_NOTE =
-  'DRAFT — backfield geometry, RIGHT: Super starts a yard LEFT of the quarterback, so he crosses behind him. He is drawn flat at about 4½ deep (under the quarterback\'s heels and under the other back\'s spot at (1, −4)), takes the ball on the move at (2.4, −3.6) — behind the right tackle\'s inside leg, the same landmark the under-center mesh uses — and presses to the aiming point OUTSIDE the playside tackle (3.8, −1.9). The quarterback opens right and works a step of depth to meet him. Everything from the aiming point downfield is the under-center path verbatim. The mesh is a step later and a yard wider than on the left-going plays; if you want it tighter, Super\'s crossing line and the quarterback\'s open step both move.'
+  'DRAFT — backfield geometry, RIGHT: Super starts a yard LEFT of the quarterback, so he crosses behind him. He is drawn flat at about 4½ deep (under the quarterback\'s heels and under the other back\'s spot at (1, −4)), takes the ball on the move at (2.4, −3.6) — behind the right tackle\'s inside leg, the same landmark the under-center mesh uses — and presses to the playside tackle\'s outside shoulder (3.5, −0.7) and climbs the C gap. The quarterback opens right and works a step of depth to meet him. Everything from the aiming point downfield is the under-center path verbatim. The mesh is a step later and a yard wider than on the left-going plays; if you want it tighter, Super\'s crossing line and the quarterback\'s open step both move.'
 
 const QB_FAKE_NOTE =
   'DRAFT — the quarterback carries out a short, flat two-yard fake to the back side after the handoff. The under-center Stretch draws NO boot at all (varsity page-12 stops his line at the mesh); from the gun he has nothing else to do and the fake is what makes the gun Waggle look live. Say the word if you want it longer, shorter, or gone.'
@@ -300,7 +299,7 @@ const redLeftGun: Play = gunPlay(stretchLeftRed, {
   ballCarrier: 'S',
   summary: SUMMARY,
   description:
-    'Our strong-side stretch out of the gun. Up front nothing changes — the same 45-degree steps, the same wall moving sideways. The backfield does: the quarterback is 3 yards back, so Super opens play side from his gun spot and takes the ball right now instead of bucket-stepping into a deep mesh. The right wing fakes the inside give to hold the backers and the left wing blocks down from the slot. Super still aims outside the playside tackle and hits whatever opens up hard.',
+    'Our strong-side stretch out of the gun. Up front nothing changes — the same 45-degree steps, the same wall moving sideways. The backfield does: the quarterback is 3 yards back, so Super opens play side from his gun spot and takes the ball right now instead of bucket-stepping into a deep mesh. The right wing fakes the inside give to hold the backers and the left wing blocks down from the slot. Super still eyes the playside tackle\'s outside shoulder, then cuts up the C gap or bounces it.',
   actions: {
     S: CARRY_LEFT,
     Q: Q_LEFT,
@@ -367,7 +366,7 @@ const redRightGun: Play = gunPlay(stretchRightRed, {
   ballCarrier: 'S',
   summary: SUMMARY,
   description:
-    'The weak-side stretch out of the gun, and the ball still goes to Super — he crosses behind the quarterback from his spot on the left and takes the handoff on the move. The right wing is the back beside the quarterback now, so he leads out in front of Super and makes the same edge block he would have made from the wing; the left wing cuts off from the slot, and Y walls off the end inside him. Same 45-degree steps up front, same aiming point outside the playside tackle.',
+    'The weak-side stretch out of the gun, and the ball still goes to Super — he crosses behind the quarterback from his spot on the left and takes the handoff on the move. The right wing is the back beside the quarterback now, so he leads out in front of Super and makes the same edge block he would have made from the wing; the left wing cuts off from the slot, and Y walls off the end inside him. Same 45-degree steps up front, same aiming point: the playside tackle\'s outside shoulder.',
   actions: {
     S: CARRY_RIGHT_CROSS,
     Q: Q_RIGHT,
