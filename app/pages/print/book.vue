@@ -8,8 +8,9 @@
  *
  * Every page is a fixed-size `.sheet`, so page breaks only ever land between
  * sheets — a row can never be split and a table header can never be
- * orphaned. A play whose eleven jobs run longer than one sheet holds gets a
- * continuation sheet, measured rather than guessed (see fitTables).
+ * orphaned. Anything that can outgrow a sheet — the contents list, a play
+ * whose eleven jobs run long — carries on to another one, measured rather
+ * than guessed (see fitContents and fitTables).
  */
 import type { Assignment, Front, FrontId, OffPosId, Play } from '~/types/football'
 import { formations, fronts, playList, routes } from '~/data'
@@ -19,6 +20,7 @@ import {
   FRONT_ORDER,
   POSITION_GROUPS,
   POSITION_NAMES,
+  PLAY_SIDE_LABELS,
   mergedAssignments,
   playSideOf,
 } from '~/utils/playbook'
@@ -63,8 +65,6 @@ interface Spread {
   front: FrontId
   rows: Row[]
 }
-
-const FIRST_PLAY_PAGE = 4
 
 /**
  * Names that appear going BOTH ways (every run concept — Veer, Crush, Buck
@@ -112,47 +112,66 @@ const fitRows = ref<Record<string, number>>({})
 /** One printed page of a spread: its own sheet, or the continuation after it. */
 interface PlaySheet extends Spread {
   sheetKey: string
-  page: number
   continued: boolean
   /** Rows carried over to the continuation sheet — set on the first sheet only. */
   rest: Row[]
 }
 
-/** Page numbers fall out of which spreads needed a continuation sheet. */
-const playSheets = computed(() => {
-  let page = FIRST_PLAY_PAGE
-  return spreads.flatMap((s): PlaySheet[] => {
+const playSheets = computed(() =>
+  spreads.flatMap((s): PlaySheet[] => {
     const fit = fitRows.value[s.key] ?? s.rows.length
     const rows = s.rows.slice(0, fit)
     const rest = s.rows.slice(fit)
-    const first = { ...s, sheetKey: s.key, page: page++, continued: false, rows, rest }
+    const first = { ...s, sheetKey: s.key, continued: false, rows, rest }
     if (!rest.length) return [first]
-    const more = {
-      ...s,
-      sheetKey: `${s.key}-more`,
-      page: page++,
-      continued: true,
-      rows: rest,
-      rest: [],
-    }
-    return [first, more]
-  })
-})
+    return [first, { ...s, sheetKey: `${s.key}-more`, continued: true, rows: rest, rest: [] }]
+  }),
+)
 
-const pageOf = (sheetKey: string) => playSheets.value.find((p) => p.sheetKey === sheetKey)!.page
-
-const ROUTES_PAGE = computed(() => playSheets.value.at(-1)!.page + 1)
-const BACK_PAGE = computed(() => ROUTES_PAGE.value + 1)
-
-const contents = computed(() => [
-  { label: 'How to read a diagram', page: 2 },
-  { label: 'Formations — Red & Black', page: 3 },
+/** Contents entries, each with the sheet it points at. */
+const tocEntries = [
+  { label: 'How to read a diagram', sheet: 'how-to-read' },
+  { label: 'Formations — Red & Black', sheet: 'formations' },
   ...playList.map((p) => ({
     label: `${playLabel(p)} — vs all three fronts`,
-    page: pageOf(`${p.id}-${FRONT_ORDER[0]}`),
+    sheet: `${p.id}-${FRONT_ORDER[0]}`,
   })),
-  { label: 'Route tree — 0 through 9', page: ROUTES_PAGE.value },
+  { label: 'Route tree — 0 through 9', sheet: 'routes' },
+]
+
+/**
+ * Entry index where each contents sheet after the first begins. Filled in
+ * after mount by fitContents; empty means the list fits one sheet.
+ */
+const tocBreaks = ref<number[]>([])
+
+const contentsSheets = computed(() => {
+  const starts = [0, ...tocBreaks.value]
+  return starts.map((start, i) => ({
+    sheetKey: `contents-${i}`,
+    start,
+    continued: i > 0,
+    entries: tocEntries.slice(start, starts[i + 1]),
+  }))
+})
+
+/**
+ * The book, sheet by sheet. A page number is a position in this list, so a
+ * contents list that grows or a play that needs a continuation sheet pushes
+ * everything after it along — no page number is written down by hand.
+ */
+const bookOrder = computed(() => [
+  'cover',
+  ...contentsSheets.value.map((c) => c.sheetKey),
+  'how-to-read',
+  'formations',
+  ...playSheets.value.map((s) => s.sheetKey),
+  'routes',
+  'back',
 ])
+
+const pageOf = (sheetKey: string) => bookOrder.value.indexOf(sheetKey) + 1
+const totalPages = computed(() => bookOrder.value.length)
 
 /* ---------------------------------------------------------------- */
 /* Per-spread derived content                                        */
@@ -223,22 +242,47 @@ function alignmentPlay(formationId: Play['formation']): Play {
 }
 
 /* ---------------------------------------------------------------- */
-/* Fitting the assignment table                                      */
+/* Fitting to the sheet                                              */
 /* ---------------------------------------------------------------- */
-/* How many jobs fit under the diagram depends on how each one wraps, which
-   only the browser knows — so measure the real layout once the fonts are in.
-   While the end of a sheet's table (or its "continued" line) pokes out of
-   the sheet body, rows move to the continuation sheet. A sheet is the same
-   fixed width on screen and on paper, so what fits here fits in print, and
-   the body ends a clear band above the running foot. */
+/* How much fits on a sheet depends on how the text wraps, which only the
+   browser knows — so measure the real layout once the fonts are in. A sheet
+   is the same fixed width on screen and on paper, so what fits here fits in
+   print, and the body ends a clear band above the running foot. */
 
+/** Nothing on a sheet may end below its body's bottom edge. */
+const floorOf = (sheet: Element) =>
+  sheet.querySelector('.sheet-body')!.getBoundingClientRect().bottom
+
+/** Index of the first contents entry that pokes out of its sheet, if any. */
+function tocOverrun(): number | undefined {
+  for (const sheet of document.querySelectorAll<HTMLElement>('[data-toc]')) {
+    const floor = floorOf(sheet)
+    const rows = [...sheet.querySelectorAll('.toc-row')]
+    const crossing = rows.findIndex((r) => r.getBoundingClientRect().bottom > floor)
+    if (crossing > 0) return Number(sheet.dataset.toc) + crossing
+  }
+  return undefined
+}
+
+/** The first entry that doesn't fit starts the next contents sheet, top down. */
+async function fitContents() {
+  for (;;) {
+    const at = tocOverrun()
+    if (at === undefined) return
+    // Breaks after this one were measured against the old split — redo them.
+    tocBreaks.value = [...tocBreaks.value.filter((b) => b < at), at]
+    await nextTick()
+  }
+}
+
+/* While the end of a play sheet's table (or its "continued" line) pokes out
+   of the sheet body, rows move to the continuation sheet. */
 async function fitTables() {
-  await document.fonts.ready
   for (;;) {
     const next = { ...fitRows.value }
     let moved = false
     for (const sheet of document.querySelectorAll<HTMLElement>('[data-fit]')) {
-      const floor = sheet.querySelector('.sheet-body')!.getBoundingClientRect().bottom
+      const floor = floorOf(sheet)
       const rows = [...sheet.querySelectorAll('.assign tbody tr')]
       const end = sheet.querySelector('.assign-more') ?? rows.at(-1)
       if (!end || rows.length < 2 || end.getBoundingClientRect().bottom <= floor) continue
@@ -254,7 +298,13 @@ async function fitTables() {
   }
 }
 
-onMounted(fitTables)
+// Tables first: their continuation sheets settle the page numbers the
+// contents list then prints.
+onMounted(async () => {
+  await document.fonts.ready
+  await fitTables()
+  await fitContents()
+})
 
 /* ---------------------------------------------------------------- */
 /* Print affordance                                                  */
@@ -263,13 +313,11 @@ onMounted(fitTables)
 function printBook() {
   window.print()
 }
-
-const totalPages = BACK_PAGE
 </script>
 
 <template>
   <div class="book" data-diagram-theme="print">
-    <!-- ===================== 1 · COVER ===================== -->
+    <!-- ===================== COVER ===================== -->
     <section class="sheet cover">
       <div class="cover-rule-top" />
       <div class="cover-main">
@@ -292,7 +340,37 @@ const totalPages = BACK_PAGE
       <div class="cover-rule-bottom" />
     </section>
 
-    <!-- ============== 2 · CONTENTS + HOW TO READ ============== -->
+    <!-- ===================== CONTENTS ===================== -->
+    <!-- As many sheets as the list needs; fitContents decides where they break. -->
+    <section v-for="c in contentsSheets" :key="c.sheetKey" class="sheet" :data-toc="c.start">
+      <header class="sheet-head">
+        <span class="sheet-head-book">Wolves<span class="hd-red"> Playbook</span></span>
+        <span class="sheet-head-section">
+          Contents<template v-if="c.continued"> &middot; continued</template>
+        </span>
+      </header>
+
+      <div class="sheet-body">
+        <p class="p-eyebrow">
+          Contents<template v-if="c.continued"> &middot; continued</template>
+        </p>
+        <h2 v-if="!c.continued" class="p-title">What&rsquo;s in here</h2>
+        <ul class="toc">
+          <li v-for="e in c.entries" :key="e.label" class="toc-row">
+            <span class="toc-label">{{ e.label }}</span>
+            <span class="toc-dots" aria-hidden="true" />
+            <span class="toc-page">{{ pageOf(e.sheet) }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <footer class="sheet-foot">
+        <span>Centennial Wolves &middot; 8th Grade</span>
+        <span class="sheet-foot-num">{{ pageOf(c.sheetKey) }} / {{ totalPages }}</span>
+      </footer>
+    </section>
+
+    <!-- ===================== HOW TO READ ===================== -->
     <section class="sheet">
       <header class="sheet-head">
         <span class="sheet-head-book">Wolves<span class="hd-red"> Playbook</span></span>
@@ -300,17 +378,8 @@ const totalPages = BACK_PAGE
       </header>
 
       <div class="sheet-body">
-        <p class="p-eyebrow">Contents</p>
-        <h2 class="p-title">What&rsquo;s in here</h2>
-        <ul class="toc">
-          <li v-for="c in contents" :key="c.label" class="toc-row">
-            <span class="toc-label">{{ c.label }}</span>
-            <span class="toc-dots" aria-hidden="true" />
-            <span class="toc-page">{{ c.page }}</span>
-          </li>
-        </ul>
-
-        <h3 class="section-label">Reading a diagram</h3>
+        <p class="p-eyebrow">How to read this book</p>
+        <h2 class="p-title">Reading a diagram</h2>
         <p class="p-lead">
           Offense is always at the bottom, going up. The thick line across the middle is the line of
           scrimmage. Defenders are bare letters &mdash; no circle around them.
@@ -548,11 +617,11 @@ const totalPages = BACK_PAGE
 
       <footer class="sheet-foot">
         <span>Centennial Wolves &middot; 8th Grade</span>
-        <span class="sheet-foot-num">2 / {{ totalPages }}</span>
+        <span class="sheet-foot-num">{{ pageOf('how-to-read') }} / {{ totalPages }}</span>
       </footer>
     </section>
 
-    <!-- ===================== 3 · FORMATIONS ===================== -->
+    <!-- ===================== FORMATIONS ===================== -->
     <section class="sheet">
       <header class="sheet-head">
         <span class="sheet-head-book">Wolves<span class="hd-red"> Playbook</span></span>
@@ -586,11 +655,11 @@ const totalPages = BACK_PAGE
 
       <footer class="sheet-foot">
         <span>Centennial Wolves &middot; 8th Grade</span>
-        <span class="sheet-foot-num">3 / {{ totalPages }}</span>
+        <span class="sheet-foot-num">{{ pageOf('formations') }} / {{ totalPages }}</span>
       </footer>
     </section>
 
-    <!-- ============ 4.. · EVERY PLAY × EVERY FRONT ============ -->
+    <!-- ============ EVERY PLAY × EVERY FRONT ============ -->
     <!-- A spread whose jobs overrun its sheet carries on to a second one: same
          head, same table header, the rows that didn't fit — never a split row. -->
     <section
@@ -618,7 +687,7 @@ const totalPages = BACK_PAGE
               </span>
             </h2>
             <p v-if="s.continued" class="play-sub">
-              Continued from page {{ s.page - 1 }} &middot; the rest of the jobs
+              Continued from page {{ pageOf(s.key) }} &middot; the rest of the jobs
             </p>
             <p v-else class="play-sub">
               <template v-if="s.play.callName">{{ s.play.callName }} &middot; </template>
@@ -688,7 +757,7 @@ const totalPages = BACK_PAGE
                   class="side-badge"
                   :class="{ 'is-playside': r.side === 'playside' }"
                 >
-                  {{ r.side }}
+                  {{ PLAY_SIDE_LABELS[r.side] }}
                 </span>
               </td>
               <td>
@@ -700,7 +769,7 @@ const totalPages = BACK_PAGE
         </table>
 
         <p v-if="s.rest.length" class="assign-more">
-          Continued on page {{ s.page + 1 }}: {{ s.rest.map((r) => r.pos).join(', ') }}
+          Continued on page {{ pageOf(s.key) + 1 }}: {{ s.rest.map((r) => r.pos).join(', ') }}
         </p>
       </div>
 
@@ -709,11 +778,11 @@ const totalPages = BACK_PAGE
           {{ playLabel(s.play) }} vs {{ FRONT_LABELS[s.front] }}
           <template v-if="s.continued"> &middot; continued</template>
         </span>
-        <span class="sheet-foot-num">{{ s.page }} / {{ totalPages }}</span>
+        <span class="sheet-foot-num">{{ pageOf(s.sheetKey) }} / {{ totalPages }}</span>
       </footer>
     </section>
 
-    <!-- ===================== 10 · ROUTE TREE ===================== -->
+    <!-- ===================== ROUTE TREE ===================== -->
     <section class="sheet">
       <header class="sheet-head">
         <span class="sheet-head-book">Wolves<span class="hd-red"> Playbook</span></span>
@@ -756,11 +825,11 @@ const totalPages = BACK_PAGE
 
       <footer class="sheet-foot">
         <span>Centennial Wolves &middot; 8th Grade</span>
-        <span class="sheet-foot-num">{{ ROUTES_PAGE }} / {{ totalPages }}</span>
+        <span class="sheet-foot-num">{{ pageOf('routes') }} / {{ totalPages }}</span>
       </footer>
     </section>
 
-    <!-- ===================== 11 · BACK ===================== -->
+    <!-- ===================== BACK ===================== -->
     <section class="sheet backpage">
       <div class="sheet-body">
         <img src="/brand/wolves-mark.png" alt="Centennial Wolves" class="back-mark" />

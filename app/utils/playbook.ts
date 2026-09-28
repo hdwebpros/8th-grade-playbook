@@ -14,6 +14,12 @@ import type {
 
 export type PlaySide = 'playside' | 'backside' | null
 
+/** The side badge's words — the app and the print book both read them from here. */
+export const PLAY_SIDE_LABELS: Record<NonNullable<PlaySide>, string> = {
+  playside: 'Play side',
+  backside: 'Away side',
+}
+
 /**
  * Playside/backside badge, computed — never stored. A player on the ball
  * (C, and Q/S when stacked on the midline) gets no badge.

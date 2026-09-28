@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { PlaySide } from '~/utils/playbook'
+import { PLAY_SIDE_LABELS, type PlaySide } from '~/utils/playbook'
 
 defineProps<{ side: PlaySide }>()
 </script>
 
 <template>
   <span v-if="side" class="badge" :class="side">
-    {{ side === 'playside' ? 'Play side' : 'Away side' }}
+    {{ PLAY_SIDE_LABELS[side] }}
   </span>
 </template>
 
