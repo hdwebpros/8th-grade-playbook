@@ -14,6 +14,8 @@ export interface LearningVideo {
    * the card sends players to YouTube instead of showing a dead player.
    */
   embed?: boolean
+  /** A YouTube Short — drawn tall (9:16) instead of widescreen. */
+  vertical?: boolean
 }
 
 export const learningVideos: LearningVideo[] = [
@@ -33,3 +35,20 @@ export const learningVideos: LearningVideo[] = [
   { id: 'kafczztzTRA', group: 'QB', title: 'How to throw farther' },
   { id: 'q3SjTy5b9RQ', group: 'QB', title: 'Instantly become a better QB', note: 'First Down Training.' },
 ]
+
+/**
+ * Videos of one play, shown on that play's page. Keyed by Play.id, the same
+ * way app/data/film.ts hangs our own practice clips off a play. These are
+ * other people's YouTube videos, so they stream — they do not play offline.
+ */
+export const playVideos: Record<string, LearningVideo[]> = {
+  'stumblebum-tight': [
+    {
+      id: 'SUQkHXYpRIY',
+      group: 'NFL',
+      title: 'How the Detroit Lions came up with Stumblebum',
+      note: 'Netflix Sports.',
+      vertical: true,
+    },
+  ],
+}

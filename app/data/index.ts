@@ -20,6 +20,7 @@ import { stretchPlays } from './plays/stretch'
 import { stretchGunPlays } from './plays/stretch-gun'
 import { stretchTightPlays } from './plays/stretch-tight'
 import { stretchBootPlays } from './plays/stretch-boot'
+import { stumblebumPlays } from './plays/stumblebum'
 import { veerPlays } from './plays/veer'
 import { veerGunPlays } from './plays/veer-gun'
 import { veerLeftTight } from './plays/veer-tight-left'
@@ -60,6 +61,7 @@ export { speedOptionGunPlays } from './plays/speed-option-gun'
 export { stretchPlays } from './plays/stretch'
 export { stretchLeftTight, stretchRightTight, stretchTightPlays } from './plays/stretch-tight'
 export { stretchBootBlack, stretchBootPlays, stretchBootRed } from './plays/stretch-boot'
+export { stumblebumPlays, stumblebumTight } from './plays/stumblebum'
 export { routes } from './routes'
 export { veerLeftBlack, veerLeftRed, veerPlays, veerRightBlack, veerRightRed } from './plays/veer'
 export { veerLeftTight } from './plays/veer-tight-left'
@@ -83,8 +85,8 @@ export { tight } from './tight-formation'
 
 /**
  * Same plays, in book order: runs first (Veer, Crush, Buck Sweep, Stretch),
- * then passing (Waggle, Boot, the audible examples), then the Split
- * Wide package
+ * then passing (Waggle, Boot, the audible examples, the Stumblebum trick
+ * play), then the Split Wide package
  * (DRAFT — gated on Coach Ryan's football review, HANDOFF §10).
  */
 export const playList: Play[] = [
@@ -100,6 +102,7 @@ export const playList: Play[] = [
   ...wagglePlays,
   ...stretchBootPlays,
   ...audiblePlays,
+  ...stumblebumPlays,
   ...splitWidePlays,
 ]
 

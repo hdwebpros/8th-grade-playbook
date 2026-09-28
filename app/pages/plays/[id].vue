@@ -2,6 +2,7 @@
 import type { FrontId, OffPosId, Play } from '~/types/football'
 import { baseIdOf, formationFor, fronts, gunIdOf, isGunPlay, plays } from '~/data'
 import { film } from '~/data/film'
+import { playVideos } from '~/data/learning'
 import { FRONT_LABELS, FRONT_ORDER, callPartsFor } from '~/utils/playbook'
 import { labelForId } from '~/utils/defense'
 
@@ -20,6 +21,9 @@ const formation = computed(() => formationFor(play.value))
 
 /** Practice clips of this exact play, if any — see app/data/film.ts. */
 const filmClips = computed(() => film[play.value.id] ?? [])
+
+/** Other people's videos of this play (YouTube) — see app/data/learning.ts. */
+const videos = computed(() => playVideos[play.value.id] ?? [])
 
 /**
  * Legacy twin (e.g. waggle-red ⇄ waggle-black): same concept, other formation,
@@ -317,6 +321,13 @@ useHead(() => {
 
         <GameFilm v-if="filmClips.length" :clips="filmClips" />
 
+        <section v-if="videos.length" class="watch" aria-label="Watch it">
+          <h2 class="watch-title">
+            <Icon name="lucide:tv" aria-hidden="true" /> Watch it
+          </h2>
+          <LearningVideo v-for="v in videos" :key="v.id" :video="v" />
+        </section>
+
         <CoachNote
           v-if="play.coachNotes?.length"
           title="Coach's notes"
@@ -545,6 +556,24 @@ useHead(() => {
 .desc {
   font-size: 1rem;
   color: var(--chalk-dim);
+}
+
+/* Same heading as the Game film section above it. */
+.watch {
+  display: grid;
+  gap: 10px;
+}
+.watch-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.15rem;
+  color: var(--steel);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.watch-title .iconify {
+  color: var(--red);
 }
 
 /* --- Desktop: diagram pinned left, jobs scroll right --- */

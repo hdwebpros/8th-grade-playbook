@@ -63,7 +63,7 @@ const watchUrl = computed(() => {
 </script>
 
 <template>
-  <article class="vid card">
+  <article class="vid card" :class="{ vertical: video.vertical }">
     <div class="frame">
       <a v-if="blocked" :href="watchUrl" target="_blank" rel="noopener" class="blocked">
         <img :src="thumb" alt="" class="blocked-bg" />
@@ -116,6 +116,14 @@ const watchUrl = computed(() => {
   aspect-ratio: 16 / 9;
   background: #000;
   line-height: 0;
+}
+/* A Short is tall: the frame sits beside the words instead of above them. */
+.vid.vertical {
+  grid-template-columns: 150px 1fr;
+  align-items: center;
+}
+.vid.vertical .frame {
+  aspect-ratio: 9 / 16;
 }
 .host,
 .frame :deep(iframe) {
