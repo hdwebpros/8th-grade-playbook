@@ -5,9 +5,10 @@
    <script setup>), so nothing here can leak into the dark app shell.
    Adds rules only; never edits tokens.css values.
 
-   The book is composed of fixed Letter-portrait sheets. Every sheet is
-   authored to fit, so a page break can never land inside a table or
-   orphan a table header — the break is always between sheets.
+   The book is composed of fixed Letter-portrait sheets, so a page break
+   can never land inside a table row or orphan a table header — the break
+   is always between sheets. Jobs that don't fit a play sheet move to a
+   continuation sheet (book.vue measures that), never off the page.
    ============================================================ */
 
 @page {
@@ -412,6 +413,15 @@ body.print-book-body {
 
 /* --- Play page ------------------------------------------------------ */
 
+/* Every point of height here is a point the jobs table can use. The foot
+   band stays clear of the running foot, just less generously. */
+.play-sheet {
+  padding-bottom: 0.58in;
+}
+.play-sheet .sheet-head {
+  margin-bottom: 7pt;
+}
+
 .play-head {
   display: flex;
   align-items: flex-end;
@@ -420,7 +430,7 @@ body.print-book-body {
   flex: none;
 }
 .play-title {
-  font-size: 24pt;
+  font-size: 22pt;
   line-height: 0.95;
 }
 .play-title .pt-dir {
@@ -436,7 +446,7 @@ body.print-book-body {
   text-align: center;
   border: 1.5px solid var(--paper-ink);
   border-radius: 5px;
-  padding: 4pt 10pt 5pt;
+  padding: 3pt 10pt 4pt;
   min-width: 1.15in;
 }
 .front-chip .fc-vs {
@@ -458,24 +468,33 @@ body.print-book-body {
 
 .play-desc {
   font-size: 8.8pt;
+  line-height: 1.32;
   color: var(--paper-mute);
-  margin: 4pt 0 5pt;
+  margin: 3pt 0 4pt;
   max-width: 96ch;
   flex: none;
 }
 
 /* The diagram's own aspect is ~1.4:1. Sizing the frame to that instead of to
    the text column keeps the drawing as large as the page allows and turns the
-   leftover strip into a scouting sidebar rather than dead white. */
+   leftover strip into a scouting sidebar rather than dead white. On a sheet
+   that has to hold all eleven jobs the drawing gives up some height to them;
+   a spread that needs a continuation sheet anyway gets it back. */
 .play-band {
   display: grid;
-  grid-template-columns: 4.56in 1fr;
+  grid-template-columns: 3.58in 1fr;
   gap: 12pt;
   align-items: stretch;
-  margin-bottom: 7pt;
+  margin-bottom: 4pt;
   flex: none;
 }
 .play-diagram {
+  height: 2.45in;
+}
+.play-sheet.is-split .play-band {
+  grid-template-columns: 4.56in 1fr;
+}
+.play-sheet.is-split .play-diagram {
   height: 3.13in;
 }
 
@@ -491,13 +510,22 @@ body.print-book-body {
   line-height: 1;
 }
 .scout-body {
-  font-size: 8.2pt;
-  line-height: 1.32;
+  font-size: 8.5pt;
+  line-height: 1.3;
   color: var(--paper-mute);
 }
+/* Key letter beside its explanation, not above it: on a read play the
+   sidebar, not the diagram, sets the band's height. */
 .scout-read {
   border-top: 1px solid var(--paper-rule);
   padding-top: 5pt;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 8pt;
+  align-items: center;
+}
+.scout-read .scout-read-cap {
+  grid-column: 1 / -1;
 }
 .scout-read-cap {
   display: block;
@@ -520,6 +548,9 @@ body.print-book-body {
   margin-top: auto;
   border-top: 1px solid var(--paper-rule);
   padding-top: 5pt;
+  display: flex;
+  align-items: baseline;
+  gap: 7pt;
 }
 .scout-foot .scout-read-cap {
   color: var(--paper-mute);
@@ -543,10 +574,13 @@ body.print-book-body {
 
 /* --- Assignment table ----------------------------------------------- */
 
+/* The jobs are the body text of the book: 8.5pt is the floor, rule and
+   detail alike. Line-height and padding are what give, not the type. */
 .assign {
   width: 100%;
   border-collapse: collapse;
-  font-size: 8.2pt;
+  font-size: 8.5pt;
+  line-height: 1.22;
   table-layout: fixed;
 }
 .assign thead th {
@@ -558,7 +592,7 @@ body.print-book-body {
   text-align: left;
   color: #fff;
   background: var(--paper-ink);
-  padding: 3.5pt 6pt;
+  padding: 3pt 6pt;
 }
 .assign thead {
   display: table-header-group;
@@ -568,7 +602,7 @@ body.print-book-body {
   page-break-inside: avoid;
 }
 .assign tbody td {
-  padding: 2.2pt 5pt;
+  padding: 1.5pt 5pt;
   border-bottom: 1px solid var(--paper-rule-soft);
   vertical-align: top;
 }
@@ -582,21 +616,31 @@ body.print-book-body {
   color: var(--paper-red-deep);
 }
 
+/* The continuation sheet has no diagram between its head and the table. */
+.play-head + .assign {
+  margin-top: 8pt;
+}
 .assign tbody tr.is-group-start td {
   border-top: 1.5px solid var(--paper-rule);
 }
 
 .col-pos {
-  width: 1.12in;
+  width: 0.95in;
 }
-.col-side {
-  width: 0.62in;
+/* Stacked under the position, not a column of its own — that column's
+   width goes to the jobs, which is where the lines were being lost. */
+.assign .side-badge {
+  display: block;
+  width: fit-content;
+  margin-top: 1pt;
+  line-height: 1.1;
 }
 
 .a-pos {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 10.5pt;
+  line-height: 1;
   letter-spacing: 0.04em;
   margin-right: 4pt;
 }
@@ -607,13 +651,27 @@ body.print-book-body {
 .a-rule {
   font-weight: 600;
 }
+/* Vue's whitespace condensing drops the template's space between the rule
+   and its detail, which ran them together ("pitch.Step to playside"). */
+.a-rule::after {
+  content: ' ';
+}
 .assign tbody tr.is-carrier .a-rule {
   color: var(--paper-red-deep);
 }
 .a-detail {
   color: var(--paper-mute);
-  font-size: 7.2pt;
-  line-height: 1.26;
+}
+/* Under a table cut short: which jobs are over the page, and where. */
+.assign-more {
+  margin-top: 4pt;
+  text-align: right;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 8.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--paper-red-deep);
 }
 .side-badge {
   display: inline-block;

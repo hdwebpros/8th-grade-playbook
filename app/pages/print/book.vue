@@ -6,9 +6,10 @@
  * hands it to the browser's print-to-PDF. No backend, no PDF library: the
  * same data that draws the app draws the book, so they cannot drift.
  *
- * Every page is a fixed-size `.sheet` authored to fit, so page breaks only
- * ever land between sheets — a table can never be split and a table header
- * can never be orphaned.
+ * Every page is a fixed-size `.sheet`, so page breaks only ever land between
+ * sheets — a row can never be split and a table header can never be
+ * orphaned. A play whose eleven jobs run longer than one sheet holds gets a
+ * continuation sheet, measured rather than guessed (see fitTables).
  */
 import type { Assignment, Front, FrontId, OffPosId, Play } from '~/types/football'
 import { formations, fronts, playList, routes } from '~/data'
@@ -39,8 +40,8 @@ useHead({
 /**
  * Assignment rows run full width in the app's own grouping (backs, ends,
  * line) with a rule between groups. Full width on purpose: a wide measure
- * costs far fewer lines than columns do, which is what keeps all eleven
- * jobs on the same sheet as their diagram.
+ * costs far fewer lines than columns do — the side badge sits under the
+ * position rather than in a column of its own for the same reason.
  */
 const TABLE_ORDER: { pos: OffPosId; group: string; groupStart: boolean }[] =
   POSITION_GROUPS.flatMap((g) =>
@@ -60,7 +61,7 @@ interface Spread {
   key: string
   play: Play
   front: FrontId
-  page: number
+  rows: Row[]
 }
 
 const FIRST_PLAY_PAGE = 4
@@ -93,27 +94,65 @@ const playLabel = (p: Play) => {
   return named ? p.name : `${p.name} ${formation}`
 }
 
-const spreads: Spread[] = playList.flatMap((play, pi) =>
-  FRONT_ORDER.map((front, fi) => ({
+const spreads: Spread[] = playList.flatMap((play) =>
+  FRONT_ORDER.map((front) => ({
     key: `${play.id}-${front}`,
     play,
     front,
-    page: FIRST_PLAY_PAGE + pi * FRONT_ORDER.length + fi,
+    rows: rowsFor(play, front),
   })),
 )
 
-const ROUTES_PAGE = FIRST_PLAY_PAGE + spreads.length
-const BACK_PAGE = ROUTES_PAGE + 1
+/**
+ * Spread key → how many of its rows fit on its own sheet. Filled in after
+ * mount by fitTables; a spread that isn't listed fits whole.
+ */
+const fitRows = ref<Record<string, number>>({})
 
-const contents = [
+/** One printed page of a spread: its own sheet, or the continuation after it. */
+interface PlaySheet extends Spread {
+  sheetKey: string
+  page: number
+  continued: boolean
+  /** Rows carried over to the continuation sheet — set on the first sheet only. */
+  rest: Row[]
+}
+
+/** Page numbers fall out of which spreads needed a continuation sheet. */
+const playSheets = computed(() => {
+  let page = FIRST_PLAY_PAGE
+  return spreads.flatMap((s): PlaySheet[] => {
+    const fit = fitRows.value[s.key] ?? s.rows.length
+    const rows = s.rows.slice(0, fit)
+    const rest = s.rows.slice(fit)
+    const first = { ...s, sheetKey: s.key, page: page++, continued: false, rows, rest }
+    if (!rest.length) return [first]
+    const more = {
+      ...s,
+      sheetKey: `${s.key}-more`,
+      page: page++,
+      continued: true,
+      rows: rest,
+      rest: [],
+    }
+    return [first, more]
+  })
+})
+
+const pageOf = (sheetKey: string) => playSheets.value.find((p) => p.sheetKey === sheetKey)!.page
+
+const ROUTES_PAGE = computed(() => playSheets.value.at(-1)!.page + 1)
+const BACK_PAGE = computed(() => ROUTES_PAGE.value + 1)
+
+const contents = computed(() => [
   { label: 'How to read a diagram', page: 2 },
   { label: 'Formations — Red & Black', page: 3 },
-  ...playList.map((p, pi) => ({
+  ...playList.map((p) => ({
     label: `${playLabel(p)} — vs all three fronts`,
-    page: FIRST_PLAY_PAGE + pi * FRONT_ORDER.length,
+    page: pageOf(`${p.id}-${FRONT_ORDER[0]}`),
   })),
-  { label: 'Route tree — 0 through 9', page: ROUTES_PAGE },
-]
+  { label: 'Route tree — 0 through 9', page: ROUTES_PAGE.value },
+])
 
 /* ---------------------------------------------------------------- */
 /* Per-spread derived content                                        */
@@ -182,6 +221,40 @@ function alignmentPlay(formationId: Play['formation']): Play {
     vs: Object.fromEntries(FRONT_ORDER.map((f) => [f, { actions: {} }])) as Play['vs'],
   }
 }
+
+/* ---------------------------------------------------------------- */
+/* Fitting the assignment table                                      */
+/* ---------------------------------------------------------------- */
+/* How many jobs fit under the diagram depends on how each one wraps, which
+   only the browser knows — so measure the real layout once the fonts are in.
+   While the end of a sheet's table (or its "continued" line) pokes out of
+   the sheet body, rows move to the continuation sheet. A sheet is the same
+   fixed width on screen and on paper, so what fits here fits in print, and
+   the body ends a clear band above the running foot. */
+
+async function fitTables() {
+  await document.fonts.ready
+  for (;;) {
+    const next = { ...fitRows.value }
+    let moved = false
+    for (const sheet of document.querySelectorAll<HTMLElement>('[data-fit]')) {
+      const floor = sheet.querySelector('.sheet-body')!.getBoundingClientRect().bottom
+      const rows = [...sheet.querySelectorAll('.assign tbody tr')]
+      const end = sheet.querySelector('.assign-more') ?? rows.at(-1)
+      if (!end || rows.length < 2 || end.getBoundingClientRect().bottom <= floor) continue
+      // Jump straight to the first row that crosses; if only the "continued"
+      // line does, make room for it by moving one more row.
+      const crossing = rows.findIndex((r) => r.getBoundingClientRect().bottom > floor)
+      next[sheet.dataset.fit!] = crossing === -1 ? rows.length - 1 : Math.max(crossing, 1)
+      moved = true
+    }
+    if (!moved) return
+    fitRows.value = next
+    await nextTick()
+  }
+}
+
+onMounted(fitTables)
 
 /* ---------------------------------------------------------------- */
 /* Print affordance                                                  */
@@ -518,11 +591,20 @@ const totalPages = BACK_PAGE
     </section>
 
     <!-- ============ 4.. · EVERY PLAY × EVERY FRONT ============ -->
-    <section v-for="s in spreads" :key="s.key" class="sheet">
+    <!-- A spread whose jobs overrun its sheet carries on to a second one: same
+         head, same table header, the rows that didn't fit — never a split row. -->
+    <section
+      v-for="s in playSheets"
+      :key="s.sheetKey"
+      class="sheet play-sheet"
+      :class="{ 'is-split': s.rest.length }"
+      :data-fit="s.continued ? undefined : s.key"
+    >
       <header class="sheet-head">
         <span class="sheet-head-book">Wolves<span class="hd-red"> Playbook</span></span>
         <span class="sheet-head-section">
           {{ playLabel(s.play) }} &middot; vs {{ FRONT_LABELS[s.front] }}
+          <template v-if="s.continued"> &middot; continued</template>
         </span>
       </header>
 
@@ -535,7 +617,10 @@ const totalPages = BACK_PAGE
                 <template v-if="twoWayNames.has(s.play.name)">{{ directionLabel(s.play) }} &middot; </template>{{ formationName(s.play) }}
               </span>
             </h2>
-            <p class="play-sub">
+            <p v-if="s.continued" class="play-sub">
+              Continued from page {{ s.page - 1 }} &middot; the rest of the jobs
+            </p>
+            <p v-else class="play-sub">
               <template v-if="s.play.callName">{{ s.play.callName }} &middot; </template>
               Going {{ s.play.direction }} &middot; Ball carrier:
               {{ POSITION_NAMES[s.play.ballCarrier] }}
@@ -550,9 +635,9 @@ const totalPages = BACK_PAGE
           </div>
         </div>
 
-        <p class="play-desc">{{ s.play.description }}</p>
+        <p v-if="!s.continued" class="play-desc">{{ s.play.description }}</p>
 
-        <div class="play-band">
+        <div v-if="!s.continued" class="play-band">
           <div class="dg-frame play-diagram">
             <PlayDiagram
               :play="s.play"
@@ -586,21 +671,18 @@ const totalPages = BACK_PAGE
           <thead>
             <tr>
               <th class="col-pos" scope="col">Position</th>
-              <th class="col-side" scope="col">Side</th>
               <th scope="col">Your job vs the {{ FRONT_LABELS[s.front] }}</th>
             </tr>
           </thead>
           <tbody>
             <tr
-              v-for="r in rowsFor(s.play, s.front)"
+              v-for="r in s.rows"
               :key="r.pos"
               :class="{ 'is-carrier': r.carrier, 'is-group-start': r.groupStart }"
             >
               <td>
                 <span class="a-pos">{{ r.pos }}</span>
                 <span class="a-name">{{ r.name }}</span>
-              </td>
-              <td>
                 <span
                   v-if="r.side"
                   class="side-badge"
@@ -608,7 +690,6 @@ const totalPages = BACK_PAGE
                 >
                   {{ r.side }}
                 </span>
-                <span v-else class="a-detail">&mdash;</span>
               </td>
               <td>
                 <span class="a-rule">{{ r.assignment.rule }}</span>
@@ -617,10 +698,17 @@ const totalPages = BACK_PAGE
             </tr>
           </tbody>
         </table>
+
+        <p v-if="s.rest.length" class="assign-more">
+          Continued on page {{ s.page + 1 }}: {{ s.rest.map((r) => r.pos).join(', ') }}
+        </p>
       </div>
 
       <footer class="sheet-foot">
-        <span>{{ playLabel(s.play) }} vs {{ FRONT_LABELS[s.front] }}</span>
+        <span>
+          {{ playLabel(s.play) }} vs {{ FRONT_LABELS[s.front] }}
+          <template v-if="s.continued"> &middot; continued</template>
+        </span>
         <span class="sheet-foot-num">{{ s.page }} / {{ totalPages }}</span>
       </footer>
     </section>
