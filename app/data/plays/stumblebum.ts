@@ -19,6 +19,7 @@
  *     so `direction` is 'left', the side the ball goes to.
  *   - Y releases RIGHT OFF THE SNAP — no block first.
  *   - Super dives, then POPS UP AND BLOCKS the first man who comes free.
+ *     Later the same day: he dives and FALLS TO THE LEFT of the quarterback.
  *   - It carries the Uncommon Play badge: once a game.
  *
  * Protection is the Tight audible's straight-up pass set (passLine, nothing
@@ -54,8 +55,8 @@ const Q_STUMBLE: Action[] = [
 ]
 
 /**
- * S: dive forward and land BESIDE the quarterback's feet like the ball is
- * loose, then get up and step into the first man who comes free.
+ * S: dive forward and fall to the LEFT of the quarterback's feet like the ball
+ * is loose, then get up and step into the first man who comes free on the left.
  */
 const S_DIVE: Action[] = [
   {
@@ -63,13 +64,13 @@ const S_DIVE: Action[] = [
     // faded it reads as a plain step into a block.
     kind: 'run',
     path: [
-      { x: 0.1, y: -3.9 },
-      { x: 0.35, y: -3.25 },
+      { x: -0.2, y: -3.8 },
+      { x: -1.3, y: -3.5 },
     ],
   },
   {
     kind: 'block',
-    path: [{ x: 1.5, y: -2.5 }],
+    path: [{ x: -1.8, y: -2.6 }],
   },
 ]
 
@@ -125,8 +126,8 @@ const assignments: Record<OffPosId, Assignment> = {
     'Take a clean snap and take two steps back like normal. Then stumble like you tripped over your own feet and lean way over toward the ground. If you are gutsy, touch the ball to the turf — but it NEVER leaves your hands. Hands and feet only: if a knee touches the ground, you are down and the play is over. Stay low for a two-count while they dive in for the "fumble." Then pop up, set your feet, and throw it deep to Y up the left sideline, over everybody\'s heads.',
   ),
   S: a(
-    'Dive on the ground by the quarterback like the ball is loose. Then pop up and block.',
-    'On the snap, dive forward and land right next to the quarterback\'s feet, like you are going after a fumble. Sell it. Land BESIDE him, never into him — you cannot take his legs out. Then get right back up and block the first man who comes free. Everybody on defense is coming for that ball, so the quarterback needs you up fast.',
+    'Dive and fall to the left of the quarterback like the ball is loose. Then pop up and block.',
+    'On the snap, dive forward and fall to the LEFT of the quarterback\'s feet, like you are going after a fumble. Sell it. Fall beside him, never into him — you cannot take his legs out. Then get right back up and block the first man who comes free on the left. Everybody on defense is coming for that ball, so the quarterback needs you up fast.',
   ),
   Y: a(
     'Run the 9 — fade — right off the snap. You are the only one going out.',
@@ -168,12 +169,13 @@ const assignments: Record<OffPosId, Assignment> = {
 
 const reviewNotes = [
   'YOUR PLAY, YOUR WORDS (2026-09-28): Super dives at the quarterback like it is a fumble, the whole line yells FUMBLE and blocks like crazy, the quarterback fakes a trip and leans to the ground (touching the ball down if he is gutsy, never letting go), Y is the only man out on a 9, and the quarterback pops up and throws it over everybody\'s heads.',
-  'YOUR RULINGS: Y (the LEFT tight end) runs the 9, one version only, so the play is drawn going LEFT and has no Right/Left toggle. Y goes right off the snap, no block first. Super dives, then pops up and blocks the first man free. Uncommon Play badge: once a game.',
+  'YOUR RULINGS: Y (the LEFT tight end) runs the 9, one version only, so the play is drawn going LEFT and has no Right/Left toggle. Y goes right off the snap, no block first. Super dives and falls to the LEFT of the quarterback, then pops up and blocks the first man free on the left. Uncommon Play badge: once a game.',
+  'YOUR REVIEW (2026-09-28): "The only change is the super should dive and fall to the left." The protection, the edge jobs, who yells and the timing below stand as drawn.',
   'LEAGUE RULES: you confirmed your league allows the "fumble" yell (2026-09-28).',
-  'MY CALL — THE PROTECTION: the straight-up pass set from the Tight audible, nothing slid. Tackles have the ends, guards and center take the man in front of them, nobody past the line. Same picture against all three fronts.',
-  'MY CALL — X AND THE WINGS: X stays in and takes the first man outside the right tackle. R takes anybody wider than X. L takes the first man off the left edge outside the tackle, because with Y gone nobody else is out there. Only the line and X are told to yell; the wings and Super are not. Say the word if you want everybody yelling.',
-  'MY CALL — THE TIMING: the quarterback takes two steps back, stumbles, and stays low for a two-count before he pops up. The drawn stumble is two yards deep. Y\'s route is the 9 straight off the route tree.',
-  'MY CALL — SUPER: he lands BESIDE the quarterback\'s feet, never into them, so he cannot trip him for real. The dive is drawn as a short solid line to the quarterback\'s feet, then his block turns out to the right.',
+  'APPROVED — THE PROTECTION: the straight-up pass set from the Tight audible, nothing slid. Tackles have the ends, guards and center take the man in front of them, nobody past the line. Same picture against all three fronts.',
+  'APPROVED — X AND THE WINGS: X stays in and takes the first man outside the right tackle. R takes anybody wider than X. L takes the first man off the left edge outside the tackle, because with Y gone nobody else is out there. Only the line and X are told to yell; the wings and Super are not.',
+  'APPROVED — THE TIMING: the quarterback takes two steps back, stumbles, and stays low for a two-count before he pops up. The drawn stumble is two yards deep. Y\'s route is the 9 straight off the route tree.',
+  'SUPER, AS DRAWN: he falls to the LEFT of the quarterback\'s feet, never into them, so he cannot trip him for real. The dive is a short solid line up and to the left, then his block turns out to the left, the side the ball is thrown to.',
 ]
 
 export const stumblebumTight: Play = {
@@ -189,7 +191,7 @@ export const stumblebumTight: Play = {
   ballCarrier: 'Q',
   summary: 'Fake a fumble, then throw it deep to Y while they dive for the ball.',
   description:
-    'A trick play. On the snap, Super dives on the ground by the quarterback like the ball is loose and the whole line yells FUMBLE — and keeps blocking like crazy. The quarterback stumbles like he tripped and leans to the ground, but he never lets go of the ball. The defense crashes in to jump on it. Then the quarterback pops up and throws it deep to Y on the 9, up the left sideline, over everybody\'s heads. Y is the only one going out. Everybody else blocks.',
+    'A trick play. On the snap, Super dives and falls to the left of the quarterback like the ball is loose and the whole line yells FUMBLE — and keeps blocking like crazy. The quarterback stumbles like he tripped and leans to the ground, but he never lets go of the ball. The defense crashes in to jump on it. Then the quarterback pops up and throws it deep to Y on the 9, up the left sideline, over everybody\'s heads. Y is the only one going out. Everybody else blocks.',
   assignments,
   vs: { '44': plan, '43': plan, '52': plan } satisfies Record<FrontId, FrontPlan>,
   uncommon: 'Trick play. Call it once a game, when the defense is crashing hard on the run.',
